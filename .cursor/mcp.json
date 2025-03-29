@@ -1,0 +1,64 @@
+{
+    "mcpServers": {
+        "browser": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@agentdeskai/browser-tools-mcp@1.1.0"
+            ]
+          },
+
+          "sequential": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking"
+            ]
+          },
+
+          "filesystem": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-filesystem",
+              "/Users/michael"
+            ]
+          },
+
+          "git": {
+            "command": "uvx",
+            "args": [
+              "mcp-server-git",
+              "--repository",
+              "/Users/michael/CursorProjects/acci_nest"
+            ]
+          },
+
+          "playwright": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@executeautomation/playwright-mcp-server"
+            ]
+          },
+
+          "tavily": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "tavily-mcp"
+            ],
+            "env": {
+              "TAVILY_API_KEY": "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"
+            }
+          },
+
+        "time": {
+            "command": "uvx",
+            "args": [
+              "mcp-server-time"
+            ]
+          }
+    }
+  }
+  

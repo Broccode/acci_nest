@@ -1,0 +1,49 @@
+---
+description: Always obtain real system dates for code actions requiring current dates
+globs: **/*CHANGELOG.md, **/*.sql, **/*.js?, **/*.ts?, **/*.java, **/*.cs, **/*.go, **/*.rs
+alwaysApply: false
+---
+
+# Real Date Retrieval for Code Actions
+
+## Context
+
+- Applied when working with code that requires the current date/time
+- Ensures accurate timestamps in files and code
+- Prevents AI from making up or guessing dates
+- Common use cases: changelogs, file headers, migrations, logs
+
+## Critical Rules
+
+- NEVER manually create or guess the current date/time in code
+- ALWAYS use a system tool to get the real current date/time
+- Use the most appropriate tool based on context:
+  - Use `mcp_time_get_current_time` if available
+  - Use terminal commands like `date` or `Get-Date` (PowerShell) as fallback
+  - For SQL migrations or similar files, ensure UTC format when appropriate
+- Format dates according to project conventions or ISO 8601 (YYYY-MM-DD) if no convention exists
+- When date format is unclear, use ISO 8601 with time (YYYY-MM-DDTHH:MM:SSZ) for maximum compatibility
+
+## Examples
+
+<example>
+// Getting date for a CHANGELOG entry
+run_terminal_cmd("date +%Y-%m-%d")
+
+// Getting date for a file header comment
+mcp_time_get_current_time(timezone="UTC")
+
+// SQL migration filename with timestamp
+run_terminal_cmd("date +%Y%m%d%H%M%S")
+</example>
+
+<example type="invalid">
+// Manually creating a date without using tools
+const currentDate = "2023-11-15"; // AI guessed date
+
+// Using hardcoded date strings
+UPDATE_DATE = "2023-11-15"; // No system tool used
+
+// Ambiguous formatting without checking project standards
+const lastModified = "11/15/2023"; // Not using ISO format
+</example> 

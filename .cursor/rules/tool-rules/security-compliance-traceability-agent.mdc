@@ -1,0 +1,114 @@
+---
+description: Ensures all security-related code changes maintain OWASP Top 10 and SOC2 compliance with proper documentation and traceability
+globs: 
+alwaysApply: false
+---
+
+# Security Compliance Traceability Standard
+
+## Context
+
+- Apply when making security-related code changes or implementing security features
+- Use for all authentication, authorization, encryption, input validation, and session management code
+- Reference when implementing security headers, access controls, and data protection features
+- Follow when making changes to security configurations or dependencies
+- Ensure compliance with OWASP Top 10 and SOC2 requirements is demonstrable
+
+## Critical Rules
+
+- DOCUMENT every security implementation with explicit reference to the specific OWASP Top 10 vulnerability it addresses
+- INCLUDE comprehensive code comments explaining security measures and their purpose
+- CREATE unit and integration tests specifically demonstrating security control effectiveness
+- MAINTAIN a security changelog in the codebase (`SECURITY.md`) tracking all security-related changes
+- ADD commit messages with prefix `[SECURITY]` for all security-related changes
+- IMPLEMENT logging for all security events with appropriate detail level for audit trails
+- VERIFY all dependencies against vulnerability databases during build process
+- ENSURE all security configurations are parameterized and documented
+- CREATE security control mapping documents that link code implementation to compliance requirements
+
+## Examples
+
+<example>
+// User authentication service - Addresses OWASP A2:2021 (Cryptographic Failures)
+@Injectable()
+export class AuthService {
+  constructor(
+    private userRepository: UserRepository,
+    private encryptionService: EncryptionService,
+    private auditLogger: AuditLogger,
+  ) {}
+
+  /**
+   * Authenticates a user with secure password verification
+   * @param credentials User login credentials
+   * @returns User session with JWT token
+   * @security OWASP A2:2021, A7:2021 - Implements secure password handling and authentication logging
+   */
+  async authenticate(credentials: UserCredentials): Promise<AuthResult> {
+    // Log authentication attempt for audit trail (SOC2 - Security Monitoring)
+    await this.auditLogger.log({
+      action: 'LOGIN_ATTEMPT',
+      targetUser: credentials.username,
+      timestamp: new Date(),
+      ipAddress: credentials.ipAddress,
+    });
+    
+    // Look up user with rate limiting to prevent brute force (OWASP A4:2021)
+    const user = await this.userRepository.findByUsername(credentials.username);
+    
+    // Secure password verification with constant-time comparison (OWASP A2:2021)
+    const isValid = await this.encryptionService.verifyPassword(
+      credentials.password,
+      user?.passwordHash
+    );
+    
+    if (!isValid || !user) {
+      // Log failed attempt (SOC2 - Security Monitoring)
+      await this.auditLogger.log({
+        action: 'LOGIN_FAILED',
+        targetUser: credentials.username,
+        timestamp: new Date(),
+        ipAddress: credentials.ipAddress,
+      });
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    
+    // Generate JWT with proper expiration (OWASP A2:2021)
+    const token = this.generateSecureToken(user);
+    
+    // Log successful authentication (SOC2 - Security Monitoring)
+    await this.auditLogger.log({
+      action: 'LOGIN_SUCCESS',
+      targetUser: user.id,
+      timestamp: new Date(),
+      ipAddress: credentials.ipAddress,
+    });
+    
+    return { user, token };
+  }
+}
+</example>
+
+<example type="invalid">
+@Injectable()
+export class AuthService {
+  constructor(
+    private userRepo: UserRepository,
+  ) {}
+
+  // Basic login function
+  async login(username: string, password: string) {
+    const user = await this.userRepo.findByUsername(username);
+    
+    // Simple password check
+    if (user && user.password === password) {
+      return { 
+        user, 
+        token: this.generateToken(user)
+      };
+    }
+    
+    return null;
+  }
+}
+</example> 

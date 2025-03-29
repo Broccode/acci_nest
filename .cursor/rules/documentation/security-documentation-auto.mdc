@@ -1,0 +1,90 @@
+---
+description: 
+globs: SECURITY.md, security/**/*.md, docs/security/**/*.md
+alwaysApply: false
+---
+
+# Security Documentation Standard
+
+## Context
+
+- Apply when creating or updating security documentation
+- Use for security compliance mapping documentation
+- Reference when documenting security controls, tests, or audit evidence
+- Follow for all OWASP Top 10 and SOC2 compliance documentation
+
+## Critical Rules
+
+- ORGANIZE documentation with clear traceability to OWASP Top 10 categories and SOC2 trust principles
+- INCLUDE compliance mapping tables linking requirements to implementations
+- PROVIDE specific code references where security controls are implemented
+- MAINTAIN a comprehensive security control inventory in `SECURITY.md`
+- DOCUMENT security testing approaches and evidence collection methods
+- CREATE security-specific test documentation with explicit compliance references
+- ESTABLISH changelog format that tracks security improvements over time
+- INCLUDE implementation details that demonstrate compliance intent
+
+## Examples
+
+<example>
+# Authentication Security Controls
+
+## Compliance Mapping
+
+| Control ID | OWASP Category | SOC2 Principle | Implementation | Test Evidence |
+|------------|----------------|----------------|----------------|---------------|
+| AUTH-01 | A2:2021 - Cryptographic Failures | Security - Access Control | Password hashing with Argon2id in `src/auth/services/encryption.service.ts` | Unit tests in `tests/auth/password-security.spec.ts` demonstrate resistance to brute force attacks |
+| AUTH-02 | A7:2021 - Identification and Authentication Failures | Security - Access Control | Multi-factor authentication in `src/auth/services/mfa.service.ts` | Integration tests in `tests/auth/mfa-workflow.spec.ts` verify complete authentication flow |
+| AUTH-03 | A4:2021 - Insecure Design | Security - Monitoring | Login attempt rate limiting in `src/auth/guards/brute-force.guard.ts` | Load tests in `tests/security/rate-limiting.spec.ts` demonstrate protection against brute force |
+
+## Implementation Details
+
+### AUTH-01: Secure Password Storage
+
+Password security is implemented using the Argon2id algorithm with the following parameters:
+- Memory cost: 65536 KB
+- Time cost: 3 iterations
+- Parallelism: 4 threads
+- Salt length: 16 bytes
+
+This configuration exceeds OWASP recommendations for password storage security and provides protection against:
+- Rainbow table attacks
+- Brute force attacks
+- Hardware-accelerated cracking attempts
+
+```typescript
+// Implementation reference from src/auth/services/encryption.service.ts
+export class EncryptionService {
+  async hashPassword(password: string): Promise<string> {
+    // Argon2id implementation with secure parameters
+    return argon2.hash(password, {
+      type: argon2.argon2id,
+      memoryCost: 65536,
+      timeCost: 3,
+      parallelism: 4,
+    });
+  }
+}
+```
+
+### Test Evidence
+
+Password security is verified through:
+1. Unit tests that confirm proper hashing implementation
+2. Timing tests that verify constant-time comparison
+3. Integration tests that validate the complete authentication flow
+</example>
+
+<example type="invalid">
+# Security Notes
+
+We use secure authentication with passwords and JWT tokens.
+
+The system has various security features like:
+- Password protection
+- JWT tokens
+- Rate limiting
+- Encryption
+
+We follow good security practices and industry standards.
+</example> 

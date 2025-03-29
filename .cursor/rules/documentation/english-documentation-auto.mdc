@@ -1,0 +1,62 @@
+---
+description: 
+globs: .ai/prd.md, .ai/arch.md, docs/**/*architecture*.md
+alwaysApply: false
+---
+
+# English Documentation Standard
+
+## Context
+
+- When working with any Product Requirement Document (PRD)
+- When creating or editing architecture documents
+- When establishing project documentation that needs to be shared across teams
+- When creating documentation that will be referenced in code or technical contexts
+
+## Critical Rules
+
+- ALL documentation for PRDs and architecture MUST be written in English
+- Headings, descriptions, requirements, and all content must be English
+- Code examples and references in documentation must be in English
+- Only UI-specific content may be in non-English languages when required for the end-user
+- Technical terms should follow industry-standard English terminology
+- Translation must be provided immediately if non-English content is necessary for business context
+- Diagrams must have English labels and descriptions
+
+## Examples
+
+<example>
+# Project Architecture Document
+
+## System Overview
+The system consists of three main components:
+1. Authentication service
+2. Core API
+3. Data processing pipeline
+
+```typescript
+// Example API endpoint implementation
+@Post('users')
+async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+  return this.userService.create(createUserDto);
+}
+```
+</example>
+
+<example type="invalid">
+# Projekt Architektur Dokument
+
+## System Übersicht
+Das System besteht aus drei Hauptkomponenten:
+1. Authentifizierungsdienst
+2. Kern-API
+3. Datenverarbeitungspipeline
+
+```typescript
+// Beispiel einer API-Endpunkt-Implementierung
+@Post('users')
+async benutzerErstellen(@Body() erstelleBenutzerDto: CreateUserDto): Promise<User> {
+  return this.benutzerService.erstellen(erstelleBenutzerDto);
+}
+```
+</example> 

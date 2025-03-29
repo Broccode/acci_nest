@@ -1,0 +1,56 @@
+---
+description: Use for deep research requests requiring real-time data with accurate date context
+globs: 
+alwaysApply: false
+---
+
+# Time-Aware Tavily Research
+
+## Context
+
+- Applied when user requests deep research or information that may be time-sensitive
+- Prevents outdated information based on AI's training cutoff
+- Ensures research is grounded in current date/time context
+- Particularly important for news, current events, market data, or evolving topics
+
+## Critical Rules
+
+- ALWAYS get current system date/time BEFORE conducting research
+- ALWAYS use web_search tool for research when Tavily tools are not available
+- INCLUDE real system date in all search queries for context
+- ADAPT search parameters based on date relevance when possible
+- DOCUMENT the current date/time in your response to the user
+- NEVER rely on your training data for date-sensitive information
+- VERIFY information timeline using the current system date as reference
+- AVOID phrases like "as of my training data" or "last I knew" without checking
+
+## Examples
+
+<example>
+User: Research the latest developments in AI regulation
+
+// First, get current date
+mcp_time_get_current_time(timezone="UTC")
+// Result shows 2025-03-15
+
+// Use date-aware web search
+web_search({
+  search_term: "Latest AI regulation developments as of March 2025",
+  explanation: "Researching current AI regulations with time context"
+})
+
+AI: Basierend auf meiner Recherche vom 15. März 2025 sind die neuesten Entwicklungen in der KI-Regulierung...
+</example>
+
+<example type="invalid">
+User: Research the latest developments in AI regulation
+
+// Using search without getting current date first
+web_search({
+  search_term: "Latest AI regulation developments",
+  explanation: "Researching AI regulations"
+})
+
+// Or making date assumptions based on training data
+AI: Nach meinem Wissensstand von 2023 sind die neuesten Entwicklungen in der KI-Regulierung...
+</example>

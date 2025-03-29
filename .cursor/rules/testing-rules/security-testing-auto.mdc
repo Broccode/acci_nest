@@ -1,0 +1,126 @@
+---
+description: 
+globs: tests/**/*.spec.ts, tests/**/*.test.ts, src/**/*.spec.ts, src/**/*.test.ts
+alwaysApply: false
+---
+
+# Security Testing Standard
+
+## Context
+
+- Apply when creating or updating security-related tests
+- Use for testing authentication, authorization, encryption, and data protection
+- Reference when implementing tests for input validation and output encoding
+- Follow when testing API security, session management, and access controls
+- Ensure all tests provide evidence of OWASP Top 10 and SOC2 compliance
+
+## Critical Rules
+
+- INCLUDE explicit compliance tags in test descriptions (e.g., `@security OWASP:A3:2021`)
+- CREATE specific test cases for each identified security control
+- IMPLEMENT positive and negative test cases for all security functionality
+- TEST boundary conditions and edge cases for all security-critical code
+- VERIFY security behavior under error conditions and exceptional cases
+- DOCUMENT evidence collection purpose in test comments
+- ORGANIZE tests to clearly map to security requirements
+- INCLUDE security-focused assertions that clearly validate security properties
+- VALIDATE security configurations are correctly applied
+
+## Examples
+
+<example>
+// tests/auth/password-security.spec.ts
+import { EncryptionService } from '../../src/auth/services/encryption.service';
+
+describe('Password Security (OWASP A2:2021, SOC2-Security)', () => {
+  let encryptionService: EncryptionService;
+
+  beforeEach(() => {
+    encryptionService = new EncryptionService();
+  });
+
+  /**
+   * @security OWASP:A2:2021 - Cryptographic Failures
+   * @evidence SOC2:Security - Demonstrates secure password storage
+   */
+  it('should hash passwords using Argon2id with secure parameters', async () => {
+    // Given a plain text password
+    const password = 'securePassword123!';
+    
+    // When we hash the password
+    const hashedPassword = await encryptionService.hashPassword(password);
+    
+    // Then it should use Argon2id (verify algorithm identifier is present)
+    expect(hashedPassword).toContain('$argon2id$');
+    
+    // And it should include appropriate work factors (memory, iterations, parallelism)
+    const segments = hashedPassword.split('$');
+    const paramSegment = segments[3];
+    const [m, t, p] = paramSegment.split(',');
+    
+    // Extract and verify memory cost
+    const memoryCost = parseInt(m.substring(1), 10);
+    expect(memoryCost).toBeGreaterThanOrEqual(65536); // OWASP recommended minimum
+    
+    // Extract and verify time cost
+    const timeCost = parseInt(t.substring(1), 10);
+    expect(timeCost).toBeGreaterThanOrEqual(3); // OWASP recommended minimum
+    
+    // Extract and verify parallelism
+    const parallelism = parseInt(p.substring(1), 10);
+    expect(parallelism).toBeGreaterThanOrEqual(1);
+  });
+
+  /**
+   * @security OWASP:A7:2021 - Identification and Authentication Failures
+   * @evidence SOC2:Security - Demonstrates protection against timing attacks
+   */
+  it('should use constant-time comparison for password verification', async () => {
+    // Given a stored password hash
+    const password = 'securePassword123!';
+    const hash = await encryptionService.hashPassword(password);
+    
+    // Measure time for correct password verification
+    const startCorrect = process.hrtime.bigint();
+    const validResult = await encryptionService.verifyPassword(password, hash);
+    const endCorrect = process.hrtime.bigint();
+    const correctDuration = Number(endCorrect - startCorrect);
+    
+    // Measure time for incorrect password verification (same length)
+    const badPassword = 'securePassword123@';
+    const startIncorrect = process.hrtime.bigint();
+    const invalidResult = await encryptionService.verifyPassword(badPassword, hash);
+    const endIncorrect = process.hrtime.bigint();
+    const incorrectDuration = Number(endIncorrect - startIncorrect);
+    
+    // Verify results are correct
+    expect(validResult).toBe(true);
+    expect(invalidResult).toBe(false);
+    
+    // Check timing difference is within acceptable range
+    // Note: This is a simplified version - real tests would use statistical approaches
+    // with multiple iterations to account for system variations
+    const difference = Math.abs(correctDuration - incorrectDuration);
+    const maxAllowedDifference = correctDuration * 0.1; // Allow 10% difference
+    
+    expect(difference).toBeLessThan(maxAllowedDifference);
+  });
+});
+</example>
+
+<example type="invalid">
+// tests/auth.test.ts
+describe('Authentication tests', () => {
+  it('should check password', async () => {
+    const authService = new AuthService();
+    const result = await authService.login('user', 'pass');
+    expect(result).toBeTruthy();
+  });
+  
+  it('should verify token', async () => {
+    const token = 'some.jwt.token';
+    const result = await authService.verifyToken(token);
+    expect(result.valid).toBe(true);
+  });
+});
+</example> 
