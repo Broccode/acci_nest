@@ -1,0 +1,192 @@
+---
+description: Ensures the plugin system implementation follows the standards defined in the PRD, maintaining proper extensibility, isolation, and compatibility
+globs: 
+alwaysApply: false
+---
+
+# Plugin System Compliance Standard
+
+## Context
+
+- Apply when implementing plugin system infrastructure
+- Use when creating new plugins
+- Reference when defining plugin interfaces
+- Follow when implementing plugin registration and discovery
+- Check when implementing plugin lifecycle hooks
+
+## Critical Rules
+
+- IMPLEMENT plugin interfaces as defined in the architecture
+- CREATE proper plugin registration and discovery mechanisms
+- ENSURE plugins can be loaded and unloaded dynamically
+- IMPLEMENT proper dependency management between plugins
+- ISOLATE plugin code from core framework to prevent tight coupling
+- IMPLEMENT version compatibility checking for plugins
+- CREATE standardized configuration mechanism for plugins
+- ENSURE plugins follow security standards and cannot compromise the system
+- DOCUMENT plugin interfaces and extension points
+- PROVIDE lifecycle hooks for plugin initialization and shutdown
+- IMPLEMENT proper error handling for plugin failures
+- TEST plugins in isolation from the core framework
+
+## Examples
+
+<example>
+// src/plugins/engine/plugin.interface.ts
+export interface Plugin {
+  /**
+   * Unique identifier for the plugin
+   */
+  id: string;
+  
+  /**
+   * Display name of the plugin
+   */
+  name: string;
+  
+  /**
+   * Semantic version of the plugin
+   */
+  version: string;
+  
+  /**
+   * Optional array of plugin IDs this plugin depends on
+   */
+  dependencies?: string[];
+  
+  /**
+   * Initialize the plugin
+   * @param app NestJS application instance
+   */
+  initialize(app: INestApplication): Promise<void>;
+  
+  /**
+   * Optional cleanup method called when plugin is disabled
+   */
+  onShutdown?(): Promise<void>;
+}
+
+// src/plugins/engine/plugin-registry.service.ts
+@Injectable()
+export class PluginRegistry {
+  private plugins: Map<string, RegisteredPlugin> = new Map();
+  private logger = new Logger(PluginRegistry.name);
+  
+  constructor(
+    private configService: ConfigService,
+    private dependencyResolver: DependencyResolver,
+  ) {}
+  
+  /**
+   * Register a plugin with the registry
+   */
+  async registerPlugin(plugin: Plugin): Promise<void> {
+    // Verify the plugin implements the required interface
+    this.validatePlugin(plugin);
+    
+    // Check if plugin with this ID is already registered
+    if (this.plugins.has(plugin.id)) {
+      throw new ConflictException(`Plugin with ID ${plugin.id} is already registered`);
+    }
+    
+    // Check framework compatibility
+    this.checkFrameworkCompatibility(plugin);
+    
+    // Register the plugin
+    this.plugins.set(plugin.id, {
+      plugin,
+      status: PluginStatus.REGISTERED,
+      registeredAt: new Date(),
+    });
+    
+    this.logger.log(`Plugin ${plugin.name} (${plugin.id}) registered successfully`);
+  }
+  
+  /**
+   * Initialize all registered plugins in dependency order
+   */
+  async initializePlugins(app: INestApplication): Promise<void> {
+    // Resolve dependencies and get initialization order
+    const orderedPlugins = this.dependencyResolver.resolveInitializationOrder(
+      Array.from(this.plugins.values()).map(p => p.plugin)
+    );
+    
+    // Initialize each plugin in order
+    for (const plugin of orderedPlugins) {
+      try {
+        this.logger.log(`Initializing plugin: ${plugin.name}`);
+        
+        // Update status to initializing
+        this.updatePluginStatus(plugin.id, PluginStatus.INITIALIZING);
+        
+        // Call plugin's initialize method
+        await plugin.initialize(app);
+        
+        // Update status to active
+        this.updatePluginStatus(plugin.id, PluginStatus.ACTIVE);
+        
+        this.logger.log(`Plugin ${plugin.name} initialized successfully`);
+      } catch (error) {
+        this.logger.error(`Failed to initialize plugin ${plugin.name}: ${error.message}`, error.stack);
+        this.updatePluginStatus(plugin.id, PluginStatus.ERROR, error.message);
+        
+        // Handle initialization failure based on configuration
+        if (this.configService.get('plugins.strictMode') === true) {
+          throw new Error(`Plugin initialization failed: ${plugin.name}`);
+        }
+      }
+    }
+  }
+  
+  // Additional plugin registry methods...
+}
+</example>
+
+<example type="invalid">
+// src/plugins/registry.ts - Poor plugin implementation
+class PluginManager {
+  plugins = [];
+  
+  // No proper interface definition
+  // No dependency management
+  // No version checking
+  
+  // Insecure plugin loading - no validation
+  loadPlugin(pluginPath) {
+    const plugin = require(pluginPath);
+    this.plugins.push(plugin);
+    
+    // Direct access to application internals - no isolation
+    plugin.init(global.app);
+    
+    // No error handling
+    return true;
+  }
+  
+  // No lifecycle management
+  // No shutdown hooks
+  // No plugin status tracking
+  
+  // Global singleton access - tight coupling
+  static getInstance() {
+    if (!PluginManager.instance) {
+      PluginManager.instance = new PluginManager();
+    }
+    return PluginManager.instance;
+  }
+}
+
+// Direct use of core internals in plugin - tight coupling
+const myPlugin = {
+  name: 'my-plugin',
+  init: (app) => {
+    // Direct modification of core components
+    app.services.userService.findUser = function() {
+      // Override core functionality
+    };
+    
+    // Direct database access without going through proper interfaces
+    app.db.query('UPDATE users SET role = "admin"');
+  }
+};
+</example> 

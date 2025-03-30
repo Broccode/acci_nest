@@ -1,0 +1,152 @@
+---
+description: Enforces testing standards defined in the PRD with >80% code coverage requirement and ensures proper test implementation for all application layers
+globs: 
+alwaysApply: false
+---
+
+# Testing Coverage Standard
+
+## Context
+
+- Apply when implementing new features or services
+- Use when reviewing test coverage
+- Reference when writing unit, integration, or E2E tests
+- Follow when implementing critical business logic
+- Check when preparing code for production deployment
+
+## Critical Rules
+
+- MAINTAIN minimum 80% code coverage for all modules
+- IMPLEMENT unit tests for all services, repositories, and utilities
+- CREATE integration tests for all API endpoints and service integrations
+- DEVELOP E2E tests for critical user journeys and workflows
+- IMPLEMENT performance tests for performance-critical operations
+- USE proper test doubles (mocks, stubs, spies) to isolate test units
+- ORGANIZE tests in a structure that mirrors the source code
+- FOLLOW AAA pattern (Arrange-Act-Assert) in test implementation
+- TEST both success and failure scenarios for all functionality
+- IMPLEMENT security-focused tests for authentication and authorization
+- VERIFY all business rules with specific test cases
+- DOCUMENT test purpose with clear descriptions
+
+## Examples
+
+<example>
+// src/core/user-management/services/user.service.spec.ts
+describe('UserService', () => {
+  let userService: UserService;
+  let userRepository: MockType<UserRepository>;
+  let encryptionService: MockType<EncryptionService>;
+  
+  beforeEach(async () => {
+    // Arrange: Set up the test module with mocked dependencies
+    const module = await Test.createTestingModule({
+      providers: [
+        UserService,
+        {
+          provide: UserRepository,
+          useFactory: mockRepository,
+        },
+        {
+          provide: EncryptionService,
+          useFactory: mockService,
+        },
+      ],
+    }).compile();
+    
+    userService = module.get(UserService);
+    userRepository = module.get(UserRepository);
+    encryptionService = module.get(EncryptionService);
+  });
+  
+  describe('createUser', () => {
+    it('should create a new user successfully', async () => {
+      // Arrange: Set up test data and mock responses
+      const userData = {
+        email: 'test@example.com',
+        password: 'SecurePass123!',
+        firstName: 'Test',
+        lastName: 'User',
+      };
+      
+      const hashedPassword = 'hashed_password';
+      const savedUser = {
+        id: 'user-id',
+        email: userData.email,
+        passwordHash: hashedPassword,
+        profile: {
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          preferredLanguage: 'en',
+        },
+        createdAt: new Date(),
+      };
+      
+      // Mock dependencies behavior
+      userRepository.findByEmail.mockResolvedValue(null);
+      encryptionService.hashPassword.mockResolvedValue(hashedPassword);
+      userRepository.save.mockResolvedValue(savedUser);
+      
+      // Act: Call the method being tested
+      const result = await userService.createUser(userData);
+      
+      // Assert: Verify the results
+      expect(userRepository.findByEmail).toHaveBeenCalledWith(userData.email);
+      expect(encryptionService.hashPassword).toHaveBeenCalledWith(userData.password);
+      expect(userRepository.save).toHaveBeenCalled();
+      expect(result).toEqual(savedUser);
+    });
+    
+    it('should throw ConflictException when user with the same email already exists', async () => {
+      // Arrange: Set up test data for the failure case
+      const userData = {
+        email: 'existing@example.com',
+        password: 'SecurePass123!',
+        firstName: 'Existing',
+        lastName: 'User',
+      };
+      
+      const existingUser = {
+        id: 'existing-id',
+        email: userData.email,
+      };
+      
+      // Mock the repository to return an existing user
+      userRepository.findByEmail.mockResolvedValue(existingUser);
+      
+      // Act & Assert: Verify the exception is thrown
+      await expect(userService.createUser(userData)).rejects.toThrow(ConflictException);
+      expect(userRepository.findByEmail).toHaveBeenCalledWith(userData.email);
+      expect(userRepository.save).not.toHaveBeenCalled();
+    });
+  });
+});
+</example>
+
+<example type="invalid">
+// src/services/user.service.test.js - Insufficient testing
+describe('UserService', () => {
+  // Missing test setup with proper mocks
+  const userService = new UserService();
+  
+  // Only testing happy path - no failure cases
+  test('should create user', () => {
+    const result = userService.createUser({
+      name: 'Test',
+      email: 'test@example.com'
+    });
+    
+    // Weak assertions
+    expect(result).toBeDefined();
+    
+    // No verification of interactions with dependencies
+    // No testing of business rules
+    // No error handling tests
+  });
+  
+  // Missing tests for other methods
+  // No integration tests
+  // No edge case testing
+  // No security-related tests
+});
+</example> 

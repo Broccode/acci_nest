@@ -1,0 +1,198 @@
+---
+description: Ensures Docker Compose configurations follow the deployment standards defined in the PRD, facilitating consistent environments and zero-downtime deployments
+globs: 
+alwaysApply: false
+---
+
+# Docker Compose Deployment Standard
+
+## Context
+
+- Apply when creating or updating Docker Compose configuration files
+- Use when configuring service dependencies
+- Reference when setting up environment-specific configurations
+- Follow when implementing deployment scripts
+- Check when configuring container networking and volumes
+
+## Critical Rules
+
+- IMPLEMENT separate Docker Compose configurations for each environment
+- USE environment variables with .env files for configuration
+- CREATE health checks for all services to verify readiness
+- CONFIGURE appropriate resource limits for containers
+- IMPLEMENT proper service dependency management with depends_on
+- DEFINE named volumes for persistent data storage
+- SETUP proper networking between services
+- CONFIGURE logging drivers and options for observability
+- IMPLEMENT restart policies for service reliability
+- ENSURE secure storage of sensitive configuration (secrets)
+- CREATE consistent service naming conventions
+- PROVIDE zero-downtime deployment configurations
+- DOCUMENT all custom configuration parameters
+
+## Examples
+
+<example>
+# docker-compose.yml - Base configuration
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: acci-nest-api:${APP_VERSION:-latest}
+    container_name: acci-nest-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${POSTGRES_DB}
+      DATABASE_USER: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-15m}
+    ports:
+      - "${API_PORT:-3000}:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    volumes:
+      - api-logs:/app/logs
+    networks:
+      - acci-network
+
+  postgres:
+    image: postgres:13-alpine
+    container_name: acci-nest-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-acci_nest}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-acci_nest}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - acci-network
+
+  redis:
+    image: redis:6-alpine
+    container_name: acci-nest-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redis}
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - acci-network
+
+volumes:
+  postgres-data:
+    name: acci-nest-postgres-data
+  redis-data:
+    name: acci-nest-redis-data
+  api-logs:
+    name: acci-nest-api-logs
+
+networks:
+  acci-network:
+    name: acci-nest-network
+
+# docker-compose.override.yml - Development environment specific
+version: '3.8'
+
+services:
+  api:
+    build:
+      target: development
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    command: npm run start:dev
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+  # Optional development-only services
+  adminer:
+    image: adminer:latest
+    container_name: acci-nest-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - acci-network
+</example>
+
+<example type="invalid">
+# docker-compose.yml - Problematic configuration
+version: '3'
+
+services:
+  api:
+    build: .
+    # No versioning for images
+    # No container name
+    # No restart policy
+    ports:
+      - "3000:3000"
+    # No health checks
+    # No resource constraints
+    # Hardcoded environment variables
+    environment:
+      DATABASE_URL: postgres://postgres:password@db:5432/app
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY: supersecretkey123
+    # No proper volumes for logs
+    
+  db:
+    image: postgres
+    # No version pinning
+    # No environment variables for credentials
+    # No volumes for data persistence
+    # No health checks
+    ports:
+      - "5432:5432"
+    # Database credentials exposed in plain text
+    environment:
+      POSTGRES_PASSWORD: password
+    
+  redis:
+    image: redis
+    # No version pinning
+    # No authentication
+    # No persistence
+    # No health checks
+    
+  # No named volumes
+  # No networks
+  # No environment-specific configurations
+  # No proper dependency management
+</example> 

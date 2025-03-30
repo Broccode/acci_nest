@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial package configuration
 - Project README with detailed documentation
 - MIT License
+- Additional cursor rules for architecture, testing, security, and API
 
 ## [0.1.0] - YYYY-MM-DD
 

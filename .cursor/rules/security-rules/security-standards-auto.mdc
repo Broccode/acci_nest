@@ -1,0 +1,153 @@
+---
+description: 
+globs: src/**/*.ts
+alwaysApply: false
+---
+
+# Security Standards
+
+## Context
+
+- Apply when implementing authentication and authorization
+- Use when handling sensitive data
+- Reference when implementing input validation
+- Follow when creating new API endpoints
+- Check when implementing data access code
+
+## Critical Rules
+
+- IMPLEMENT secure authentication with proper password hashing (Argon2id)
+- USE HTTPS/TLS for all communications
+- IMPLEMENT proper input validation for all user-provided data
+- USE parameterized queries to prevent SQL injection
+- IMPLEMENT Content Security Policy headers
+- IMPLEMENT proper CORS configuration
+- ENFORCE role-based access control for all protected resources
+- ENCRYPT sensitive data at rest
+- IMPLEMENT proper session management with secure cookies
+- LOG all security-relevant events
+- IMPLEMENT rate limiting for authentication endpoints
+- VALIDATE JWT tokens with proper signature verification
+- IMPLEMENT multi-factor authentication where required
+- SET secure HTTP headers (X-XSS-Protection, X-Content-Type-Options, etc.)
+- AVOID exposing sensitive information in error messages
+- DOCUMENT all security measures with references to OWASP/SOC2
+
+## Examples
+
+<example>
+// src/core/user-management/services/auth.service.ts
+@Injectable()
+export class AuthService {
+  constructor(
+    private userRepository: UserRepository,
+    private jwtService: JwtService,
+    private configService: ConfigService,
+    private securityLogger: SecurityLogger,
+  ) {}
+
+  /**
+   * Authenticate user with proper security measures
+   * Addresses OWASP A2:2021 and A7:2021
+   */
+  async authenticate(credentials: AuthCredentialsDto): Promise<TokenResponseDto> {
+    const { username, password, ipAddress, userAgent } = credentials;
+    
+    // Log authentication attempt (SOC2 compliance)
+    await this.securityLogger.logAuthAttempt({
+      username,
+      ipAddress,
+      userAgent,
+      timestamp: new Date(),
+    });
+    
+    // Rate limiting check (OWASP A7:2021)
+    await this.checkRateLimiting(username, ipAddress);
+    
+    // Find user with case-insensitive username matching
+    const user = await this.userRepository.findByUsername(username.toLowerCase());
+    
+    // Secure password verification with constant-time comparison (OWASP A7:2021)
+    const isValid = user && await argon2.verify(user.passwordHash, password);
+    
+    if (!isValid) {
+      // Log failed attempt (SOC2 compliance)
+      await this.securityLogger.logFailedAuth({
+        username,
+        ipAddress,
+        userAgent,
+        reason: 'Invalid credentials',
+      });
+      
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    
+    // Check MFA requirement if enabled (OWASP A7:2021)
+    if (user.mfaEnabled) {
+      return this.handleMfaFlow(user, credentials);
+    }
+    
+    // Generate short-lived JWT (OWASP A2:2021)
+    const token = this.jwtService.sign(
+      { 
+        sub: user.id,
+        tenantId: user.tenantId,
+        roles: user.roles.map(r => r.name),
+      },
+      {
+        expiresIn: this.configService.get('JWT_EXPIRATION') || '15m',
+      },
+    );
+    
+    // Generate refresh token with proper security measures
+    const refreshToken = await this.createRefreshToken(user, ipAddress, userAgent);
+    
+    // Log successful authentication (SOC2 compliance)
+    await this.securityLogger.logSuccessfulAuth({
+      userId: user.id,
+      username,
+      ipAddress,
+      userAgent,
+    });
+    
+    return {
+      accessToken: token,
+      refreshToken: refreshToken.token,
+      expiresIn: this.configService.get('JWT_EXPIRATION') || '15m',
+    };
+  }
+}
+</example>
+
+<example type="invalid">
+// src/auth/auth.service.ts - Security issues
+@Injectable()
+export class AuthService {
+  constructor(private userRepo: Repository<User>) {}
+
+  // Insecure authentication implementation
+  async login(username: string, password: string) {
+    // Direct SQL query - SQL injection risk
+    const user = await this.userRepo.query(
+      `SELECT * FROM users WHERE username = '${username}'`
+    );
+    
+    // Insecure password comparison
+    if (user && user.password === password) {
+      // No expiration on token - security risk
+      const token = jwt.sign({ userId: user.id }, 'secret');
+      
+      // No refresh token mechanism
+      // No logging of authentication events
+      return { token };
+    }
+    
+    return null;
+  }
+  
+  // No rate limiting
+  // No MFA support
+  // No secure password hashing
+  // No proper error handling
+}
+</example> 

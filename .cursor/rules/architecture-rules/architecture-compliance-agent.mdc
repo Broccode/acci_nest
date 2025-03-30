@@ -1,0 +1,90 @@
+---
+description: Ensures code changes adhere to the Domain-Driven Design architecture defined in the PRD, maintaining proper project structure and modular separation
+globs: 
+alwaysApply: false
+---
+
+# Architecture Compliance Standard
+
+## Context
+
+- Apply when creating new modules, services, or components
+- Use when modifying the project structure
+- Reference when implementing domain entities or repositories
+- Follow when implementing business logic in services
+- Check when creating new API endpoints or GraphQL resolvers
+
+## Critical Rules
+
+- MAINTAIN the defined project structure with clear separation of concerns
+- PLACE code in the appropriate directory based on its responsibility
+- IMPLEMENT repositories for data access, not direct database calls in services
+- CREATE domain entities as defined in the PRD with proper encapsulation
+- SEPARATE business logic in domain services from API controllers
+- FOLLOW dependency injection patterns throughout the application
+- IMPLEMENT proper layering with controllers/resolvers → services → repositories
+- AVOID cross-module dependencies that violate the architectural boundaries
+
+## Examples
+
+<example>
+// src/core/user-management/services/user.service.ts
+@Injectable()
+export class UserService {
+  constructor(
+    private userRepository: UserRepository,
+    private encryptionService: EncryptionService,
+  ) {}
+  
+  async createUser(userData: CreateUserDto): Promise<User> {
+    // Domain validation logic
+    if (await this.userRepository.findByEmail(userData.email)) {
+      throw new ConflictException('User with this email already exists');
+    }
+    
+    // Entity creation using domain model
+    const user = new UserEntity();
+    user.email = userData.email;
+    user.passwordHash = await this.encryptionService.hashPassword(userData.password);
+    user.profile = {
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      preferredLanguage: userData.preferredLanguage || 'en',
+    };
+    
+    // Persistence through repository
+    return this.userRepository.save(user);
+  }
+}
+</example>
+
+<example type="invalid">
+// src/api/rest/users.controller.ts - Violates architecture by mixing concerns
+@Controller('users')
+export class UsersController {
+  constructor(
+    @InjectRepository(User) private userRepo: Repository<User>,
+    private configService: ConfigService,
+  ) {}
+  
+  @Post()
+  async createUser(@Body() userData: any) {
+    // Direct database access in controller - violates layering
+    const existingUser = await this.userRepo.findOne({ where: { email: userData.email } });
+    if (existingUser) {
+      throw new HttpException('User exists', 409);
+    }
+    
+    // Business logic in controller - should be in service
+    const user = new User();
+    user.email = userData.email;
+    
+    // Direct password handling - security logic should be in a service
+    const salt = crypto.randomBytes(16).toString('hex');
+    user.passwordHash = crypto.pbkdf2Sync(userData.password, salt, 1000, 64, 'sha512').toString('hex');
+    
+    // Direct repository access for persistence
+    return this.userRepo.save(user);
+  }
+}
+</example> 

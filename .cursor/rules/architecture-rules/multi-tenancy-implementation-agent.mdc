@@ -1,0 +1,108 @@
+---
+description: Enforces correct implementation of multi-tenancy requirements as defined in the PRD, ensuring proper tenant isolation across all application layers
+globs: 
+alwaysApply: false
+---
+
+# Multi-Tenancy Implementation Standard
+
+## Context
+
+- Apply when implementing tenant-aware repositories or services
+- Use when working on database queries that need tenant isolation
+- Reference when implementing tenant context management
+- Follow when creating APIs that must respect tenant boundaries
+- Check when implementing cross-tenant operations
+
+## Critical Rules
+
+- INCLUDE tenant context in all data access operations
+- EXTEND repositories with TenantAwareRepository for automatic tenant filtering
+- IMPLEMENT tenant resolution using the defined strategies (URL, header, JWT)
+- VALIDATE tenant access in middleware before processing requests
+- PROPAGATE tenant context through the entire request pipeline
+- ENSURE secure cross-tenant operations with explicit authorization checks
+- ISOLATE tenant-specific configurations and customizations
+- IMPLEMENT tenant-specific database schemas or row-level security
+
+## Examples
+
+<example>
+// src/core/multi-tenancy/repositories/tenant-aware.repository.ts
+export abstract class TenantAwareRepository<T extends BaseEntity> {
+  constructor(
+    @InjectRepository(EntityClass) protected repository: Repository<T>,
+    @Inject(TENANT_CONTEXT) protected tenantContext: TenantContext,
+  ) {}
+  
+  async findAll(options?: FindManyOptions<T>): Promise<T[]> {
+    const tenantId = this.tenantContext.getCurrentTenant();
+    
+    // Apply tenant filter to all queries
+    return this.repository.find({
+      ...options,
+      where: {
+        ...(options?.where || {}),
+        tenantId,
+      },
+    });
+  }
+  
+  async findOne(id: string): Promise<T> {
+    const tenantId = this.tenantContext.getCurrentTenant();
+    
+    const entity = await this.repository.findOne({
+      where: {
+        id,
+        tenantId,
+      } as any,
+    });
+    
+    if (!entity) {
+      throw new NotFoundException(`Entity with ID ${id} not found`);
+    }
+    
+    return entity;
+  }
+  
+  // Other repository methods with tenant filtering...
+}
+
+// src/domain/repositories/product.repository.ts
+@Injectable()
+export class ProductRepository extends TenantAwareRepository<Product> {
+  constructor(
+    @InjectRepository(Product) repository: Repository<Product>,
+    @Inject(TENANT_CONTEXT) tenantContext: TenantContext,
+  ) {
+    super(repository, tenantContext);
+  }
+  
+  // Product-specific repository methods...
+}
+</example>
+
+<example type="invalid">
+// src/domain/repositories/user.repository.ts - Missing tenant isolation
+@Injectable()
+export class UserRepository {
+  constructor(
+    @InjectRepository(User) private repository: Repository<User>,
+  ) {}
+  
+  // Missing tenant filtering - security risk!
+  async findAll(): Promise<User[]> {
+    return this.repository.find();
+  }
+  
+  // Missing tenant context - data leakage across tenants!
+  async findByEmail(email: string): Promise<User> {
+    return this.repository.findOne({ where: { email } });
+  }
+  
+  // Direct save without tenant assignment - data isolation issue
+  async save(user: User): Promise<User> {
+    return this.repository.save(user);
+  }
+}
+</example> 

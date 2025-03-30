@@ -1,0 +1,161 @@
+---
+description: 
+globs: src/**/*.ts, src/**/*.tsx
+alwaysApply: false
+---
+
+# Internationalization Implementation Standard
+
+## Context
+
+- Apply when adding user-facing text to the application
+- Use when implementing UI components
+- Reference when creating error messages or notifications
+- Follow when implementing date, number, or currency formatting
+- Check when adding new features with text content
+
+## Critical Rules
+
+- AVOID hardcoded user-facing strings in the codebase
+- USE translation keys with the i18n service for all user-visible text
+- IMPLEMENT proper language detection and switching
+- SUPPORT regional formatting for dates, numbers, and currencies
+- PROVIDE default fallback translations for all strings
+- ORGANIZE translation keys in a logical structure
+- EXTRACT all translatable strings into translation files
+- HANDLE pluralization rules correctly for all supported languages
+- IMPLEMENT right-to-left (RTL) text support where necessary
+- INCLUDE language metadata in API responses when relevant
+- RESPECT user language preferences in all components
+- TEST UI with different languages and locales
+
+## Examples
+
+<example>
+// src/core/i18n/i18n.service.ts
+@Injectable()
+export class I18nService {
+  constructor(
+    @Inject(I18N_OPTIONS) private options: I18nOptions,
+    private translationLoader: TranslationLoader,
+    private tenantContext: TenantContext,
+  ) {}
+  
+  /**
+   * Translate a key with optional parameters based on current language
+   */
+  translate(
+    key: string, 
+    params?: Record<string, any>, 
+    language?: string
+  ): string {
+    // Get the active language either from parameter, request, or default
+    const activeLanguage = language || 
+      this.getCurrentLanguage() || 
+      this.options.defaultLanguage;
+    
+    // Get translations for the active language
+    const translations = this.translationLoader.getTranslations(activeLanguage);
+    
+    // Get the translation string or fallback to key
+    let translatedText = this.getNestedTranslation(translations, key) || 
+      this.getFallbackTranslation(key) || 
+      key;
+    
+    // Replace parameters in the translated string
+    if (params) {
+      Object.entries(params).forEach(([paramKey, value]) => {
+        translatedText = translatedText.replace(`{{${paramKey}}}`, String(value));
+      });
+    }
+    
+    return translatedText;
+  }
+  
+  /**
+   * Format date according to the current locale
+   */
+  formatDate(
+    date: Date, 
+    format: DateFormat = 'medium', 
+    locale?: string
+  ): string {
+    const activeLocale = locale || this.getCurrentLocale();
+    return new Intl.DateTimeFormat(activeLocale, this.getDateFormatOptions(format)).format(date);
+  }
+  
+  /**
+   * Format number according to the current locale
+   */
+  formatNumber(
+    value: number, 
+    options?: Intl.NumberFormatOptions, 
+    locale?: string
+  ): string {
+    const activeLocale = locale || this.getCurrentLocale();
+    return new Intl.NumberFormat(activeLocale, options).format(value);
+  }
+  
+  // Additional i18n methods...
+}
+
+// Usage in a controller
+@Controller('users')
+export class UsersController {
+  constructor(
+    private usersService: UsersService,
+    private i18nService: I18nService,
+  ) {}
+  
+  @Get(':id')
+  async getUser(@Param('id') id: string, @I18nLang() lang: string): Promise<UserResponseDto> {
+    const user = await this.usersService.findById(id);
+    
+    if (!user) {
+      const errorMessage = this.i18nService.translate('users.errors.notFound', { id }, lang);
+      throw new NotFoundException(errorMessage);
+    }
+    
+    return new UserResponseDto(user);
+  }
+}
+</example>
+
+<example type="invalid">
+// src/controllers/products.controller.ts - i18n violations
+@Controller('products')
+export class ProductsController {
+  constructor(private productsService: ProductsService) {}
+  
+  @Get()
+  async getProducts() {
+    const products = await this.productsService.findAll();
+    
+    // Hardcoded user-facing strings
+    if (!products.length) {
+      throw new NotFoundException('No products found. Please try again later.');
+    }
+    
+    // Direct date formatting without localization
+    return products.map(product => ({
+      ...product,
+      // Hardcoded date format
+      createdAt: product.createdAt.toLocaleDateString('en-US'),
+      // Hardcoded currency format
+      price: '$' + product.price.toFixed(2),
+      // No translation for status texts
+      status: product.status === 'AVAILABLE' ? 'In Stock' : 'Out of Stock'
+    }));
+  }
+  
+  @Post()
+  async createProduct(@Body() data: CreateProductDto) {
+    try {
+      return await this.productsService.create(data);
+    } catch (error) {
+      // Hardcoded error message
+      throw new BadRequestException('Unable to create product. Please check your input.');
+    }
+  }
+}
+</example> 

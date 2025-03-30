@@ -1,0 +1,135 @@
+---
+description: 
+globs: src/api/**/*.ts, src/**/*.controller.ts, src/**/*.resolver.ts
+alwaysApply: false
+---
+
+# API Standards
+
+## Context
+
+- Apply when creating or modifying REST API controllers
+- Use when implementing GraphQL resolvers
+- Reference when defining API response formats
+- Follow when defining API documentation
+- Check when implementing API versioning
+
+## Critical Rules
+
+- DOCUMENT all API endpoints with OpenAPI/Swagger annotations
+- IMPLEMENT standardized response formats across all endpoints
+- VERSION all API endpoints using the defined strategy
+- VALIDATE input data using DTO classes with validation decorators
+- IMPLEMENT proper error handling with appropriate HTTP status codes
+- FOLLOW RESTful conventions for resource naming and HTTP methods
+- DOCUMENT GraphQL schema with descriptions for types and fields
+- IMPLEMENT DataLoader pattern for GraphQL N+1 query optimization
+- SEPARATE API layer from business logic implementation
+- IMPLEMENT proper authorization checks at the API level
+
+## Examples
+
+<example>
+// src/api/rest/users/users.controller.ts
+/**
+ * @api {post} /users Create a new user
+ * @apiName CreateUser
+ * @apiGroup Users
+ * @apiVersion 1.0.0
+ */
+@Controller({
+  path: 'users',
+  version: '1',
+})
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new user' })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'User created successfully',
+    type: UserResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input' })
+  @ApiResponse({ status: 409, description: 'User already exists' })
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
+    // Call service layer for business logic
+    const user = await this.usersService.createUser(createUserDto);
+    
+    // Transform to response DTO
+    return new UserResponseDto(user);
+  }
+}
+
+// src/api/graphql/users/users.resolver.ts
+@Resolver(() => User)
+export class UsersResolver {
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly usersLoader: UsersDataLoader,
+  ) {}
+
+  @Query(() => [User], { description: 'Get all users' })
+  @UseGuards(GqlAuthGuard)
+  async users(
+    @CurrentUser() currentUser: JwtPayload,
+  ): Promise<User[]> {
+    // Call service layer with authorization context
+    return this.usersService.findAll(currentUser.tenantId);
+  }
+
+  @ResolveField(() => [Post], { description: 'User posts' })
+  async posts(@Parent() user: User): Promise<Post[]> {
+    // Use DataLoader to avoid N+1 query problem
+    return this.usersLoader.loadPosts(user.id);
+  }
+}
+</example>
+
+<example type="invalid">
+// src/controllers/users.ts - Violates API standards
+@Controller('users')
+export class UsersController {
+  constructor(private userRepository: Repository<User>) {}
+
+  // Missing API documentation
+  // No versioning
+  // Direct repository access
+  @Post()
+  async create(@Body() data: any) {
+    // No input validation
+    const user = new User();
+    user.name = data.name;
+    user.email = data.email;
+    
+    // No proper error handling
+    return this.userRepository.save(user);
+  }
+  
+  // Inconsistent response format
+  @Get()
+  async getAll() {
+    const users = await this.userRepository.find();
+    return { data: users, success: true };
+  }
+}
+
+// src/graphql/resolvers.ts - Poor GraphQL implementation
+const resolvers = {
+  Query: {
+    // No authorization checks
+    // No documentation
+    // Direct database access
+    users: async () => {
+      return db.query('SELECT * FROM users');
+    }
+  },
+  User: {
+    // N+1 query problem
+    posts: async (user) => {
+      return db.query('SELECT * FROM posts WHERE userId = $1', [user.id]);
+    }
+  }
+};
+</example> 
