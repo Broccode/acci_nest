@@ -1,6 +1,6 @@
 ---
 description: 
-globs: .ai/prd.md, .ai/arch.md, docs/**/*architecture*.md
+globs: .ai/prd.md, .ai/arch.md, docs/**/*.md
 alwaysApply: false
 ---
 

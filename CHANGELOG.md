@@ -26,6 +26,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MIT License
 - Additional cursor rules for architecture, testing, security, and API
 
+### Changed
+
+- Updated documentation rules for English language standards
+- Enhanced workflow rules for agile development
+- Improved architecture documentation template
+- Extended .gitignore for better file exclusion
+
 ## [0.1.0] - YYYY-MM-DD
 
 ### Added

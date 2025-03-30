@@ -25,7 +25,7 @@ Table listing choices for languages, libraries, infra, etc...
 
 { Mermaid Diagrams to describe key flows interactions or architecture to be followed during implementation, infra provisioning, and deployments }
 
-## Data Models, API Specs, Schemas, etc...
+## Data Models, API Specs, Schemas, etc
 
 { As needed - may not be exhaustive - but key ideas that need to be retained and followed into the architecture and stories }
 
