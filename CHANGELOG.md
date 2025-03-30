@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Infrastructure setup with Docker Compose
 - Project directory structure for backend and frontend
 - Initial package configuration
+- Project README with detailed documentation
+- MIT License
 
 ## [0.1.0] - YYYY-MM-DD
 
