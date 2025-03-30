@@ -2,7 +2,7 @@
 
 <version>1.0.0</version>
 
-## Status: Draft
+## Status: Approved
 
 ## Intro
 
@@ -21,9 +21,9 @@ This PRD defines the requirements and goals for the ACCI Nest Enterprise Applica
 ### Technical KPIs
 
 - **Performance**:
-  - API response time under 100ms for 95% of requests
-  - Support for 1000+ concurrent users with less than 1% error rate
-  - Handles 10+ million database records without performance degradation
+  - API response time under 500ms for 95% of requests
+  - Support for 100+ concurrent users with less than 1% error rate
+  - Handles hundred thousands of database records without performance degradation
 - **Scalability**:
   - Horizontal scaling to handle 10x traffic increase with proportional resource addition
   - 99.9% uptime during traffic spikes
@@ -75,7 +75,7 @@ This PRD defines the requirements and goals for the ACCI Nest Enterprise Applica
 
 **Name**: Jamie Rodriguez  
 **Role**: DevOps Engineer  
-**Technical Skills**: Kubernetes, CI/CD pipelines, monitoring systems  
+**Technical Skills**: Docker, Docker Compose, CI/CD pipelines, monitoring systems  
 **Goals**:
 
 - Easy deployment and maintenance
@@ -86,14 +86,14 @@ This PRD defines the requirements and goals for the ACCI Nest Enterprise Applica
 **Key Pain Points**:
 
 - Insufficient monitoring and debugging information
-- Difficulty scaling services independently
 - Complex deployment procedures
 - Limited automation for routine maintenance tasks
+- Difficulty managing service configurations across environments
 
 **Key User Stories**:
 
 - "As a system administrator, I want a dashboard that shows the health of all system components so that I can quickly identify issues."
-- "As a system administrator, I want automated scaling capabilities so that I can handle traffic spikes without manual intervention."
+- "As a system administrator, I want simplified service orchestration using Docker Compose so that I can manage deployments with minimal complexity."
 - "As a system administrator, I want centralized logging with correlation IDs so that I can trace requests across multiple services."
 
 ### Enterprise Architect
@@ -448,9 +448,9 @@ This PRD defines the requirements and goals for the ACCI Nest Enterprise Applica
 ### Infrastructure
 
 - Docker containers for consistent deployment
-- Kubernetes for orchestration (if applicable)
-- Infrastructure as Code using Terraform or similar
-- Zero-downtime deployment strategy using rolling updates
+- Docker Compose for service orchestration and multi-container applications
+- Environment-specific configuration management with .env files
+- Zero-downtime deployment strategy with rolling updates
 
 ## Technology Stack
 
@@ -625,6 +625,7 @@ src/
 | Added Features | N/A | Extracted and adapted features from architecture document |
 | Expanded PRD | N/A | Added success criteria, roadmap, risks, detailed stories, and more |
 | Enhanced Details | N/A | Added detailed sections on multi-tenancy, plugin system, workflow engine, and security architecture |
+| Infrastructure Update | N/A | Updated deployment infrastructure to use Docker Compose instead of Kubernetes and Terraform |
 
 ## Multi-Tenancy Architecture Details
 
