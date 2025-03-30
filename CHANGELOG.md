@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor rules for commit message conventions (semver-commit-agent)
 - Cursor rules for changelog updates (changelog-update-agent)
 - TypeScript best practices for NestJS development
+- Project configuration files (.env.example, biome.json)
+- Infrastructure setup with Docker Compose
+- Project directory structure for backend and frontend
+- Initial package configuration
 
 ## [0.1.0] - YYYY-MM-DD
 

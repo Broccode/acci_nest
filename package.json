@@ -1,0 +1,42 @@
+{
+  "name": "acci-nest",
+  "version": "0.1.0",
+  "description": "Multi-tenant, plugin-extensible platform built with NestJS and React using Bun runtime",
+  "private": true,
+  "workspaces": [
+    "src/backend",
+    "src/frontend"
+  ],
+  "scripts": {
+    "start:dev": "bun run concurrently \"bun run start:backend:dev\" \"bun run start:frontend:dev\"",
+    "start:backend:dev": "bun run --cwd src/backend start:dev",
+    "start:frontend:dev": "bun run --cwd src/frontend start",
+    "build": "bun run --cwd src/backend build && bun run --cwd src/frontend build",
+    "test": "bun run --cwd src/backend test && bun run --cwd src/frontend test",
+    "test:e2e": "bun run --cwd src/backend test:e2e",
+    "test:cov": "bun run --cwd src/backend test:cov && bun run --cwd src/frontend test:cov",
+    "migration:generate": "bun run --cwd src/backend migration:generate",
+    "migration:run": "bun run --cwd src/backend migration:run",
+    "migration:revert": "bun run --cwd src/backend migration:revert",
+    "lint": "bunx @biomejs/biome lint .",
+    "format": "bunx @biomejs/biome format --write ."
+  },
+  "keywords": [
+    "nestjs",
+    "react",
+    "multi-tenant",
+    "plugin-architecture",
+    "typescript",
+    "bun"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "1.4.1",
+    "concurrently": "^8.0.0",
+    "rimraf": "^5.0.0"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}

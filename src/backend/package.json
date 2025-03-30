@@ -1,0 +1,94 @@
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "description": "ACCI Nest Backend API using Bun runtime",
+  "main": "dist/main.js",
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "nest build",
+    "format": "bunx @biomejs/biome format --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "bun run dist/main",
+    "lint": "bunx @biomejs/biome lint \"src/**/*.ts\" \"test/**/*.ts\"",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:cov": "bun test --coverage",
+    "test:debug": "bun run --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "bun test --config ./test/jest-e2e.json",
+    "migration:generate": "bunx typeorm migration:generate",
+    "migration:run": "bunx typeorm migration:run -d src/config/typeorm.config.ts",
+    "migration:revert": "bunx typeorm migration:revert -d src/config/typeorm.config.ts"
+  },
+  "keywords": [
+    "nestjs",
+    "api",
+    "typescript",
+    "multi-tenant",
+    "bun"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/jwt": "^10.0.0",
+    "@nestjs/passport": "^10.0.0",
+    "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/platform-socket.io": "^10.0.0",
+    "@nestjs/swagger": "^7.0.0",
+    "@nestjs/typeorm": "^10.0.0",
+    "@nestjs/websockets": "^10.0.0",
+    "argon2": "^0.30.0",
+    "class-transformer": "^0.5.0",
+    "class-validator": "^0.14.0",
+    "helmet": "^7.0.0",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.11.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0",
+    "typeorm": "^0.3.0",
+    "winston": "^3.9.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.4.1",
+    "@nestjs/cli": "^10.0.0",
+    "@nestjs/schematics": "^10.0.0",
+    "@nestjs/testing": "^10.0.0",
+    "@types/express": "^4.17.0",
+    "@types/jest": "^29.5.0",
+    "@types/node": "^18.0.0",
+    "@types/passport-jwt": "^3.0.0",
+    "@types/passport-local": "^1.0.0",
+    "@types/socket.io": "^3.0.0",
+    "@types/supertest": "^2.0.0",
+    "rimraf": "^5.0.0",
+    "source-map-support": "^0.5.0",
+    "supertest": "^6.0.0",
+    "ts-loader": "^9.0.0",
+    "ts-node": "^10.0.0",
+    "tsconfig-paths": "^4.0.0",
+    "typescript": "^5.0.0"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}
