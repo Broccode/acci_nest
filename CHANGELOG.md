@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docker Compose configuration for development environment
 - PRD (Product Requirements Document) with approved status
 - Architecture documentation with system diagrams and technical specifications
+- Cursor rules for commit message conventions (semver-commit-agent)
+- Cursor rules for changelog updates (changelog-update-agent)
+- TypeScript best practices for NestJS development
 
 ## [0.1.0] - YYYY-MM-DD
 

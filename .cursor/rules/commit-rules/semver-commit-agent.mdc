@@ -1,0 +1,109 @@
+---
+name: SemVer Commit Agent
+description: Ensures commit messages follow conventional commit standards and adhere to Semantic Versioning principles
+---
+
+# Semantic Versioning Commit Agent
+
+## Purpose
+
+This rule ensures that all commits follow a standardized format that aligns with [Semantic Versioning](https://semver.org/) principles and [Conventional Commits](https://www.conventionalcommits.org/) specification, making version management systematic and predictable.
+
+## Commit Message Format
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types (determines version bump)
+
+- **feat**: New feature (MINOR version bump)
+- **fix**: Bug fix (PATCH version bump)
+- **perf**: Performance improvement (PATCH version bump)
+- **refactor**: Code change that neither fixes a bug nor adds a feature (no version bump)
+- **style**: Changes that do not affect code meaning (no version bump)
+- **test**: Adding missing tests or correcting existing tests (no version bump)
+- **docs**: Documentation only changes (no version bump)
+- **build**: Changes to build system or dependencies (no version bump unless significant)
+- **ci**: Changes to CI configuration (no version bump)
+- **chore**: Other changes that don't modify src or test files (no version bump)
+
+### Breaking Changes
+
+- When a commit introduces a breaking change, the type/scope must have a `!` suffix (e.g., `feat!:` or `fix(auth)!:`)
+- The body or footer must contain `BREAKING CHANGE:` followed by description
+- Breaking changes trigger a MAJOR version bump
+
+## SemVer Rules
+
+### Version Format: `MAJOR.MINOR.PATCH[-prerelease][+build]`
+
+- **MAJOR**: Incremented for incompatible API changes
+- **MINOR**: Incremented for backward-compatible functionality additions
+- **PATCH**: Incremented for backward-compatible bug fixes
+- **Pre-release**: Denoted by hyphen (e.g., `-alpha.1`)
+- **Build metadata**: Denoted by plus sign (e.g., `+20130313144700`)
+
+### Version Bumping Guidelines
+
+1. **MAJOR version** when making incompatible API changes
+2. **MINOR version** when adding functionality in a backward-compatible manner
+3. **PATCH version** when making backward-compatible bug fixes
+
+## Examples
+
+### Valid Commit Messages
+
+```
+feat(auth): add OAuth2 login support
+
+Implement OAuth2 authorization code flow with PKCE extension
+```
+
+```
+fix(api): correct rate limiting algorithm
+
+BREAKING CHANGE: Rate limiting now applies per API key instead of per IP
+```
+
+```
+docs: update API documentation with new endpoints
+```
+
+### Invalid Commit Messages
+
+```
+updated login page
+```
+
+```
+WIP
+```
+
+```
+fixed stuff
+```
+
+## Pre-1.0.0 Development
+
+During initial development (0.y.z):
+- API is not considered stable
+- MINOR version is bumped for breaking changes
+- PATCH version is bumped for new features or fixes
+
+## Workflow Integration
+
+1. Before committing, format your message according to these guidelines
+2. Indicate the type of change clearly
+3. Mark breaking changes explicitly
+4. Update the version number in package.json according to SemVer rules
+5. Update CHANGELOG.md with details about the changes
+
+## Tools
+
+- Consider using commitlint or similar tools to validate commit messages
+- Use semantic-release for automated version management 

@@ -1,0 +1,69 @@
+---
+name: Changelog Update Agent
+description: Ensures the CHANGELOG.md is updated when making commits
+---
+
+# Changelog Update Agent
+
+## Purpose
+
+This rule ensures proper documentation of changes in the project's CHANGELOG.md file with every commit you make. Following the [Keep a Changelog](https://keepachangelog.com/) format helps maintain a clear and consistent record of project evolution.
+
+## When to Apply
+
+- ALWAYS check if CHANGELOG.md needs updating when preparing to make commits
+- ALWAYS include changelog updates in the same commit as code changes
+- NEVER make significant code changes without documenting them
+
+## Changelog Entry Guidelines
+
+Each entry should be concise and follow this structure:
+
+### Type of Change
+
+Categorize changes under one of these sections:
+- **Added**: New features
+- **Changed**: Changes in existing functionality
+- **Deprecated**: Soon-to-be removed features
+- **Removed**: Removed features
+- **Fixed**: Bug fixes
+- **Security**: Vulnerability fixes
+- **Performance**: Performance improvements
+- **Documentation**: Documentation-only changes
+- **Build**: Build system or dependency changes
+- **CI**: CI configuration changes
+
+### Format Rules
+
+1. Add new entries under the `## [Unreleased]` section
+2. Use bullet points (- ) for each change
+3. Write in imperative, present tense (e.g., "Add" not "Added")
+4. Include issue/PR references where applicable: `(#123)`
+5. Group related changes under the same bullet
+6. Use sub-bullets for details when necessary
+
+## Example Workflow
+
+1. Make code changes
+2. Update CHANGELOG.md with appropriate entry
+3. Include both in the same commit
+4. Ensure the commit message references the changelog update
+
+## Example Entries
+
+```markdown
+### Added
+- Add multi-tenant authentication system (#42)
+- Implement plugin management interface
+
+### Fixed
+- Fix race condition in tenant initialization (#56)
+- Correct styling issues in dashboard components
+```
+
+## Version Guidelines
+
+When releasing a new version:
+1. Change `## [Unreleased]` to `## [x.y.z] - YYYY-MM-DD`
+2. Add a new empty `## [Unreleased]` section at top
+3. Update the diff links at the bottom of the file 

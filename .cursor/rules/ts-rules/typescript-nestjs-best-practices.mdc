@@ -1,0 +1,78 @@
+---
+name: TypeScript Best Practices for NestJS
+description: Contains best practices, do's and don'ts for TypeScript development in NestJS projects
+glob: "src/backend/**/*.ts"
+---
+
+# TypeScript Best Practices and Do's & Don'ts for NestJS
+
+## Best Practices
+
+1. **Define explicit types**
+   - Create interfaces and DTOs for API requests/responses
+   - Use generics for reusable services and repositories
+
+2. **Use strict configuration**
+   - Enable `strict: true` in tsconfig.json
+   - Apply `noImplicitAny` to avoid implicit `any` types
+
+3. **Prefer union types over any**
+   - Define more specific return types for services
+   - Use discriminated unions for complex API responses
+
+4. **Promote immutability**
+   - Use `readonly` for service properties
+   - Apply `const assertions` (`as const`) for configuration
+
+5. **Structure your application properly**
+   - Follow the NestJS module organization pattern
+   - Group related functionality in feature modules
+
+6. **Leverage TypeScript with NestJS decorators**
+   - Use proper typing with `@nestjs/swagger` decorators
+   - Type controller parameters with proper DTO classes
+
+## Do's
+
+- **Use class-validator with TypeScript for DTO validation**
+- **Create proper interfaces for service return types**
+- **Utilize dependency injection with proper typing**
+- **Document DTOs and interfaces with JSDoc and Swagger**
+- **Use repository/service patterns with well-defined types**
+- **Type your providers in module definitions**
+- **Define custom decorators with proper TypeScript typing**
+- **Apply generics for reusable repository patterns**
+
+## Don'ts
+
+- **Don't use `any` in controller or service signatures**
+- **Avoid type assertions (`as Type`) in business logic**
+- **Don't mix REST and GraphQL types in the same files**
+- **Avoid defining overly generic repositories or services**
+- **Don't override NestJS type information unnecessarily**
+- **Avoid circular dependencies by using forwardRef() sparingly**
+- **Don't use unsafe type casting in guards or interceptors**
+- **Avoid ignoring TypeScript errors with `// @ts-ignore`**
+- **Don't rely on Express types directly, use NestJS abstractions**
+- **Avoid exporting implementation details from modules**
+
+## For Advanced NestJS Development
+
+- **Use custom parameter decorators with proper typing**
+- **Implement strongly typed event patterns using generics**
+- **Apply interceptors with well-defined response transformations**
+- **Create proper typing for custom providers and tokens**
+- **Utilize dynamic modules with proper TypeScript generics**
+- **Type your database entities and repositories correctly**
+- **Use proper typing for microservice message patterns**
+- **Implement custom pipes with strong input/output typing**
+
+## NestJS-Specific TypeScript Tips
+
+- **Type GraphQL resolvers with proper ObjectType classes**
+- **Use enums for feature flags and configuration options**
+- **Implement proper error hierarchies with custom types**
+- **Create typed factory providers for complex initialization**
+- **Use namespace pattern for related configuration types**
+- **Type your middleware with proper request/response generics**
+- **Define proper return types for custom decorators** 
