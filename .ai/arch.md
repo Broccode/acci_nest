@@ -26,6 +26,7 @@ This architecture document outlines the technical design decisions, infrastructu
 | GraphQL | Query language for APIs alongside REST |
 | Swagger/OpenAPI | API documentation and testing |
 | Bun | JavaScript runtime and package manager for improved performance |
+| Biome | Toolchain for code formatting and linting, replacing ESLint/Prettier |
 
 ## Architectural Diagrams
 
@@ -442,3 +443,4 @@ The project follows a testing pyramid approach to ensure code quality and system
 | Initial draft | 2025-03-30 | Initial draft of the architecture document |
 | Add Testing Strategy | 2025-03-31 | Added detailed Testing Strategy section. |
 | Finalize ORM Choice | 2025-03-31 | Selected MikroORM as the project ORM for its strong DDD support. |
+| Add Biome Tooling | 2025-03-31 | Specified Biome for linting and formatting, replacing ESLint/Prettier. |

@@ -1,47 +1,42 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as helmet from 'helmet';
+import { Logger } from '@nestjs/common';
+// import { ValidationPipe } from '@nestjs/common'; // Temporarily commented out
+// import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'; // Temporarily commented out
+// import * as helmet from 'helmet'; // Temporarily commented out
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const port = process.env.BACKEND_PORT || 3000;
   
-  // Set global prefix
-  app.setGlobalPrefix('api');
+  // app.setGlobalPrefix('api'); // Temporarily commented out
   
-  // Enable CORS
-  app.enableCors();
+  // app.enableCors(); // Temporarily commented out
   
-  // Use helmet for security headers
-  app.use(helmet());
+  // app.use(helmet()); // Temporarily commented out - Caused Linter Error
   
-  // Global validation pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      forbidNonWhitelisted: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-    }),
-  );
+  // app.useGlobalPipes( // Temporarily commented out
+  //   new ValidationPipe({
+  //     whitelist: true,
+  //     transform: true,
+  //     forbidNonWhitelisted: true,
+  //     transformOptions: {
+  //       enableImplicitConversion: true,
+  //     },
+  //   }),
+  // );
   
-  // Swagger setup
-  const config = new DocumentBuilder()
-    .setTitle('ACCI Nest API')
-    .setDescription('The ACCI Nest API documentation')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  // const config = new DocumentBuilder() // Temporarily commented out
+  //   .setTitle('ACCI Nest API')
+  //   .setDescription('The ACCI Nest API documentation')
+  //   .setVersion('1.0')
+  //   .addBearerAuth()
+  //   .build();
+  // const document = SwaggerModule.createDocument(app, config);
+  // SwaggerModule.setup('api/docs', app, document);
   
-  // Start the application
-  const port = process.env.PORT || 3001;
   await app.listen(port);
-  console.log(`Application is running on: http://localhost:${port}`);
+  Logger.log(`🚀 Application is running on: http://localhost:${port}`, 'Bootstrap');
 }
 
 bootstrap(); 

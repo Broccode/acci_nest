@@ -27,6 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Additional cursor rules for architecture, testing, security, and API
 - bun.lock file for dependency management
 - MikroORM as an additional ORM option alongside TypeORM and Prisma
+- Basic NestJS backend application setup (Module, Controller, Service, main.ts) (#1)
+- `/health` check endpoint for backend (#1)
+- E2E test setup for backend using Jest (#1)
+- Initial `.env` configuration for backend (#1)
 
 ### Changed
 

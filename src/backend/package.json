@@ -16,7 +16,7 @@
     "test:watch": "bun test --watch",
     "test:cov": "bun test --coverage",
     "test:debug": "bun run --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "bun test --config ./test/jest-e2e.json",
+    "test:e2e": "jest --config ./test/jest-e2e.json --runInBand",
     "migration:generate": "bunx typeorm migration:generate",
     "migration:run": "bunx typeorm migration:run -d src/config/typeorm.config.ts",
     "migration:revert": "bunx typeorm migration:revert -d src/config/typeorm.config.ts"
@@ -72,7 +72,8 @@
     "ts-loader": "^9.0.0",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "^4.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "ts-jest": "^29.1.0"
   },
   "jest": {
     "moduleFileExtensions": [
