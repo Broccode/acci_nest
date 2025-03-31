@@ -45,6 +45,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved architecture documentation template
 - Extended .gitignore for better file exclusion
 - Updated app.module.ts to include MikroORM configuration (#2)
+- Updated PRD to reflect MikroORM as the exclusive ORM solution, replacing references to TypeORM/Prisma
+- Added Bun and Biome to technology stack in PRD
+- Updated Multi-Tenancy implementation examples in PRD to align with MikroORM patterns
 
 ## [0.1.0] - 2025-03-31
 

@@ -274,7 +274,7 @@ This PRD defines the requirements and goals for the ACCI Nest Enterprise Applica
   Status: ''
   Requirements:
   - Configure PostgreSQL connections
-  - Set up TypeORM/Prisma integration
+  - Set up MikroORM integration
   - Implement migration system
   - Create data access layer
 
@@ -461,11 +461,13 @@ This PRD defines the requirements and goals for the ACCI Nest Enterprise Applica
 | PostgreSQL | Primary database for persistent storage |
 | Redis | In-memory data structure store for caching and pub/sub |
 | Docker | Containerization for consistent development and deployment |
-| TypeORM/Prisma/MikroORM | ORM for database interaction and migrations |
+| MikroORM | TypeScript ORM implementing Data Mapper and Unit of Work patterns for database interaction and migrations |
 | Jest | Testing framework for unit and integration tests |
 | Passport.js | Authentication middleware for Node.js |
 | GraphQL | Query language for APIs alongside REST |
 | Swagger/OpenAPI | API documentation and testing |
+| Bun | JavaScript runtime and package manager for improved performance |
+| Biome | Toolchain for code formatting and linting, replacing ESLint/Prettier |
 
 ## Reference
 
@@ -626,6 +628,7 @@ src/
 | Expanded PRD | N/A | Added success criteria, roadmap, risks, detailed stories, and more |
 | Enhanced Details | N/A | Added detailed sections on multi-tenancy, plugin system, workflow engine, and security architecture |
 | Infrastructure Update | N/A | Updated deployment infrastructure to use Docker Compose instead of Kubernetes and Terraform |
+| ORM Update | N/A | Updated ORM choice to MikroORM and added Bun/Biome to the technology stack |
 
 ## Multi-Tenancy Architecture Details
 
@@ -665,16 +668,17 @@ interface TenantIdentificationStrategy {
 }
 
 // Tenant-aware repository base class
-abstract class TenantAwareRepository<T> {
+abstract class TenantAwareRepository<T extends object, PK extends keyof T> {
   constructor(
-    @InjectRepository(EntityClass) private repository: Repository<T>,
+    protected readonly em: EntityManager,
+    protected readonly entityClass: EntityClass<T>,
     @Inject(TENANT_CONTEXT) private tenantContext: TenantContext,
   ) {}
   
-  findAll(): Promise<T[]> {
-    return this.repository.find({
-      where: { tenantId: this.tenantContext.getCurrentTenant() },
-    });
+  async findAll(): Promise<T[]> {
+    return this.em.find(this.entityClass, { 
+      tenantId: this.tenantContext.getCurrentTenant() 
+    } as FilterQuery<T>);
   }
   
   // Other repository methods with tenant filtering
