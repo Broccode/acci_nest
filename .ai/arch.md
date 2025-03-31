@@ -1,6 +1,6 @@
 # Architecture for ACCI Nest Enterprise Application Framework
 
-Status: Draft
+Status: Approved
 
 ## Technical Summary
 
@@ -19,7 +19,7 @@ This architecture document outlines the technical design decisions, infrastructu
 | Redis | In-memory data store for caching and pub/sub messaging |
 | Docker | Containerization platform for consistent development and deployment |
 | Docker Compose | Tool for defining and running multi-container applications |
-| TypeORM/Prisma/MikroORM | ORM for database interaction and schema migrations |
+| MikroORM | TypeScript ORM implementing Data Mapper and Unit of Work patterns, chosen for strong DDD support |
 | Jest | Testing framework for unit and integration tests |
 | Passport.js | Authentication middleware for Node.js |
 | JWT | JSON Web Tokens for secure authentication |
@@ -364,6 +364,28 @@ The infrastructure is designed to be simple yet scalable, focusing on containeri
 - **Caching Strategy**: Implement Redis clustering for cache scaling
 - **Load Balancing**: Distribute traffic across multiple instances
 
+## Testing Strategy
+
+The project follows a testing pyramid approach to ensure code quality and system reliability.
+
+### 1. Unit Tests (Base of the Pyramid)
+
+- **Focus**: Testing individual classes, functions, or components in isolation (e.g., services, utility functions, individual React components). Dependencies are mocked.
+- **Tools**: `Jest` serves as the primary testing framework, assertion library, and mocking tool (`jest.fn()`, `jest.spyOn()`, `jest.mock()`).
+- **Goal**: Provide fast feedback on the correctness of isolated logic units. Aims for high code coverage.
+
+### 2. Integration Tests (Middle Layer)
+
+- **Focus**: Verifying the interaction between multiple components within a module or across modules (e.g., Controller -> Service -> Repository Mock). External systems like databases or third-party APIs are typically mocked or stubbed.
+- **Tools**: `Jest` combined with NestJS's `@nestjs/testing` utilities. The `Test.createTestingModule({...})` method is used to set up a testing module environment, allowing for controlled dependency injection and mocking. For frontend, Testing Library (`@testing-library/react`) can be used for component interaction tests.
+- **Goal**: Ensure that integrated components work together as expected. Balances coverage and execution speed.
+
+### 3. End-to-End (E2E) Tests (Top of the Pyramid)
+
+- **Focus**: Testing the application as a whole from an external perspective, typically via its API endpoints or UI. Simulates real user scenarios and workflows.
+- **Tools**: `Jest` with `supertest` for backend API testing. A separate, seeded test database might be used. For frontend E2E tests, frameworks like Cypress or Playwright can be considered.
+- **Goal**: Validate complete features and user flows through the entire stack. Fewer tests due to higher execution time and maintenance cost.
+
 ## Deployment Plan
 
 ### Initial Setup
@@ -417,4 +439,6 @@ The infrastructure is designed to be simple yet scalable, focusing on containeri
 
 | Change | Date | Description |
 | -------------------- | ---------- | ------------------------------------------------------------- |
-| Initial draft | 2024-03-30 | Initial draft of the architecture document |
+| Initial draft | 2025-03-30 | Initial draft of the architecture document |
+| Add Testing Strategy | 2025-03-31 | Added detailed Testing Strategy section. |
+| Finalize ORM Choice | 2025-03-31 | Selected MikroORM as the project ORM for its strong DDD support. |
