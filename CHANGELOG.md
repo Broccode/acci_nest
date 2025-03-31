@@ -31,6 +31,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `/health` check endpoint for backend (#1)
 - E2E test setup for backend using Jest (#1)
 - Initial `.env` configuration for backend (#1)
+- MikroORM integration with PostgreSQL database (#2)
+- Base entity model with UUID primary keys, created/updated timestamps (#2)
+- Tenant entity model with multi-tenancy support (#2)
+- Database migrations system with MikroORM CLI commands (#2)
+- Enhanced health check endpoint with database connectivity status (#2)
+- Extended E2E tests for database connectivity verification (#2)
 
 ### Changed
 
@@ -38,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced workflow rules for agile development
 - Improved architecture documentation template
 - Extended .gitignore for better file exclusion
+- Updated app.module.ts to include MikroORM configuration (#2)
 
 ## [0.1.0] - 2025-03-31
 
