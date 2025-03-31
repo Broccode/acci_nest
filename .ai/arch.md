@@ -19,7 +19,7 @@ This architecture document outlines the technical design decisions, infrastructu
 | Redis | In-memory data store for caching and pub/sub messaging |
 | Docker | Containerization platform for consistent development and deployment |
 | Docker Compose | Tool for defining and running multi-container applications |
-| TypeORM/Prisma | ORM for database interaction and schema migrations |
+| TypeORM/Prisma/MikroORM | ORM for database interaction and schema migrations |
 | Jest | Testing framework for unit and integration tests |
 | Passport.js | Authentication middleware for Node.js |
 | JWT | JSON Web Tokens for secure authentication |
@@ -291,46 +291,46 @@ interface Plugin {
 acci-nest/
 ├── docs/                    # Documentation files
 │   ├── architecture/        # Architecture documents
-│   ├── api/                 # API documentation
-│   └── guides/              # Usage guides
-├── src/
-│   ├── backend/             # NestJS backend application
-│   │   ├── src/
-│   │   │   ├── main.ts                # Application entry point
-│   │   │   ├── app.module.ts          # Root application module
-│   │   │   ├── config/                # Configuration and environment setup
-│   │   │   ├── common/                # Shared utilities, decorators, and filters
-│   │   │   ├── auth/                  # Authentication and authorization
-│   │   │   ├── users/                 # User management
-│   │   │   ├── tenants/               # Multi-tenancy implementation
-│   │   │   └── plugins/               # Plugin system
-│   │   └── test/                     # Backend tests
-│   ├── frontend/            # React frontend application
-│   │   ├── src/
-│   │   │   ├── index.tsx             # Entry point
-│   │   │   ├── App.tsx               # Root component
-│   │   │   ├── components/           # Reusable UI components
-│   │   │   ├── pages/                # Page components
-│   │   │   ├── hooks/                # Custom React hooks
-│   │   │   ├── store/                # State management
-│   │   │   ├── api/                  # API clients
-│   │   │   └── utils/                # Utility functions
-│   │   └── test/                    # Frontend tests
-│   └── shared/               # Shared code between frontend and backend
-│       ├── types/                   # TypeScript interfaces and types
-│       ├── constants/               # Shared constants
-│       └── utils/                   # Shared utility functions
-├── tests/                   # Test files
-│   ├── unit/                # Unit tests
-│   ├── integration/         # Integration tests
-│   └── e2e/                 # End-to-end tests
-├── deploy/                  # Deployment configurations
-│   ├── docker-compose/      # Docker Compose files
-│   └── scripts/             # Deployment scripts
-├── .env.example             # Example environment variables
-├── docker-compose.yml       # Docker Compose configuration
-├── package.json             # Project configuration
-└── README.md                # Project documentation
+│   │   ├── api/                 # API documentation
+│   │   └── guides/              # Usage guides
+│   ├── src/
+│   │   ├── backend/             # NestJS backend application
+│   │   │   ├── src/
+│   │   │   │   ├── main.ts                # Application entry point
+│   │   │   │   ├── app.module.ts          # Root application module
+│   │   │   │   ├── config/                # Configuration and environment setup
+│   │   │   │   ├── common/                # Shared utilities, decorators, and filters
+│   │   │   │   ├── auth/                  # Authentication and authorization
+│   │   │   │   ├── users/                 # User management
+│   │   │   │   ├── tenants/               # Multi-tenancy implementation
+│   │   │   │   └── plugins/               # Plugin system
+│   │   │   └── test/                     # Backend tests
+│   │   ├── frontend/            # React frontend application
+│   │   │   ├── src/
+│   │   │   │   ├── index.tsx             # Entry point
+│   │   │   │   ├── App.tsx               # Root component
+│   │   │   │   ├── components/           # Reusable UI components
+│   │   │   │   ├── pages/                # Page components
+│   │   │   │   ├── hooks/                # Custom React hooks
+│   │   │   │   ├── store/                # State management
+│   │   │   │   ├── api/                  # API clients
+│   │   │   │   └── utils/                # Utility functions
+│   │   │   └── test/                    # Frontend tests
+│   │   └── shared/               # Shared code between frontend and backend
+│   │       ├── types/                   # TypeScript interfaces and types
+│   │       ├── constants/               # Shared constants
+│   │       └── utils/                   # Shared utility functions
+│   ├── tests/                   # Test files
+│   │   ├── unit/                # Unit tests
+│   │   ├── integration/         # Integration tests
+│   │   └── e2e/                 # End-to-end tests
+│   ├── deploy/                  # Deployment configurations
+│   │   ├── docker-compose/      # Docker Compose files
+│   │   └── scripts/             # Deployment scripts
+│   ├── .env.example             # Example environment variables
+│   ├── docker-compose.yml       # Docker Compose configuration
+│   └── package.json             # Project configuration
+│   └── README.md                # Project documentation
 ```
 
 ## Infrastructure

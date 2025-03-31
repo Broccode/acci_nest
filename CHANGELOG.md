@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MIT License
 - Additional cursor rules for architecture, testing, security, and API
 - bun.lock file for dependency management
+- MikroORM as an additional ORM option alongside TypeORM and Prisma
 
 ### Changed
 
@@ -34,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved architecture documentation template
 - Extended .gitignore for better file exclusion
 
-## [0.1.0] - YYYY-MM-DD
+## [0.1.0] - 2025-03-31
 
 ### Added
 

@@ -461,7 +461,7 @@ This PRD defines the requirements and goals for the ACCI Nest Enterprise Applica
 | PostgreSQL | Primary database for persistent storage |
 | Redis | In-memory data structure store for caching and pub/sub |
 | Docker | Containerization for consistent development and deployment |
-| TypeORM/Prisma | ORM for database interaction and migrations |
+| TypeORM/Prisma/MikroORM | ORM for database interaction and migrations |
 | Jest | Testing framework for unit and integration tests |
 | Passport.js | Authentication middleware for Node.js |
 | GraphQL | Query language for APIs alongside REST |
