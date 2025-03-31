@@ -1,5 +1,5 @@
 ---
-description:
+description: Ensures consistent and meaningful Git commit messages and processes when pushing code changes
 globs:
 alwaysApply: false
 ---

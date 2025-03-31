@@ -1,5 +1,5 @@
 ---
-description:
+description: Defines a rigorous agile workflow process focusing on story-based development and project documentation maintenance in the .ai folder for sustained memory
 globs:
 alwaysApply: true
 ---
