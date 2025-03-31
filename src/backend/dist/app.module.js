@@ -10,6 +10,7 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const nestjs_1 = require("@mikro-orm/nestjs");
+const postgresql_1 = require("@mikro-orm/postgresql");
 const configuration_1 = require("./config/configuration");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
@@ -25,7 +26,7 @@ exports.AppModule = AppModule = __decorate([
             }),
             nestjs_1.MikroOrmModule.forRootAsync({
                 useFactory: (configService) => ({
-                    driver: require('@mikro-orm/postgresql').PostgreSqlDriver,
+                    driver: postgresql_1.PostgreSqlDriver,
                     host: configService.get('database.host'),
                     port: configService.get('database.port'),
                     user: configService.get('database.username'),
