@@ -8,7 +8,7 @@ MikroORM Integration and Configuration
 
 ## Status
 
-Draft
+Completed
 
 ## Context
 
@@ -25,44 +25,44 @@ Story Points: 2
 
 ## Tasks
 
-1. - [ ] Install MikroORM Dependencies
-    - [ ] Add `@mikro-orm/core`, `@mikro-orm/nestjs`, `@mikro-orm/postgresql`, and `@mikro-orm/cli` to `package.json` using `bun add`.
-2. - [ ] Configure MikroORM Module
-    - [ ] Import `MikroOrmModule` in `src/backend/src/app.module.ts`.
-    - [ ] Use `MikroOrmModule.forRootAsync` to load database configuration asynchronously.
-    - [ ] Inject `ConfigService` to retrieve database credentials (host, port, user, password, dbName) from `.env`.
-    - [ ] Configure basic MikroORM options:
-        - `entities`: Set path for entity discovery (e.g., `['dist/**/*.entity.js']`).
-        - `entitiesTs`: Set path for TypeScript entity discovery (e.g., `['src/**/*.entity.ts']`).
-        - `dbName`: From config.
-        - `type`: 'postgresql'.
-        - `debug`: Enable debug logging based on environment (e.g., `process.env.NODE_ENV !== 'production'`).
-        - `autoLoadEntities`: `true`.
-3. - [ ] Set up MikroORM CLI
-    - [ ] Create `src/backend/mikro-orm.config.ts` referencing the asynchronous configuration setup (potentially exporting the options factory used in `forRootAsync`).
-    - [ ] Add MikroORM CLI scripts to `src/backend/package.json`:
-        - `orm:debug`: `mikro-orm debug`
-        - `orm:schema:create`: `mikro-orm schema:create`
-        - `orm:schema:update`: `mikro-orm schema:update --run`
-        - `orm:migration:create`: `mikro-orm migration:create`
-        - `orm:migration:up`: `mikro-orm migration:up`
-        - `orm:migration:down`: `mikro-orm migration:down`
-4. - [ ] Create Base Entity
-    - [ ] Create `src/backend/src/common/entities/base.entity.ts`.
-    - [ ] Define common fields like `id` (primary key, UUID), `createdAt`, `updatedAt` using MikroORM decorators.
-5. - [ ] Create Example Entity (e.g., Tenant)
-    - [ ] Create `src/backend/src/tenants/entities/tenant.entity.ts` (create `tenants` module directory if needed).
-    - [ ] Define basic fields based on `arch.md` (e.g., `name`, `domain`), inheriting from `BaseEntity`.
-    - [ ] Ensure the entity is discovered by MikroORM.
-6. - [ ] Generate Initial Database Schema
-    - [ ] Run `bun run orm:migration:create -- --initial` (adjust script name if needed).
-    - [ ] Verify the generated migration file in `src/backend/migrations/`.
-    - [ ] Run `bun run orm:migration:up` to apply the migration to the database (ensure database is running).
-7. - [ ] Implement Database Health Check
-    - [ ] Inject `EntityManager` or `MikroORM` into `src/backend/src/app.service.ts` or a dedicated health service.
-    - [ ] Add a method to check database connectivity (e.g., `em.getKnex().raw('SELECT 1')`).
-    - [ ] Integrate this check into the `/health` endpoint in `src/backend/src/app.controller.ts`, returning database status.
-    - [ ] Example implementation:
+1. - [x] Install MikroORM Dependencies
+    - [x] Add `@mikro-orm/core`, `@mikro-orm/nestjs`, `@mikro-orm/postgresql`, and `@mikro-orm/cli` to `package.json` using `bun add`.
+2. - [x] Configure MikroORM Module
+    - [x] Import `MikroOrmModule` in `src/backend/src/app.module.ts`.
+    - [x] Use `MikroOrmModule.forRootAsync` to load database configuration asynchronously.
+    - [x] Inject `ConfigService` to retrieve database credentials (host, port, user, password, dbName) from `.env`.
+    - [x] Configure basic MikroORM options:
+        - [x] `entities`: Set path for entity discovery (e.g., `['dist/**/*.entity.js']`).
+        - [x] `entitiesTs`: Set path for TypeScript entity discovery (e.g., `['src/**/*.entity.ts']`).
+        - [x] `dbName`: From config.
+        - [x] `type`: 'postgresql'.
+        - [x] `debug`: Enable debug logging based on environment (e.g., `process.env.NODE_ENV !== 'production'`).
+        - [x] `autoLoadEntities`: `true`.
+3. - [x] Set up MikroORM CLI
+    - [x] Create `src/backend/mikro-orm.config.ts` referencing the asynchronous configuration setup (potentially exporting the options factory used in `forRootAsync`).
+    - [x] Add MikroORM CLI scripts to `src/backend/package.json`:
+        - [x] `orm:debug`: `mikro-orm debug`
+        - [x] `orm:schema:create`: `mikro-orm schema:create`
+        - [x] `orm:schema:update`: `mikro-orm schema:update --run`
+        - [x] `orm:migration:create`: `mikro-orm migration:create`
+        - [x] `orm:migration:up`: `mikro-orm migration:up`
+        - [x] `orm:migration:down`: `mikro-orm migration:down`
+4. - [x] Create Base Entity
+    - [x] Create `src/backend/src/common/entities/base.entity.ts`.
+    - [x] Define common fields like `id` (primary key, UUID), `createdAt`, `updatedAt` using MikroORM decorators.
+5. - [x] Create Example Entity (e.g., Tenant)
+    - [x] Create `src/backend/src/tenants/entities/tenant.entity.ts` (create `tenants` module directory if needed).
+    - [x] Define basic fields based on `arch.md` (e.g., `name`, `domain`), inheriting from `BaseEntity`.
+    - [x] Ensure the entity is discovered by MikroORM.
+6. - [x] Generate Initial Database Schema
+    - [x] Run `bun run orm:migration:create -- --initial` (adjust script name if needed).
+    - [x] Verify the generated migration file in `src/backend/migrations/`.
+    - [x] Run `bun run orm:migration:up` to apply the migration to the database (ensure database is running).
+7. - [x] Implement Database Health Check
+    - [x] Inject `EntityManager` or `MikroORM` into `src/backend/src/app.service.ts` or a dedicated health service.
+    - [x] Add a method to check database connectivity (e.g., `em.getKnex().raw('SELECT 1')`).
+    - [x] Integrate this check into the `/health` endpoint in `src/backend/src/app.controller.ts`, returning database status.
+    - [x] Example implementation:
 
       ```typescript
       // In app.service.ts
@@ -113,8 +113,8 @@ Story Points: 2
       }
       ```
 
-8. - [ ] Add Database Health Check Test
-    - [ ] Update the E2E test (`src/backend/test/app.e2e-spec.ts`) to check the database status in the `/health` endpoint response.
+8. - [x] Add Database Health Check Test
+    - [x] Update the E2E test (`src/backend/test/app.e2e-spec.ts`) to check the database status in the `/health` endpoint response.
 
 ## Constraints
 
@@ -161,3 +161,16 @@ Story Points: 2
 - Agent: Überprüfung abgeschlossen, zwei Verbesserungsvorschläge identifiziert.
 - User: ja, erwähne das mit dem repository-pattern, und gib ein konkretes beispiel für die health-check-implementierung
 - Agent: Aktualisiere story-2.story.md mit Repository-Pattern-Erklärung und Health-Check-Beispiel.
+- User: ok, dann führe nun einen regelkonformen commit durch, bevor du mit der implementierung anfängst
+- Agent: Commit für story-2.story.md durchgeführt.
+- User: beginne nun mit der implementierung
+- Agent: Implementierung der MikroORM-Integration gestartet...
+- Agent: Installation von MikroORM-Paketen...
+- Agent: Erstellung der Konfigurationsdatei...
+- Agent: Implementierung der BaseEntity...
+- Agent: Implementierung der Tenant-Entity...
+- Agent: Integration des MikroORM-Moduls in app.module.ts...
+- Agent: Aktualisierung des Health-Check-Endpunkts...
+- Agent: Erstellung der Migration...
+- Agent: Tests erfolgreich durchgeführt.
+- User: überprüfe die story darauf, ob sie best practices entspricht
