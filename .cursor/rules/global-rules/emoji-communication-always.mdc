@@ -1,5 +1,5 @@
 ---
-description: 
+description: ALWAYS adds appropriate emojis at the end of responses to enhance communication clarity while maintaining a professional but friendly tone
 globs:
 alwaysApply: true
 ---

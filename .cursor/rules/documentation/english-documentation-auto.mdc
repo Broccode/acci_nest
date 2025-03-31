@@ -1,27 +1,35 @@
 ---
-description: 
-globs: .ai/prd.md, .ai/arch.md, docs/**/*.md
-alwaysApply: false
+description: ALWAYS use when writing or editing any content to ensure consistent English language usage throughout the entire project
+globs: **/*.{md,ts,js,tsx,jsx,html,css,scss,json,yml,yaml,sql,graphql,prisma}
+alwaysApply: true
 ---
 
 # English Documentation Standard
 
 ## Context
 
-- When working with any Product Requirement Document (PRD)
-- When creating or editing architecture documents
+- When working with ANY documentation, code, comments, or text files
+- When creating or editing any files in the project
 - When establishing project documentation that needs to be shared across teams
-- When creating documentation that will be referenced in code or technical contexts
+- When creating commits, messages, changelogs, or any other project-related content
 
 ## Critical Rules
 
-- ALL documentation for PRDs and architecture MUST be written in English
+- ALL text MUST be written in English (code, comments, documentation, changelogs, etc.)
+- ALL variable names, function names, and other identifiers MUST be in English
+- ALL commit messages MUST be in English
+- ALL file content MUST be in English by default
 - Headings, descriptions, requirements, and all content must be English
 - Code examples and references in documentation must be in English
-- Only UI-specific content may be in non-English languages when required for the end-user
 - Technical terms should follow industry-standard English terminology
-- Translation must be provided immediately if non-English content is necessary for business context
-- Diagrams must have English labels and descriptions
+
+## Exceptions (Limited)
+
+- Language translation files specifically created for internationalization purposes
+- User-facing content within i18n-specific examples when demonstrating multi-language support
+- A few UI-specific elements that are explicitly required to be in non-English languages for end-user display
+- API responses containing non-English content specifically designed for international users
+- ONLY when explicitly directed by the user with specific instructions mentioning the exception
 
 ## Examples
 
@@ -41,6 +49,13 @@ async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
   return this.userService.create(createUserDto);
 }
 ```
+
+// Example of valid i18n exception
+const translations = {
+  'en': { 'welcome': 'Welcome to our system' },
+  'de': { 'welcome': 'Willkommen in unserem System' },
+  'fr': { 'welcome': 'Bienvenue dans notre système' }
+};
 </example>
 
 <example type="invalid">
@@ -59,4 +74,7 @@ async benutzerErstellen(@Body() erstelleBenutzerDto: CreateUserDto): Promise<Use
   return this.benutzerService.erstellen(erstelleBenutzerDto);
 }
 ```
+
+// Invalid mix of languages in non-i18n context
+const message = "Dies ist ein error message";
 </example> 
