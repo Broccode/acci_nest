@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project README with detailed documentation
 - MIT License
 - Additional cursor rules for architecture, testing, security, and API
+- bun.lock file for dependency management
 
 ### Changed
 
