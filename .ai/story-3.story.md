@@ -2,9 +2,9 @@
 
 Advanced Database Integration and Data Access Layer
 
-**Als** Entwickler
-**Möchte ich** eine vollständige Datenbankintegration und eine robuste Datenzugriffsschicht
-**Damit** ich eine strukturierte, typsichere und wartbare Interaktion mit der Datenbank gewährleisten kann.
+**As a** developer
+**I want** a complete database integration and robust data access layer
+**So that** I can ensure structured, type-safe, and maintainable database interactions.
 
 ## Status
 
@@ -12,12 +12,12 @@ Draft
 
 ## Context
 
-- Diese Story baut auf der grundlegenden MikroORM-Integration aus Story 2 auf.
-- Während wir in Story 2 bereits die Basis für die Datenbankinteraktion gelegt haben (grundlegende MikroORM-Konfiguration, Base-Entity, Tenant-Entity), werden wir nun fortgeschrittenere Datenbankfunktionen implementieren.
-- Die Datenzugriffsschicht soll nach dem Repository-Pattern organisiert werden, was mit dem Data-Mapper-Muster von MikroORM übereinstimmt.
-- Die Infrastruktur für Migrationen wurde teilweise in Story 2 eingerichtet, benötigt aber Erweiterungen und Automatisierung.
-- Wir werden in dieser Story auch ein Seeding-System für Testdaten implementieren.
-- Die Multi-Tenancy-Anforderungen aus der PRD und der Architektur müssen in der Datenzugriffsschicht berücksichtigt werden.
+- This story builds upon the basic MikroORM integration from Story 2.
+- While we have already established the foundation for database interaction in Story 2 (basic MikroORM configuration, Base Entity, Tenant Entity), we will now implement more advanced database functions.
+- The data access layer should be organized according to the Repository Pattern, which aligns with MikroORM's Data Mapper pattern.
+- The infrastructure for migrations was partially set up in Story 2 but requires extensions and automation.
+- We will also implement a seeding system for test data in this story.
+- The multi-tenancy requirements from the PRD and architecture must be considered in the data access layer.
 
 ## Estimation
 
@@ -25,52 +25,52 @@ Story Points: 3
 
 ## Tasks
 
-1. - [ ] Repository Pattern Implementierung
-   1. - [ ] Erstellen einer `BaseRepository`-Klasse, die von `EntityRepository` erbt und gemeinsame Funktionalität bietet.
-   2. - [ ] Implementieren eines `TenantRepository` mit tenant-spezifischen Methoden.
-   3. - [ ] Einrichten von Repository-Providern in entsprechenden Modulen.
-   4. - [ ] Unit-Tests für Repository-Methoden schreiben.
+1. - [ ] Repository Pattern Implementation
+   1. - [ ] Create a `BaseRepository` class that extends `EntityRepository` and provides common functionality.
+   2. - [ ] Implement a `TenantRepository` with tenant-specific methods.
+   3. - [ ] Set up repository providers in the appropriate modules.
+   4. - [ ] Write unit tests for repository methods.
 
-2. - [ ] Erweiterung des Migrations-Systems
-   1. - [ ] Erstellen einer Migrations-Strategie (Wann und wie Migrationen ausgeführt werden).
-   2. - [ ] Implementieren von Skripten zur Automatisierung von Migrationen während der Deployment-Phase.
-   3. - [ ] Sicherstellen, dass Migrationen auch für Multi-Tenancy funktionieren (Schema-Separation).
+2. - [ ] Extension of the Migration System
+   1. - [ ] Create a migration strategy (when and how migrations are executed).
+   2. - [ ] Implement scripts to automate migrations during the deployment phase.
+   3. - [ ] Ensure that migrations also work for multi-tenancy (schema separation).
 
-3. - [ ] Entwicklung eines Seeding-Systems
-   1. - [ ] Erstellen einer `Seeder`-Basisklasse zur Definition der Seeding-Struktur.
-   2. - [ ] Implementieren eines `DatabaseSeeder` für die Koordination aller Seeder.
-   3. - [ ] Erstellen eines `TenantSeeder` für Basis-Tenant-Daten.
-   4. - [ ] Skripte zur Ausführung von Seedern in verschiedenen Umgebungen.
+3. - [ ] Development of a Seeding System
+   1. - [ ] Create a `Seeder` base class to define the seeding structure.
+   2. - [ ] Implement a `DatabaseSeeder` for coordinating all seeders.
+   3. - [ ] Create a `TenantSeeder` for base tenant data.
+   4. - [ ] Create scripts to run seeders in different environments.
 
-4. - [ ] Optimierung der PostgreSQL-Verbindung
-   1. - [ ] Konfiguration von Connection-Pooling mit angemessenen Limits.
-   2. - [ ] Implementierung von Retry-Mechanismen für Datenbankverbindungen.
-   3. - [ ] Logging und Monitoring der Datenbankinteraktionen.
+4. - [ ] Optimization of the PostgreSQL Connection
+   1. - [ ] Configure connection pooling with appropriate limits.
+   2. - [ ] Implement retry mechanisms for database connections.
+   3. - [ ] Add logging and monitoring of database interactions.
 
-5. - [ ] Unit of Work Pattern Implementierung
-   1. - [ ] Korrekte Nutzung der MikroORM EntityManager für Unit-of-Work.
-   2. - [ ] Entwicklung eines transaktionalen Services für komplexe Datenbankoperationen.
-   3. - [ ] Implementierung von Fehlerbehandlung und Rollback-Strategien.
+5. - [ ] Unit of Work Pattern Implementation
+   1. - [ ] Correct use of the MikroORM EntityManager for Unit of Work.
+   2. - [ ] Development of a transactional service for complex database operations.
+   3. - [ ] Implementation of error handling and rollback strategies.
 
-6. - [ ] Multi-Tenancy in der Datenzugriffsschicht
-   1. - [ ] Implementierung einer `TenantAwareRepository`-Klasse, die Tenant-ID-Filter automatisch anwendet.
-   2. - [ ] Entwicklung eines `TenantContext`-Service zur Tenant-Identifikation.
-   3. - [ ] Integration der Tenant-Filterung in Repositories und Queries.
+6. - [ ] Multi-Tenancy in the Data Access Layer
+   1. - [ ] Implementation of a `TenantAwareRepository` class that automatically applies tenant ID filters.
+   2. - [ ] Development of a `TenantContext` service for tenant identification.
+   3. - [ ] Integration of tenant filtering in repositories and queries.
 
-7. - [ ] Erweiterung der Datenbank-Gesundheitsüberprüfung
-   1. - [ ] Implementierung umfassenderer Datenbank-Gesundheitschecks.
-   2. - [ ] Hinzufügen von Datenbankstatistiken zum Health-Endpoint.
-   3. - [ ] Überprüfung der Migrationsversion im Health-Check.
+7. - [ ] Enhancement of Database Health Checks
+   1. - [ ] Implementation of more comprehensive database health checks.
+   2. - [ ] Adding database statistics to the health endpoint.
+   3. - [ ] Checking the migration version in the health check.
 
 ## Constraints
 
-- MikroORM als exklusive ORM-Lösung verwenden.
-- Domain-Driven Design Prinzipien einhalten.
-- Die Datenbankabstraktion sollte die Geschäftslogik nicht beeinflussen.
-- Multi-Tenancy-Anforderungen müssen durchgängig berücksichtigt werden.
-- Klare Trennung von Zuständigkeiten zwischen Repositories, Services und Controllern.
-- PostgreSQL-spezifische Funktionen nutzen, wo sie Vorteile bieten.
-- Test-gesteuerte Entwicklung für Repository-Implementierungen.
+- Use MikroORM as the exclusive ORM solution.
+- Adhere to Domain-Driven Design principles.
+- The database abstraction should not influence business logic.
+- Multi-tenancy requirements must be considered throughout.
+- Clear separation of responsibilities between repositories, services, and controllers.
+- Utilize PostgreSQL-specific functions where they offer advantages.
+- Test-driven development for repository implementations.
 
 ## Data Models / Schema
 
@@ -94,7 +94,7 @@ export class BaseRepository<T extends BaseEntity> extends EntityRepository<T> {
     return count > 0;
   }
 
-  // Weitere gemeinsame Methoden...
+  // Additional common methods...
 }
 ```
 
@@ -125,11 +125,11 @@ export abstract class TenantAwareRepository<T extends BaseEntity> extends BaseRe
     return this.findOne({ ...where, tenantId } as FilterQuery<T>);
   }
 
-  // Weitere tenant-spezifische Methoden...
+  // Additional tenant-specific methods...
 }
 ```
 
-### DatabaseSeeder Struktur
+### DatabaseSeeder Structure
 
 ```typescript
 import { EntityManager } from '@mikro-orm/core';
@@ -143,34 +143,34 @@ export abstract class BaseSeeder extends Seeder {
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
     await new TenantSeeder().seed(em);
-    // Weitere Seeder...
+    // Additional seeders...
   }
 }
 
 export class TenantSeeder extends BaseSeeder {
   async seed(em: EntityManager): Promise<void> {
-    // Implementierung des Tenant-Seeding
+    // Implementation of tenant seeding
   }
 
   async truncate(em: EntityManager): Promise<void> {
-    // Implementierung des Tenant-Truncating
+    // Implementation of tenant truncating
   }
 }
 ```
 
 ## Structure
 
-- Erweiterung von `src/backend/src/common/repositories/`:
+- Extension of `src/backend/src/common/repositories/`:
   - `base.repository.ts`
   - `tenant-aware.repository.ts`
-- Erweiterung von `src/backend/src/tenants/`:
+- Extension of `src/backend/src/tenants/`:
   - `repositories/tenant.repository.ts`
   - `tenant-context.service.ts`
-- Erstellen von `src/backend/seeders/`:
+- Creation of `src/backend/seeders/`:
   - `database.seeder.ts`
   - `tenant.seeder.ts`
-- Anpassung von `src/backend/mikro-orm.config.ts` für Verbindungsoptimierung.
-- Erweiterung von `src/backend/src/app.service.ts` für verbesserte Health-Checks.
+- Modification of `src/backend/mikro-orm.config.ts` for connection optimization.
+- Extension of `src/backend/src/app.service.ts` for improved health checks.
 
 ## Diagrams
 
@@ -244,14 +244,16 @@ sequenceDiagram
 
 ## Dev Notes
 
-- Die `BaseRepository` und `TenantAwareRepository` bilden das Fundament der Datenzugriffsschicht und sollten sorgfältig implementiert werden.
-- Das Unit-of-Work-Muster von MikroORM (über EntityManager) sollte konsequent genutzt werden, um Transaktionen und Datenintegrität zu gewährleisten.
-- Die Testdatengeneration über Seeder ist essenziell für Entwicklungs- und Testumgebungen, sollte aber konfigurierbar sein, um nicht in Produktionsumgebungen zu laufen.
-- Bei der Optimierung der PostgreSQL-Verbindungen ist auf geeignete Pool-Größen zu achten, abhängig von der erwarteten Last und den Serverressourcen.
-- Die Multi-Tenancy-Implementierung muss sorgfältig gestaltet werden, um Datenisolation zu gewährleisten und gleichzeitig Abfragen effizient zu halten.
-- Die Migration-Strategie sollte sowohl automatisierte Deployments als auch manuelle Entwicklungsworkflows unterstützen.
+- The `BaseRepository` and `TenantAwareRepository` form the foundation of the data access layer and should be carefully implemented.
+- The Unit of Work pattern of MikroORM (via EntityManager) should be consistently used to ensure transactions and data integrity.
+- Test data generation via seeders is essential for development and test environments but should be configurable to not run in production environments.
+- When optimizing PostgreSQL connections, pay attention to appropriate pool sizes depending on expected load and server resources.
+- The multi-tenancy implementation must be carefully designed to ensure data isolation while keeping queries efficient.
+- The migration strategy should support both automated deployments and manual development workflows.
 
 ## Chat Command Log
 
 - User: ja, lass uns mit der planung der story beginnen
-- Agent: Erstellung des Story-Dokuments für Epic-1 Story-3 "Advanced Database Integration and Data Access Layer".
+- Agent: Creation of the story document for Epic-1 Story-3 "Advanced Database Integration and Data Access Layer".
+- User: wieso ist die story auf deutsch???
+- Agent: Corrected the story document, rewriting it in English as per project documentation standards.
