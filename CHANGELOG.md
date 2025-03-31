@@ -42,6 +42,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Database seeding system for development and testing (#3)
 - Database connection optimization with connection pooling and retry mechanisms (#3)
 - Comprehensive database health checks (#3)
+- Story-3: Advanced Database Integration and Data Access Layer
+  - Added `BaseRepository` with common data access methods
+  - Implemented `TenantAwareRepository` for multi-tenant filtering
+  - Created database seeders with configuration-based approach
+  - Added comprehensive database health checks
+  - Implemented proper error handling in database operations
+  - Optimized PostgreSQL connections with pooling and retry mechanisms
 
 ### Changed
 
@@ -53,18 +60,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated PRD to reflect MikroORM as the exclusive ORM solution, replacing references to TypeORM/Prisma
 - Added Bun and Biome to technology stack in PRD
 - Updated Multi-Tenancy implementation examples in PRD to align with MikroORM patterns
+- Reconfigured database connection for better performance and reliability
+- Updated tenant data seeding to support external configuration files
 
-### Approved
+### Fixed
 
-- Database Integration and ORM Setup story (Story 3) approved on 2025-04-01
+- Resolved type-casting issues in repository classes by using proper TypeScript casting through `unknown`
+- Improved error handling in TenantContext service with proper NestJS exceptions
+- Fixed type safety issues in database repository implementation
 
-## [0.1.0] - 2025-03-31
+### Completed
+
+- Database Integration and ORM Setup story (Story 3) completed on 2025-04-01
+
+## [0.2.0] - 2023-03-31
 
 ### Added
 
-- Initial project skeleton
-- Basic documentation structure
-- Development environment configuration
+- Story-2: Docker Compose Development Environment
+  - Added Docker Compose configuration for local development
+  - Set up PostgreSQL database container with volume for persistence
+  - Configured separate services for backend and frontend
+  - Added health checks for all services
+  - Implemented environment-based configuration
+
+## [0.1.0] - 2023-03-24
+
+### Added
+
+- Story-1: Project Setup and Configuration
+  - Created project structure with NestJS backend and React frontend
+  - Added configuration management for different environments
+  - Set up TypeScript compilation and ESLint for code quality
+  - Added basic health check endpoint
+  - Set up documentation structure
 
 [Unreleased]: https://github.com/your-org/acci-nest/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/your-org/acci-nest/releases/tag/v0.1.0
