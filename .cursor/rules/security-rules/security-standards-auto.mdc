@@ -1,5 +1,5 @@
 ---
-description: 
+description: ALWAYS apply when handling authentication, authorization, sensitive data, or implementing security features to ensure OWASP Top 10 and SOC2 compliance
 globs: src/**/*.ts
 alwaysApply: false
 ---

@@ -1,7 +1,7 @@
 ---
-description: 
-globs: src/api/**/*.ts, src/**/*.controller.ts, src/**/*.resolver.ts
-alwaysApply: false
+description: ALWAYS apply when designing, documenting or implementing APIs to ensure consistent standards, secure practices, and proper documentation across all API endpoints
+globs: src/**/*.{ts,js,tsx,jsx,controller.ts,service.ts,resolver.ts}
+alwaysApply: true
 ---
 
 # API Standards
