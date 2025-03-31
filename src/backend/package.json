@@ -25,7 +25,17 @@
     "orm:schema:update": "mikro-orm schema:update --run",
     "orm:migration:create": "mikro-orm migration:create",
     "orm:migration:up": "mikro-orm migration:up",
-    "orm:migration:down": "mikro-orm migration:down"
+    "orm:migration:down": "mikro-orm migration:down",
+    "migration:create": "mikro-orm migration:create",
+    "migration:up": "mikro-orm migration:up",
+    "migration:down": "mikro-orm migration:down",
+    "migration:pending": "mikro-orm migration:pending",
+    "schema:create": "mikro-orm schema:create --run",
+    "schema:update": "mikro-orm schema:update --run",
+    "schema:drop": "mikro-orm schema:drop --run",
+    "seed:create": "mikro-orm seeder:create",
+    "seed:run": "mikro-orm seeder:run",
+    "db:init": "bun run schema:create && bun run seed:run"
   },
   "keywords": [
     "nestjs",
@@ -42,6 +52,7 @@
     "@mikro-orm/migrations": "^6.4.11",
     "@mikro-orm/nestjs": "^6.1.1",
     "@mikro-orm/postgresql": "^6.4.11",
+    "@mikro-orm/seeder": "^6.4.11",
     "@mikro-orm/sql-highlighter": "^1.0.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.0.0",

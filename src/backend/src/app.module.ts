@@ -5,6 +5,7 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import configuration from './config/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { TenantsModule } from './tenants/tenants.module';
 
 @Module({
   imports: [
@@ -30,6 +31,9 @@ import { AppService } from './app.service';
       }),
       inject: [ConfigService],
     }),
+    
+    // Application modules
+    TenantsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
