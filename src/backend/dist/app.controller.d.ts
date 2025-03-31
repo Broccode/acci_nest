@@ -3,7 +3,11 @@ export declare class AppController {
     private readonly appService;
     constructor(appService: AppService);
     getHello(): string;
-    getHealth(): {
+    getHealth(): Promise<{
         status: string;
-    };
+        timestamp: string;
+        checks: {
+            database: string;
+        };
+    }>;
 }

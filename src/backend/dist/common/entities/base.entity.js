@@ -9,30 +9,27 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppService = void 0;
-const common_1 = require("@nestjs/common");
+exports.BaseEntity = void 0;
 const core_1 = require("@mikro-orm/core");
-let AppService = class AppService {
-    constructor(em) {
-        this.em = em;
+const uuid_1 = require("uuid");
+class BaseEntity {
+    constructor() {
+        this.id = (0, uuid_1.v4)();
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
     }
-    getHello() {
-        return 'Hello World!';
-    }
-    async checkDbConnection() {
-        try {
-            await this.em.getConnection().execute('SELECT 1');
-            return true;
-        }
-        catch (error) {
-            console.error('Database connection failed:', error);
-            return false;
-        }
-    }
-};
-exports.AppService = AppService;
-exports.AppService = AppService = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [core_1.EntityManager])
-], AppService);
-//# sourceMappingURL=app.service.js.map
+}
+exports.BaseEntity = BaseEntity;
+__decorate([
+    (0, core_1.PrimaryKey)({ type: 'uuid' }),
+    __metadata("design:type", String)
+], BaseEntity.prototype, "id", void 0);
+__decorate([
+    (0, core_1.Property)(),
+    __metadata("design:type", Date)
+], BaseEntity.prototype, "createdAt", void 0);
+__decorate([
+    (0, core_1.Property)({ onUpdate: () => new Date() }),
+    __metadata("design:type", Date)
+], BaseEntity.prototype, "updatedAt", void 0);
+//# sourceMappingURL=base.entity.js.map

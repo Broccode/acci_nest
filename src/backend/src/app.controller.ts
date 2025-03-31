@@ -10,10 +10,18 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  // Task 4: Basic Health Check Endpoint
+  // Task 4: Basic Health Check Endpoint - updated with database status
   @Get('health')
   @HttpCode(HttpStatus.OK)
-  getHealth(): { status: string } {
-    return { status: 'ok' };
+  async getHealth(): Promise<{ status: string, timestamp: string, checks: { database: string } }> {
+    const dbStatus = await this.appService.checkDbConnection();
+    
+    return {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      checks: {
+        database: dbStatus ? 'up' : 'down',
+      }
+    };
   }
 } 

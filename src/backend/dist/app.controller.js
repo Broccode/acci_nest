@@ -19,8 +19,15 @@ let AppController = class AppController {
     getHello() {
         return this.appService.getHello();
     }
-    getHealth() {
-        return { status: 'ok' };
+    async getHealth() {
+        const dbStatus = await this.appService.checkDbConnection();
+        return {
+            status: 'ok',
+            timestamp: new Date().toISOString(),
+            checks: {
+                database: dbStatus ? 'up' : 'down',
+            }
+        };
     }
 };
 exports.AppController = AppController;
@@ -35,7 +42,7 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Object)
+    __metadata("design:returntype", Promise)
 ], AppController.prototype, "getHealth", null);
 exports.AppController = AppController = __decorate([
     (0, common_1.Controller)(),

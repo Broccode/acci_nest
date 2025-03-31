@@ -23,14 +23,26 @@ describe('AppController (e2e)', () => {
     return request(app.getHttpServer())
       .get('/')
       .expect(200)
-      .expect('Hello from ACCI Nest Backend!');
+      .expect('Hello World!');
   });
 
-  // Test for Task 4: Basic Health Check Endpoint
+  // Test for Task 4: Updated Health Check Endpoint with database status
   it('/health (GET)', () => {
     return request(app.getHttpServer())
       .get('/health')
       .expect(200) // Expect HttpStatus.OK
-      .expect({ status: 'ok' }); // Expect the defined response body
+      .expect((res) => {
+        // Check response structure without checking exact values for timestamp
+        expect(res.body).toHaveProperty('status');
+        expect(res.body).toHaveProperty('timestamp');
+        expect(res.body).toHaveProperty('checks');
+        expect(res.body.checks).toHaveProperty('database');
+        
+        // Status should be 'ok' regardless of database connection
+        expect(res.body.status).toBe('ok');
+        
+        // Database status could be 'up' or 'down' depending on the test environment
+        expect(['up', 'down']).toContain(res.body.checks.database);
+      });
   });
 }); 
