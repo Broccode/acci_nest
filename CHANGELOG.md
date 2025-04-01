@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added integration tests for service layer with entity manager mocking
   - Created comprehensive test suite for user management components
   - Added test utilities for MikroORM entity testing
+  - Added Testcontainers integration documentation for realistic infrastructure testing
 
 - **User Management System**
   - Implemented core user module with entities and repositories
@@ -125,6 +126,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optimized database queries for better performance
 - Enhanced multi-tenancy support in service layer
 - Updated architecture documentation to include LDAP/Active Directory integration for enterprise authentication
+- Enhanced Testing Strategy section in architecture document with Testcontainers implementation examples
+- Added detailed examples for PostgreSQL, Redis, Multi-Tenancy, LDAP and Plugin System testing with real containers
 - **Project Configuration Updates**
   - Updated TypeScript configuration files for better module resolution
   - Updated package dependencies and configuration files
@@ -145,4 +148,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added cursor rule for simplified test dependencies to improve test maintainability
 - Fixed incorrect year (2024 to 2025) in migration filename and class name to align with project timeline
 
+## [0.1.0] - 2025-04-02
+
+### Added
+
+- Initial project structure and documentation
+- Base architecture design
+- Core framework setup
+- Testing framework foundation
+- Documentation framework
+
 [Unreleased]: https://github.com/your-org/acci-nest/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/your-org/acci-nest/releases/tag/v0.1.0
