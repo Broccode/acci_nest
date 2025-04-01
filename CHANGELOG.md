@@ -141,5 +141,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Error handling in TenantContext service
 - Integration issues between Redis and NestJS modules
 - Documentation error in Story 5 - task checkboxes were not properly marked as completed
+- Dependency resolution errors in exception tests by implementing a simplified test exception filter
+- Added cursor rule for simplified test dependencies to improve test maintainability
 
 [Unreleased]: https://github.com/your-org/acci-nest/compare/v0.1.0...HEAD
