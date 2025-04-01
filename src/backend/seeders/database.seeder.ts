@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
-import { TenantSeeder } from './tenant.seeder.ts';
+import { TenantSeeder } from './tenant.seeder';
 
 /**
  * Main database seeder that coordinates all other seeders
