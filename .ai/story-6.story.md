@@ -8,7 +8,7 @@ User and Role Management - Core Entities
 
 ## Status
 
-Draft
+Approved
 
 ## Context
 
