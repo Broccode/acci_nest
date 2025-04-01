@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Database Management**
+  - Added migration for user management tables (users, roles, permissions)
+  - Updated MikroORM configuration for better TypeScript support
+  - Improved seeder architecture with proper dependencies
+  - Added database seeder for initial data population
+
 - **MikroORM Development Rules**
   - Added bidirectional relationship rules for MikroORM entities
   - Added examples of proper relationship configuration

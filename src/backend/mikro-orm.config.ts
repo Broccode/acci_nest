@@ -1,15 +1,14 @@
-import { defineConfig } from '@mikro-orm/core';
+import { defineConfig, LoadStrategy, Options } from '@mikro-orm/core';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
-import { LoadStrategy } from '@mikro-orm/core';
 import configuration from './src/config/configuration';
+import { DatabaseSeeder } from './seeders/DatabaseSeeder';
 
 // Load environment variables from .env file
-import * as dotenv from 'dotenv';
-dotenv.config();
+require('dotenv').config();
 
 const config = configuration();
 
-export default defineConfig({
+const configOptions: Options = {
   driver: require('@mikro-orm/postgresql').PostgreSqlDriver,
   host: config.database.host,
   port: config.database.port,
@@ -58,9 +57,11 @@ export default defineConfig({
   
   seeder: {
     path: './seeders',
+    pathTs: './seeders',
     defaultSeeder: 'DatabaseSeeder',
     glob: '!(*.d).{js,ts}',
     emit: 'ts',
+    fileName: (className: string) => className,
   },
   
   allowGlobalContext: true,
@@ -68,4 +69,6 @@ export default defineConfig({
   discovery: {
     warnWhenNoEntities: false, // disable warnings when no entities were discovered
   },
-}); 
+};
+
+export default configOptions; 
