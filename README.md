@@ -1,39 +1,41 @@
-# ACCI Nest
+# 🏢 ACCI Nest
 
-Multi-tenant, plugin-extensible platform built with NestJS and React using Bun runtime.
+Robust, scalable multi-tenant platform with plugin architecture, built with NestJS and React using the Bun runtime.
 
-## Overview
+## 📋 Overview
 
-ACCI Nest is a scalable, multi-tenant application platform that supports plugin-based extension. It uses a modern tech stack including NestJS (backend), React (frontend), Bun (JavaScript/TypeScript runtime), PostgreSQL (database), and Redis (caching).
+ACCI Nest is a scalable, multi-tenant application platform that supports plugin-based extension. It uses a modern tech stack including NestJS (backend), React (frontend), Bun (JavaScript/TypeScript runtime), PostgreSQL (database), MikroORM (ORM), and Redis (caching).
 
-## Features
+## ✨ Key Features
 
-- **Multi-tenancy**: Isolated environments for different tenants
-- **Plugin Architecture**: Extend functionality through plugins
-- **RESTful API**: Well-documented API with Swagger integration
-- **Authentication & Authorization**: Secure JWT-based authentication
-- **Real-time Communication**: WebSocket support for real-time features
-- **Responsive UI**: Modern user interface built with React
+- **🏢 Multi-Tenancy**: Isolated environments for different tenants with shared infrastructure
+- **🧩 Plugin Architecture**: Extend functionality through dynamically loadable plugins
+- **🔄 Dual API Support**: REST and GraphQL APIs with Swagger/OpenAPI documentation
+- **🔐 Authentication & Authorization**: Secure JWT-based authentication with RBAC
+- **📱 Responsive UI**: Modern user interface built with React and TypeScript
+- **🌐 Internationalization**: Multi-language support and cultural/regional formatting
+- **📊 Monitoring & Observability**: Structured logging with correlation IDs and health checks
 
-## Technology Stack
+## 🛠️ Technology Stack
 
-- **Backend**: NestJS (TypeScript)
-- **Frontend**: React (TypeScript)
+- **Backend**: NestJS, TypeScript, MikroORM
+- **Frontend**: React, TypeScript, Redux/Context API
 - **Runtime**: Bun (Fast JavaScript/TypeScript runtime)
 - **Database**: PostgreSQL
 - **Caching**: Redis
-- **Authentication**: JWT, Passport
+- **Authentication**: JWT, Passport.js
 - **API Documentation**: Swagger/OpenAPI
 - **Containerization**: Docker, Docker Compose
+- **CI/CD**: GitHub Actions
+- **Monitoring**: Prometheus, Grafana
 
-## Prerequisites
+## 📋 Prerequisites
 
 - Bun >= 1.0.0
 - Docker and Docker Compose
-- PostgreSQL 14+
-- Redis 7+
+- Node.js >= 18.0.0 (for development tools)
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Installation
 
@@ -50,7 +52,7 @@ cd acci-nest
 bun install
 ```
 
-3. Create a `.env` file based on the `.env.example`:
+3. Create a `.env` file based on `.env.example`:
 
 ```bash
 cp .env.example .env
@@ -75,7 +77,7 @@ bun run start:frontend:dev
 bun run build
 ```
 
-## Directory Structure
+## 📂 Directory Structure
 
 ```
 acci-nest/
@@ -85,7 +87,14 @@ acci-nest/
 │   └── guides/              # Usage guides
 ├── src/
 │   ├── backend/             # NestJS backend application
+│   │   ├── auth/            # Authentication module
+│   │   ├── user/            # User management module
+│   │   ├── tenant/          # Tenant management module
+│   │   └── plugin/          # Plugin system
 │   ├── frontend/            # React frontend application
+│   │   ├── components/      # Reusable components
+│   │   ├── pages/           # Page components
+│   │   └── services/        # Frontend services
 │   └── shared/              # Shared code between frontend and backend
 ├── tests/                   # Test files
 │   ├── unit/                # Unit tests
@@ -100,17 +109,18 @@ acci-nest/
 └── README.md                # Project documentation
 ```
 
-## Contributing
+## 🤝 Contributing
 
 Please read the contribution guidelines before submitting pull requests.
 
-## License
+## 📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Acknowledgments
+## 👏 Acknowledgments
 
 - NestJS - The framework used
 - React - The frontend library
+- MikroORM - The TypeScript ORM
 - PostgreSQL - The database
 - Docker - Containerization platform
