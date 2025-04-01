@@ -6,6 +6,8 @@ import configuration from './config/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TenantsModule } from './tenants/tenants.module';
+import { UsersModule } from './users/users.module';
+import { RedisModule } from './common/redis/redis.module';
 import { CacheModule } from './common/cache/cache.module';
 import { RateLimitModule } from './common/rate-limiting';
 import { PerformanceModule } from './common/performance';
@@ -51,6 +53,8 @@ import { PerformanceInterceptor } from './common/performance';
     
     // Application modules
     TenantsModule,
+    UsersModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [
