@@ -29,7 +29,7 @@ bun run start:dev
 bun install
 
 // Using the Bun package runner
-bunx typeorm migration:run
+bunx mikro-orm migration:up
 
 // Using Biome.js through Bun
 bunx @biomejs/biome check --apply .

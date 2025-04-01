@@ -93,7 +93,7 @@ The application is distributed via Docker Compose as follows:
 ## Technology Stack
 
 - **Frontend**: React, TypeScript, Redux/Context API
-- **Backend**: NestJS, TypeScript, TypeORM
+- **Backend**: NestJS, TypeScript, MikroORM
 - **Database**: PostgreSQL
 - **API Documentation**: Swagger/OpenAPI
 - **Containerization**: Docker, Docker Compose

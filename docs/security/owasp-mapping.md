@@ -55,7 +55,7 @@ This document provides detailed mapping between OWASP Top 10 (2021) security ris
 | Implementation | Description | Status | Location |
 |----------------|-------------|--------|----------|
 | Input Validation | Comprehensive input validation for all user inputs | Planned | `src/common/validation` |
-| ORM Usage | Use of TypeORM/Prisma with parameterized queries | Planned | `src/infrastructure/database` |
+| ORM Usage | Use of MikroORM with parameterized queries | Planned | `src/infrastructure/database` |
 | Content Security Policy | Implementation of CSP headers | Planned | `src/main.ts` |
 | API Input Sanitization | Validation pipes for all API inputs | Planned | `src/common/pipes` |
 | Command Execution Protection | Secure handling of any command execution | Planned | `src/common/utils/exec.util.ts` |

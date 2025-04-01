@@ -6,7 +6,7 @@
 |------------|-------------|------------|
 | Backend    | NestJS      | Modular structure, TypeScript support, Dependency Injection |
 | Frontend   | React       | Component-based, large community, flexibility |
-| ORM        | TypeORM     | TypeScript integration, Repository pattern |
+| ORM        | MikroORM    | TypeScript integration, Repository pattern, better type safety |
 | API Docs   | Swagger     | Automatic documentation, testability |
 | Testing    | Jest        | Comprehensive, easy mock creation |
 
@@ -21,7 +21,7 @@ NestJS was chosen as the backend framework for the following reasons:
 - **Dependency Injection**: Simplifies testability and modularity
 - **Express Compatibility**: Enables use of the Express ecosystem
 - **Decorator API**: Facilitates implementation of middleware and guards
-- **Integrations**: Offers ready-made integrations for TypeORM, GraphQL, etc.
+- **Integrations**: Offers ready-made integrations for MikroORM, GraphQL, etc.
 
 #### React
 
@@ -145,7 +145,7 @@ The application implements a discriminator-based multi-tenancy approach:
 
 | Threat | Protection Mechanism | Implementation Details |
 |-----------|-------------------|-------------------------|
-| Injection | Prepared Statements, ORM | TypeORM with parameterization |
+| Injection | Prepared Statements, ORM | MikroORM with parameterization |
 | XSS | Content Security Policy, Output Encoding | Helmet.js, React escaping |
 | CSRF | CSRF Tokens, SameSite Cookies | CSRF middleware |
 | Broken Authentication | Secure Password Hashing, MFA | Argon2, TOTP |

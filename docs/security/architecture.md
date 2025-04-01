@@ -190,7 +190,7 @@ graph TD
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([User, RefreshToken, LoginAttempt]),
+    MikroOrmModule.forFeature([User, RefreshToken, LoginAttempt]),
     MfaModule,
   ],
   providers: [
