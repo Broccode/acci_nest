@@ -1,0 +1,125 @@
+---
+description: Apply when designing or implementing middleware components in NestJS to ensure proper dependency injection and avoid circular dependencies
+globs: src/**/*.middleware.ts
+alwaysApply: false
+---
+
+# Middleware Dependency Injection Best Practices
+
+## Context
+
+- Apply when creating or modifying NestJS middleware
+- Reference when implementing constructor parameters in middleware
+- Follow when designing middleware configuration patterns
+- Use when troubleshooting dependency injection errors in middleware
+- Check when middleware components need complex configurations
+
+## Critical Rules
+
+- AVOID passing configuration objects directly to middleware constructors
+- USE parameterless constructors for simple middlewares
+- IMPLEMENT configuration through module providers and dependency injection
+- DEFINE middleware options as injectable providers in the related module
+- USE factory providers for complex middleware configuration
+- KEEP middleware constructors simple and only inject known providers
+- LEVERAGE dependency injection for service dependencies in middlewares
+- BIND the `use` method to the middleware instance when using outside of the middleware consumer
+
+## Examples
+
+<example>
+// Good: Simple middleware with no constructor parameters
+@Injectable()
+export class SimpleMiddleware implements NestMiddleware {
+  private readonly logger = new Logger(SimpleMiddleware.name);
+
+  constructor() {}
+
+  use(req: Request, res: Response, next: NextFunction): void {
+    // Implementation
+    next();
+  }
+}
+
+// Good: Module configuration for more complex middleware
+@Module({
+  providers: [
+    // Configure options as a provider
+    {
+      provide: 'COMPRESSION_OPTIONS',
+      useValue: { level: 6, threshold: 1024 },
+    },
+    CompressionService,
+  ],
+  exports: ['COMPRESSION_OPTIONS', CompressionService],
+})
+export class CompressionModule {}
+
+// Good: Middleware with proper dependency injection
+@Injectable()
+export class ConfigurableMiddleware implements NestMiddleware {
+  constructor(
+    @Inject('COMPRESSION_OPTIONS') private options: CompressionOptions,
+    private compressionService: CompressionService,
+  ) {}
+
+  use(req: Request, res: Response, next: NextFunction): void {
+    // Use injected services and configuration
+    this.compressionService.compress(req, res, next, this.options);
+  }
+}
+
+// Good: Proper middleware usage in main.ts
+const middleware = new SimpleMiddleware();
+app.use(middleware.use.bind(middleware));
+</example>
+
+<example type="invalid">
+// Bad: Direct configuration in constructor
+@Injectable()
+export class BadMiddleware implements NestMiddleware {
+  private readonly middleware: any;
+
+  // Problem: NestJS can't resolve these parameters
+  constructor(options: MiddlewareOptions = {}) {
+    this.middleware = createMiddleware(options);
+  }
+
+  use(req: Request, res: Response, next: NextFunction): void {
+    this.middleware(req, res, next);
+  }
+}
+
+// Bad: Using middleware without binding this context
+// In main.ts or bootstrap function
+const middleware = new SomeMiddleware();
+app.use(middleware.use); // Will lose 'this' context
+
+// Bad: Complex configuration logic in constructor
+@Injectable()
+export class ComplexConfigMiddleware implements NestMiddleware {
+  private config: any;
+
+  constructor(
+    private configService: ConfigService,
+    // Unknown parameter that NestJS can't resolve
+    options: Record<string, any>,
+  ) {
+    // Complex configuration logic in constructor
+    this.config = {
+      ...this.configService.get('middleware'),
+      ...options,
+      callback: this.handleCallback
+    };
+  }
+
+  use(req: Request, res: Response, next: NextFunction): void {
+    // Implementation using this.config
+    next();
+  }
+
+  private handleCallback() {
+    // Some callback logic
+  }
+}
+</example> 
