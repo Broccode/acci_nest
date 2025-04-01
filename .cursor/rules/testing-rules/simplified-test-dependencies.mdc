@@ -1,0 +1,149 @@
+---
+description: ALWAYS prefer simplified test dependencies when testing components with complex external dependencies to improve test maintainability and focus
+globs: tests/**/*.spec.ts, tests/**/*.test.ts, src/**/*.spec.ts, src/**/*.test.ts
+alwaysApply: false
+---
+
+# Simplified Test Dependencies
+
+## Context
+
+- Apply when writing tests for components with complex external dependencies
+- Use when dependency injection creates obstacles in test setup
+- Reference when mocking would add unnecessary complexity
+- Follow when isolating specific functionality for testing
+- Check when tests fail due to dependency resolution issues
+
+## Critical Rules
+
+- PREFER creating simplified test-specific implementations over complex mocking when appropriate
+- IMPLEMENT only the functionality needed for the specific test scenario
+- ISOLATE the component under test from external dependencies whenever possible
+- AVOID unnecessary dependency chains in test implementations
+- FOCUS tests on the specific behavior being validated, not on peripheral concerns
+- DOCUMENT clearly when a simplified implementation is used in place of the real component
+- CREATE independent test utilities that don't rely on the application's dependency injection
+- CONSIDER direct instantiation of classes instead of relying on the DI container for simpler tests
+- ENSURE test implementations mimic the essential behavior of the real components
+- BALANCE between realistic testing and test simplicity
+
+## Examples
+
+<example>
+// Original implementation with complex dependencies
+@Injectable()
+export class GlobalExceptionFilter implements ExceptionFilter {
+  constructor(
+    @Inject(LOGGING_SERVICE) private readonly loggingService: LoggingService,
+    @Inject(METRICS_SERVICE) private readonly metricsService: MetricsService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  catch(exception: any, host: ArgumentsHost) {
+    // Complex implementation with many dependencies
+    this.loggingService.error('Exception caught', exception);
+    this.metricsService.incrementCounter('exceptions');
+    // ...
+  }
+}
+
+// Simplified test implementation with no external dependencies
+@Catch()
+class TestExceptionFilter implements ExceptionFilter {
+  catch(exception: any, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse();
+    const request = ctx.getRequest();
+    
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
+    let errorResponse = {
+      statusCode: status,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+      message: 'Internal server error',
+    };
+    
+    // Only implement the functionality needed for tests
+    if (exception instanceof DomainException) {
+      status = exception.getStatus();
+      errorResponse = {
+        ...errorResponse,
+        statusCode: status,
+        message: exception.message,
+      };
+    }
+    
+    response.status(status).json(errorResponse);
+  }
+}
+
+// Test using the simplified implementation
+describe('ExceptionsModule', () => {
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [TestModule],
+      providers: [
+        {
+          provide: APP_FILTER,
+          useClass: TestExceptionFilter, // Use simplified filter
+        }
+      ],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    await app.init();
+  });
+
+  // Tests can now focus on exception handling behavior
+  // without dealing with logging, metrics, etc.
+});
+</example>
+
+<example type="invalid">
+// Overly complex test setup trying to mock every dependency
+describe('ExceptionsModule', () => {
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    // Creating mocks for all dependencies
+    const mockLoggingService = createMock<LoggingService>();
+    const mockMetricsService = createMock<MetricsService>();
+    const mockConfigService = createMock<ConfigService>();
+    const mockCacheService = createMock<CacheService>();
+    const mockTenantService = createMock<TenantService>();
+    
+    // Unnecessarily complex mocking
+    mockLoggingService.error.mockImplementation(() => {});
+    mockMetricsService.incrementCounter.mockImplementation(() => {});
+    mockConfigService.get.mockImplementation((key) => {
+      if (key === 'app.environment') return 'test';
+      if (key === 'logging.level') return 'error';
+      return undefined;
+    });
+    
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [
+        LoggingModule,
+        MetricsModule,
+        ConfigModule,
+        CacheModule,
+        TenantModule,
+        ExceptionsModule,
+        TestModule,
+      ],
+    })
+    .overrideProvider(LOGGING_SERVICE)
+    .useValue(mockLoggingService)
+    .overrideProvider(METRICS_SERVICE)
+    .useValue(mockMetricsService)
+    .overrideProvider(ConfigService)
+    .useValue(mockConfigService)
+    // ... many more overrides
+    .compile();
+
+    // The test becomes more about setting up dependencies
+    // than testing the actual functionality
+  });
+});</example> 

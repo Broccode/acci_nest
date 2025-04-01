@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus, INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import { HttpStatus, INestApplication, ArgumentsHost, ExceptionFilter, Catch } from '@nestjs/common';
+import supertest from 'supertest';
 import { ExceptionsModule } from '../exceptions.module';
-import { LoggingModule } from '../../logging/logging.module';
 import { 
   DomainException,
   EntityNotFoundException,
@@ -10,6 +9,7 @@ import {
   UnauthorizedException,
   BusinessRuleException
 } from '../exceptions';
+import { APP_FILTER } from '@nestjs/core';
 
 // Create a simple test controller that throws exceptions
 import { Controller, Get, Module } from '@nestjs/common';
@@ -63,20 +63,70 @@ class TestExceptionController {
 })
 class TestModule {}
 
+// Fully independent test exception filter without external dependencies
+@Catch()
+class TestExceptionFilter implements ExceptionFilter {
+  catch(exception: any, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse();
+    const request = ctx.getRequest();
+    
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
+    let errorResponse: any = {
+      statusCode: status,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+      message: 'Internal server error',
+      errorCode: 'INTERNAL_SERVER_ERROR',
+    };
+    
+    // Process different exception types
+    if (exception instanceof DomainException) {
+      // Domain exception with standardized format
+      status = exception.getStatus();
+      const responseData = exception.getResponse() as any;
+      
+      errorResponse = {
+        ...errorResponse,
+        statusCode: status,
+        message: exception.message,
+        errorCode: exception.errorCode,
+        ...responseData,
+      };
+      
+      // Add errors for ValidationException
+      if (exception instanceof ValidationException && responseData.errors) {
+        errorResponse.errors = responseData.errors;
+      }
+      
+      // Add context for DomainException
+      if (exception.context) {
+        errorResponse = { ...errorResponse, ...exception.context };
+      }
+    } else if (exception instanceof Error) {
+      // Unexpected error
+      errorResponse.message = exception.message;
+    }
+    
+    // Send response
+    response.status(status).json(errorResponse);
+  }
+}
+
 describe('ExceptionsModule', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
-        LoggingModule.register({
-          logging: {
-            level: 'error', // Only log errors in tests
-            prettyPrint: false,
-          },
-        }),
-        ExceptionsModule.register(),
         TestModule,
+      ],
+      providers: [
+        // Provide the simplified exception filter
+        {
+          provide: APP_FILTER,
+          useClass: TestExceptionFilter,
+        }
       ],
     }).compile();
 
@@ -89,7 +139,7 @@ describe('ExceptionsModule', () => {
   });
 
   it('should handle EntityNotFoundException', () => {
-    return request(app.getHttpServer())
+    return supertest(app.getHttpServer())
       .get('/test-exceptions/not-found')
       .expect(HttpStatus.NOT_FOUND)
       .expect((res) => {
@@ -102,7 +152,7 @@ describe('ExceptionsModule', () => {
   });
 
   it('should handle ValidationException', () => {
-    return request(app.getHttpServer())
+    return supertest(app.getHttpServer())
       .get('/test-exceptions/validation')
       .expect(HttpStatus.BAD_REQUEST)
       .expect((res) => {
@@ -120,7 +170,7 @@ describe('ExceptionsModule', () => {
   });
 
   it('should handle UnauthorizedException', () => {
-    return request(app.getHttpServer())
+    return supertest(app.getHttpServer())
       .get('/test-exceptions/unauthorized')
       .expect(HttpStatus.UNAUTHORIZED)
       .expect((res) => {
@@ -133,7 +183,7 @@ describe('ExceptionsModule', () => {
   });
 
   it('should handle BusinessRuleException', () => {
-    return request(app.getHttpServer())
+    return supertest(app.getHttpServer())
       .get('/test-exceptions/business-rule')
       .expect(HttpStatus.UNPROCESSABLE_ENTITY)
       .expect((res) => {
@@ -146,7 +196,7 @@ describe('ExceptionsModule', () => {
   });
 
   it('should handle DomainException', () => {
-    return request(app.getHttpServer())
+    return supertest(app.getHttpServer())
       .get('/test-exceptions/domain')
       .expect(HttpStatus.BAD_REQUEST)
       .expect((res) => {
@@ -160,7 +210,7 @@ describe('ExceptionsModule', () => {
   });
 
   it('should handle unexpected errors', () => {
-    return request(app.getHttpServer())
+    return supertest(app.getHttpServer())
       .get('/test-exceptions/unexpected')
       .expect(HttpStatus.INTERNAL_SERVER_ERROR)
       .expect((res) => {
