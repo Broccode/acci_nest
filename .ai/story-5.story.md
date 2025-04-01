@@ -8,7 +8,7 @@ Logging and Exception Handling Framework
 
 ## Status
 
-Draft
+Completed
 
 ## Context
 
