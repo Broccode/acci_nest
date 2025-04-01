@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisModule } from '../redis/redis.module';
 import { RedisCacheService } from './redis-cache.service';
 import { CacheableInterceptor } from './cacheable.interceptor';
+import { TenantsModule } from '../../tenants/tenants.module';
 
 /**
  * Configuration options for the cache module
@@ -37,6 +38,7 @@ export class CacheModule {
         RedisModule.register({
           isGlobal: false,
         }),
+        TenantsModule,
       ],
       providers: [
         RedisCacheService,

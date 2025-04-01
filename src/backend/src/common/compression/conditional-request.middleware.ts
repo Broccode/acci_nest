@@ -3,31 +3,14 @@ import { NextFunction, Request, Response } from 'express';
 import * as crypto from 'crypto';
 
 /**
- * Options for conditional request middleware
- */
-export interface ConditionalRequestOptions {
-  /** Formats for the ETag of a response */
-  etag?: boolean | 'weak' | 'strong';
-  /** Whether to include Last-Modified headers */
-  lastModified?: boolean;
-}
-
-/**
  * Middleware for handling conditional requests with ETags and Last-Modified headers
  * Implements HTTP 304 Not Modified responses for efficient caching
  */
 @Injectable()
 export class ConditionalRequestMiddleware implements NestMiddleware {
   private readonly logger = new Logger(ConditionalRequestMiddleware.name);
-  private readonly options: ConditionalRequestOptions;
 
-  constructor(options: ConditionalRequestOptions = {}) {
-    this.options = {
-      etag: 'weak',
-      lastModified: true,
-      ...options,
-    };
-  }
+  constructor() {}
 
   /**
    * Applies conditional request handling to responses
@@ -68,39 +51,31 @@ export class ConditionalRequestMiddleware implements NestMiddleware {
           return originalEnd.apply(res, [chunk, ...args]);
         }
 
-        // Add ETag header if enabled
-        if (this.options.etag) {
-          const hash = crypto.createHash('md5')
-            .update(completeBody)
-            .digest('hex');
-          
-          const etagValue = this.options.etag === 'weak' 
-            ? `W/"${hash}"`
-            : `"${hash}"`;
-          
-          res.setHeader('ETag', etagValue);
-          
-          // Check If-None-Match header
-          const ifNoneMatch = req.headers['if-none-match'];
-          if (ifNoneMatch && ifNoneMatch === etagValue) {
-            res.statusCode = 304;
-            return originalEnd.apply(res, [null, 'utf-8']);
-          }
+        // Add ETag header
+        const hash = crypto.createHash('md5')
+          .update(completeBody)
+          .digest('hex');
+        
+        const etagValue = `W/"${hash}"`;
+        
+        res.setHeader('ETag', etagValue);
+        
+        // Check If-None-Match header
+        const ifNoneMatch = req.headers['if-none-match'];
+        if (ifNoneMatch && ifNoneMatch === etagValue) {
+          res.statusCode = 304;
+          return originalEnd.apply(res, [null, 'utf-8']);
         }
         
-        // Add Last-Modified header if enabled
-        if (this.options.lastModified) {
-          // Use current time as a last resort, but ideally this would be
-          // set from a real resource modification time
-          const lastModified = new Date().toUTCString();
-          res.setHeader('Last-Modified', lastModified);
-          
-          // Check If-Modified-Since header
-          const ifModifiedSince = req.headers['if-modified-since'];
-          if (ifModifiedSince && ifModifiedSince === lastModified) {
-            res.statusCode = 304;
-            return originalEnd.apply(res, [null, 'utf-8']);
-          }
+        // Add Last-Modified header
+        const lastModified = new Date().toUTCString();
+        res.setHeader('Last-Modified', lastModified);
+        
+        // Check If-Modified-Since header
+        const ifModifiedSince = req.headers['if-modified-since'];
+        if (ifModifiedSince && ifModifiedSince === lastModified) {
+          res.statusCode = 304;
+          return originalEnd.apply(res, [null, 'utf-8']);
         }
       } catch (error) {
         this.logger.error('Error in conditional request middleware', error instanceof Error ? error.stack : String(error));

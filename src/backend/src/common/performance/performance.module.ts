@@ -8,7 +8,11 @@ import { RedisModule } from '../redis/redis.module';
  * Provides services and interceptors for tracking and analyzing performance metrics
  */
 @Module({
-  imports: [RedisModule],
+  imports: [
+    RedisModule.register({
+      isGlobal: false,
+    })
+  ],
   providers: [PerformanceService, PerformanceInterceptor],
   exports: [PerformanceService, PerformanceInterceptor],
 })

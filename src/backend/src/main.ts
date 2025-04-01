@@ -11,23 +11,12 @@ async function bootstrap() {
   const port = process.env.BACKEND_PORT || 3000;
   
   // Apply compression middleware
-  app.use(new CompressionMiddleware({
-    level: 6, // Balanced between speed and compression ratio
-    threshold: 1024, // Compress responses larger than 1KB
-  }).use);
+  const compressionMiddleware = new CompressionMiddleware();
+  app.use(compressionMiddleware.use.bind(compressionMiddleware));
   
-  // Apply HTTP cache middleware
-  app.use(new HttpCacheMiddleware({
-    maxAge: 300, // 5 minutes default cache
-    public: true,
-    getCacheOptions: (req) => {
-      // Dynamic cache options based on route
-      if (req.path.startsWith('/api/public')) {
-        return { maxAge: 3600 }; // Cache public endpoints for 1 hour
-      }
-      return {};
-    }
-  }).use);
+  // Apply HTTP cache middleware with minimal configuration
+  const httpCacheMiddleware = new HttpCacheMiddleware();
+  app.use(httpCacheMiddleware.use.bind(httpCacheMiddleware));
   
   // app.setGlobalPrefix('api'); // Temporarily commented out
   
