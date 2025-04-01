@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **MikroORM Development Rules**
+  - Added bidirectional relationship rules for MikroORM entities
+  - Added examples of proper relationship configuration
+  - Included common error patterns to avoid
+  - Configured auto-application for entity files
+
 - **Story 4: Caching and Performance Foundation**
   - **Redis Integration**
     - Redis service in Docker Compose with persistence
