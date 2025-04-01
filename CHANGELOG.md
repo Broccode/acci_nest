@@ -9,101 +9,91 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Story 4: Caching and Performance Foundation**
+  - **Redis Integration**
+    - Redis service in Docker Compose with persistence
+    - Redis module with connection pooling and error handling
+    - Redis health checks for application monitoring
+    - Redis clustering support for development and production
+    - Redis client provider with auto-reconnect capabilities
+
+  - **Caching Strategy**
+    - Cache abstraction layer with type-safe operations
+    - Redis-based caching with multi-tenancy support
+    - Tenant-aware cache key generation
+    - Method-level caching with TTL and tag support
+    - Query result caching for database operations
+    - Cache interceptor for transparent method caching
+    - Decorator-based cache configuration
+
+  - **Cache Invalidation**
+    - Event-based cache invalidation mechanism
+    - Cache tags for grouping related cache entries
+    - Tenant-specific cache clearing operations
+    - Cache dependencies tracking for related data
+    - Optimized bulk cache invalidation using Redis pipelines
+    - Atomic cache operations for thread safety
+    - Background cache invalidation processing
+
+  - **Performance Monitoring**
+    - Performance monitoring service for metrics collection
+    - Performance interceptor for API request tracking
+    - Time-based metrics analysis with Redis storage
+    - Tenant-aware performance metrics
+    - Automatic tracking of slow requests
+    - Performance metrics aggregation for analysis
+    - Request sampling to reduce overhead
+
+  - **Rate Limiting**
+    - Rate limiting service with Redis-based implementation
+    - Rate limiting guard for API endpoints
+    - Configurable rate limits by endpoint and user role
+    - Tenant-aware rate limiting
+    - Rate limit information in response headers
+    - Decorator-based rate limiting configuration
+    - Thread-safe rate limiting with atomic operations
+
+  - **Response Optimization**
+    - Response compression middleware with content type filtering
+    - HTTP cache control headers middleware
+    - ETag and conditional request support
+    - Content-based cache validation
+    - Cache-Control header with configurable directives
+    - Last-Modified header support
+    - Content-Type based compression optimization
+
+### Changed
+
+- Updated `AppModule` to integrate caching and performance components
+- Enhanced error handling in middleware implementations
+- Improved type safety in repository classes
+- Optimized database queries for better performance
+- Enhanced multi-tenancy support in service layer
+
+### Fixed
+
+- Type-casting issues in repository classes
+- Error handling in TenantContext service
+- Integration issues between Redis and NestJS modules
+
+## [0.1.0] - 2025-04-01
+
+### Added
+
 - Initial project setup with multi-tenant architecture
 - Backend structure with NestJS
 - Frontend structure with React
 - Docker Compose configuration for development environment
-- PRD (Product Requirements Document) with approved status
 - Architecture documentation with system diagrams and technical specifications
-- Cursor rules for commit message conventions (semver-commit-agent)
-- Cursor rules for changelog updates (changelog-update-agent)
-- TypeScript best practices for NestJS development
-- Project configuration files (.env.example, biome.json)
-- Infrastructure setup with Docker Compose
-- Project directory structure for backend and frontend
-- Initial package configuration
-- Project README with detailed documentation
-- MIT License
-- Additional cursor rules for architecture, testing, security, and API
-- bun.lock file for dependency management
-- MikroORM as an additional ORM option alongside TypeORM and Prisma
-- Basic NestJS backend application setup (Module, Controller, Service, main.ts) (#1)
-- `/health` check endpoint for backend (#1)
-- E2E test setup for backend using Jest (#1)
-- Initial `.env` configuration for backend (#1)
-- MikroORM integration with PostgreSQL database (#2)
-- Base entity model with UUID primary keys, created/updated timestamps (#2)
-- Tenant entity model with multi-tenancy support (#2)
-- Database migrations system with MikroORM CLI commands (#2)
-- Enhanced health check endpoint with database connectivity status (#2)
-- Extended E2E tests for database connectivity verification (#2)
-- Advanced data access layer design with Repository Pattern (#3)
-- Multi-tenancy support in Repository layer (#3)
-- Database seeding system for development and testing (#3)
-- Database connection optimization with connection pooling and retry mechanisms (#3)
-- Comprehensive database health checks (#3)
-- Story-3: Advanced Database Integration and Data Access Layer
-  - Added `BaseRepository` with common data access methods
-  - Implemented `TenantAwareRepository` for multi-tenant filtering
-  - Created database seeders with configuration-based approach
-  - Added comprehensive database health checks
-  - Implemented proper error handling in database operations
-  - Optimized PostgreSQL connections with pooling and retry mechanisms
-- Story-4: Caching and Performance Foundation
-  - Added Redis integration for caching infrastructure
-  - Implemented tenant-aware caching mechanisms
-  - Created robust cache invalidation strategies
-  - Designed method-level caching with interceptors
-  - Integrated performance monitoring foundations
-  - Added rate limiting capabilities with Redis
-  - Implemented response optimization techniques
-  - Ensured graceful degradation when cache is unavailable
-
-### Changed
-
-- Updated documentation rules for English language standards
-- Enhanced workflow rules for agile development
-- Improved architecture documentation template
-- Extended .gitignore for better file exclusion
-- Updated app.module.ts to include MikroORM configuration (#2)
-- Updated PRD to reflect MikroORM as the exclusive ORM solution, replacing references to TypeORM/Prisma
-- Added Bun and Biome to technology stack in PRD
-- Updated Multi-Tenancy implementation examples in PRD to align with MikroORM patterns
-- Reconfigured database connection for better performance and reliability
-- Updated tenant data seeding to support external configuration files
-
-### Fixed
-
-- Resolved type-casting issues in repository classes by using proper TypeScript casting through `unknown`
-- Improved error handling in TenantContext service with proper NestJS exceptions
-- Fixed type safety issues in database repository implementation
-
-### Completed
-
-- Database Integration and ORM Setup story (Story 3) completed on 2025-04-01
-- Caching and Performance Foundation story (Story 4) approved on 2025-04-01
-
-## [0.2.0] - 2023-03-31
-
-### Added
-
-- Story-2: Docker Compose Development Environment
-  - Added Docker Compose configuration for local development
-  - Set up PostgreSQL database container with volume for persistence
-  - Configured separate services for backend and frontend
-  - Added health checks for all services
-  - Implemented environment-based configuration
-
-## [0.1.0] - 2023-03-24
-
-### Added
-
-- Story-1: Project Setup and Configuration
-  - Created project structure with NestJS backend and React frontend
-  - Added configuration management for different environments
-  - Set up TypeScript compilation and ESLint for code quality
-  - Added basic health check endpoint
-  - Set up documentation structure
+- MikroORM integration with PostgreSQL database
+- Entity and repository base classes
+- Multi-tenancy foundation with tenant isolation
+- Tenant context middleware and tenant header propagation
+- Basic error handling middleware
+- Logging system with structured logging
+- Service and controller base classes
+- Environment-based configuration system
+- Initial CI/CD pipeline configuration
 
 [Unreleased]: https://github.com/your-org/acci-nest/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/your-org/acci-nest/releases/tag/v0.1.0
