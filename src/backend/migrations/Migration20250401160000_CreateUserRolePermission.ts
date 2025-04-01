@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20240401160000_CreateUserRolePermission extends Migration {
+export class Migration20250401160000_CreateUserRolePermission extends Migration {
   async up(): Promise<void> {
     this.addSql(`
       CREATE TABLE "permissions" (

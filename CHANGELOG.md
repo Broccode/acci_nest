@@ -143,5 +143,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation error in Story 5 - task checkboxes were not properly marked as completed
 - Dependency resolution errors in exception tests by implementing a simplified test exception filter
 - Added cursor rule for simplified test dependencies to improve test maintainability
+- Fixed incorrect year (2024 to 2025) in migration filename and class name to align with project timeline
 
 [Unreleased]: https://github.com/your-org/acci-nest/compare/v0.1.0...HEAD
