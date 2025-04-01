@@ -11,17 +11,15 @@
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
-    "@types/react-router-dom": "^5.3.0",
     "axios": "^1.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^7.4.1",
     "typescript": "^5.0.0",
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "start": "bun run react-dev",
-    "build": "bun run react-build",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
     "test": "bun test",
     "lint": "bunx @biomejs/biome lint \"src/**/*.{ts,tsx}\"",
     "format": "bunx @biomejs/biome format --write \"src/**/*.{ts,tsx}\""

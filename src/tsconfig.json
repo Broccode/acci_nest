@@ -1,0 +1,21 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../dist",
+    "paths": {
+      "@infrastructure/*": ["infrastructure/*"],
+      "@backend/*": ["backend/*"],
+      "@frontend/*": ["frontend/*"],
+      "@examples/*": ["examples/*"],
+      "@shared/*": ["shared/*"]
+    }
+  },
+  "references": [
+    { "path": "./infrastructure" },
+    { "path": "./backend" },
+    { "path": "./frontend" },
+    { "path": "./examples" }
+  ],
+  "files": []
+} 

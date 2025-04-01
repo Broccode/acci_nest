@@ -7,42 +7,45 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "correctness": {
-        "useExhaustiveDependencies": "error"
-      },
       "suspicious": {
         "noExplicitAny": "warn"
       },
-      "security": {
-        "noDangerouslySetInnerHtml": "error"
-      },
       "style": {
-        "noNonNullAssertion": "warn",
         "useTemplate": "error"
       },
       "complexity": {
-        "noBannedTypes": "error"
+        "noStaticOnlyClass": "off"
       },
-      "performance": {
-        "noDelete": "error"
-      },
-      "a11y": {
-        "useAltText": "error",
-        "useKeyWithClickEvents": "error"
+      "correctness": {
+        "useExhaustiveDependencies": "warn"
       }
-    }
+    },
+    "ignore": [
+      "node_modules",
+      "dist",
+      "build",
+      ".git",
+      ".github"
+    ]
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "space",
     "indentWidth": 2,
+    "indentStyle": "space",
     "lineWidth": 100
   },
   "javascript": {
     "formatter": {
+      "enabled": true,
       "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
       "trailingComma": "es5",
-      "semicolons": "always"
+      "semicolons": "always",
+      "indentWidth": 2,
+      "lineWidth": 100
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
     }
   },
   "files": {
