@@ -1,16 +1,15 @@
 import { Test } from '@nestjs/testing';
 import { EntityManager } from '@mikro-orm/core';
-import * as bcrypt from 'bcrypt';
 import { UserService } from './user.service';
 import { User, UserStatus } from '../entities/user.entity';
 import { Role } from '../entities/role.entity';
 import { CreateUserDto, UpdateUserDto } from '../types/user.types';
+import * as bcrypt from 'bcrypt';
 
-jest.mock('bcrypt', () => ({
-  genSalt: jest.fn().mockResolvedValue('salt'),
-  hash: jest.fn().mockResolvedValue('hashed_password'),
-  compare: jest.fn(),
-}));
+// Manually mock bcrypt module
+jest.spyOn(bcrypt, 'genSalt').mockResolvedValue('salt' as never);
+jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashed_password' as never);
+jest.spyOn(bcrypt, 'compare').mockImplementation(() => Promise.resolve(false));
 
 describe('UserService', () => {
   let service: UserService;
@@ -253,7 +252,7 @@ describe('UserService', () => {
 
   describe('validatePassword', () => {
     it('should return true for valid password', async () => {
-      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(true);
       
       const result = await service.validatePassword('correct_password', 'hashed_password');
       
@@ -262,7 +261,7 @@ describe('UserService', () => {
     });
 
     it('should return false for invalid password', async () => {
-      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(false);
       
       const result = await service.validatePassword('wrong_password', 'hashed_password');
       

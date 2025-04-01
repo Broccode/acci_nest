@@ -1,4 +1,4 @@
-import { DynamicModule, Global, MiddlewareConsumer, Module, NestModule, Provider, Type } from '@nestjs/common';
+import { DynamicModule, Global, MiddlewareConsumer, Module, NestModule, Provider, Type, Optional } from '@nestjs/common';
 import { CorrelationIdService, TenantContextService } from './context';
 import { CorrelationIdMiddleware, DefaultTenantResolver, TenantContextMiddleware, TenantResolver } from './middleware';
 import { PinoLoggingOptions, PinoLoggingServiceImpl } from './services';
@@ -88,7 +88,7 @@ export class LoggingModule implements NestModule {
   }
   
   constructor(
-    private readonly options: LoggingModuleOptions = defaultOptions,
+    @Optional() private readonly options: LoggingModuleOptions = defaultOptions,
   ) {}
   
   /**
