@@ -81,6 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   - **Status Update**
     - Completed all tasks for Story 5 on 2025-04-01
+    - Korrektur des Story-5 Dokumentationsfehlers - alle Tasks sind als abgeschlossen markiert
     - Verified all requirements met including multi-tenant support and performance optimization
     - Full test coverage for all logging and exception handling components
     - Provided comprehensive documentation in README.md
@@ -108,5 +109,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Type-casting issues in repository classes
 - Error handling in TenantContext service
 - Integration issues between Redis and NestJS modules
+- Dokumentationsfehler in Story 5 - Task-Checkboxen waren nicht korrekt markiert
 
 [Unreleased]: https://github.com/your-org/acci-nest/compare/v0.1.0...HEAD
