@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **User Management System**
+  - Implemented core user module with entities and repositories
+  - Added role-based access control (RBAC) framework
+  - Created tenant-aware user management services
+  - Implemented secure password handling with bcrypt
+  - Added user status management system
+
 - **Database Management**
   - Added migration for user management tables (users, roles, permissions)
   - Updated MikroORM configuration for better TypeScript support
