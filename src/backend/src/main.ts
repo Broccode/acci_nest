@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
+import { CompressionMiddleware, HttpCacheMiddleware } from './common/compression';
 // import { ValidationPipe } from '@nestjs/common'; // Temporarily commented out
 // import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'; // Temporarily commented out
 // import * as helmet from 'helmet'; // Temporarily commented out
@@ -8,6 +9,25 @@ import { Logger } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = process.env.BACKEND_PORT || 3000;
+  
+  // Apply compression middleware
+  app.use(new CompressionMiddleware({
+    level: 6, // Balanced between speed and compression ratio
+    threshold: 1024, // Compress responses larger than 1KB
+  }).use);
+  
+  // Apply HTTP cache middleware
+  app.use(new HttpCacheMiddleware({
+    maxAge: 300, // 5 minutes default cache
+    public: true,
+    getCacheOptions: (req) => {
+      // Dynamic cache options based on route
+      if (req.path.startsWith('/api/public')) {
+        return { maxAge: 3600 }; // Cache public endpoints for 1 hour
+      }
+      return {};
+    }
+  }).use);
   
   // app.setGlobalPrefix('api'); // Temporarily commented out
   
