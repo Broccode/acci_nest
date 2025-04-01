@@ -23,6 +23,7 @@ This architecture document outlines the technical design decisions, infrastructu
 | Jest | Testing framework for unit and integration tests |
 | Passport.js | Authentication middleware for Node.js |
 | JWT | JSON Web Tokens for secure authentication |
+| LDAP/Active Directory | Enterprise directory services integration for authentication |
 | GraphQL | Query language for APIs alongside REST |
 | Swagger/OpenAPI | API documentation and testing |
 | Bun | JavaScript runtime and package manager for improved performance |
@@ -122,13 +123,24 @@ sequenceDiagram
     participant Auth as Authentication Service
     participant User as User Service
     participant DB as Database
+    participant Directory as LDAP/Active Directory
     
     Client->>API: Login Request
     API->>Auth: Validate Credentials
-    Auth->>User: Get User Details
-    User->>DB: Query User
-    DB-->>User: User Data
-    User-->>Auth: User Details
+    
+    alt Local Authentication
+        Auth->>User: Get User Details
+        User->>DB: Query User
+        DB-->>User: User Data
+        User-->>Auth: User Details
+    else LDAP/AD Authentication
+        Auth->>Directory: Validate Against Directory
+        Directory-->>Auth: Authentication Result
+        Auth->>User: Get or Create User
+        User->>DB: Query/Create User
+        DB-->>User: User Data
+        User-->>Auth: User Details
+    end
     
     alt Credentials Valid
         Auth->>Auth: Generate JWT & Refresh Token
@@ -263,6 +275,16 @@ interface Plugin {
  */
 
 /**
+ * @route POST /auth/login/ldap
+ * @group Authentication - Operations about LDAP/AD authentication
+ * @param {string} username.body.required - LDAP username
+ * @param {string} password.body.required - LDAP password
+ * @param {string} tenantId.body.required - Tenant identifier
+ * @returns {object} 200 - Access and refresh tokens
+ * @returns {Error} 401 - Invalid credentials
+ */
+
+/**
  * @route POST /auth/refresh
  * @group Authentication - Operations about user authentication
  * @param {string} token.body.required - Refresh token
@@ -302,6 +324,9 @@ acci-nest/
 │   │   │   │   ├── config/                # Configuration and environment setup
 │   │   │   │   ├── common/                # Shared utilities, decorators, and filters
 │   │   │   │   ├── auth/                  # Authentication and authorization
+│   │   │   │   │   ├── strategies/        # Authentication strategies (local, LDAP, OAuth)
+│   │   │   │   │   ├── guards/            # Auth guards
+│   │   │   │   │   └── services/          # Auth services
 │   │   │   │   ├── users/                 # User management
 │   │   │   │   ├── tenants/               # Multi-tenancy implementation
 │   │   │   │   └── plugins/               # Plugin system
@@ -444,3 +469,4 @@ The project follows a testing pyramid approach to ensure code quality and system
 | Add Testing Strategy | 2025-03-31 | Added detailed Testing Strategy section. |
 | Finalize ORM Choice | 2025-03-31 | Selected MikroORM as the project ORM for its strong DDD support. |
 | Add Biome Tooling | 2025-03-31 | Specified Biome for linting and formatting, replacing ESLint/Prettier. |
+| Add LDAP/AD Integration | 2025-04-01 | Added LDAP/Active Directory integration details to authentication flow and API endpoints. |
