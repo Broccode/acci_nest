@@ -21,6 +21,15 @@ export default () => ({
   redis: {
     host: process.env.REDIS_HOST || 'localhost',
     port: parseInt(process.env.REDIS_PORT || '6379', 10),
+    password: process.env.REDIS_PASSWORD || '',
+    db: parseInt(process.env.REDIS_DB || '0', 10),
+    connectionTimeout: parseInt(process.env.REDIS_CONNECTION_TIMEOUT || '10000', 10),
+    commandTimeout: parseInt(process.env.REDIS_COMMAND_TIMEOUT || '5000', 10),
+    retryAttempts: parseInt(process.env.REDIS_RETRY_ATTEMPTS || '5', 10),
+    retryDelay: parseInt(process.env.REDIS_RETRY_DELAY || '1000', 10),
+    keyPrefix: process.env.REDIS_KEY_PREFIX || 'acci:',
+    ttl: parseInt(process.env.REDIS_DEFAULT_TTL || '3600', 10), // Default 1 hour
+    maxConnections: parseInt(process.env.REDIS_MAX_CONNECTIONS || '20', 10),
   },
   
   cors: {
