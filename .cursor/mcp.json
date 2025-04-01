@@ -1,5 +1,8 @@
 {
     "mcpServers": {
+      "Skeet": {
+        "url": "https://skeet.sh/ot/144c4aaf31c522ffafe66385ad163e89f86761190acf52d469165b01a7005307"    
+      },
         "browser": {
             "command": "npx",
             "args": [
