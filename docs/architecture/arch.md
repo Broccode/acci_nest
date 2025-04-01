@@ -102,9 +102,56 @@ Security is implemented at multiple levels:
 The database schema follows a tenant-aware design with:
 
 1. **Tenant Table**: Central registry of tenants
-2. **User Tables**: User management with tenant association
+2. **User Management Tables**:
+   - **Users**: Core user data with tenant association and embedded profile
+   - **Roles**: Tenant-specific roles with system and custom roles
+   - **Permissions**: Global permissions based on resource-action pairs
+   - **User-Roles**: Many-to-many relationship between users and roles
+   - **Role-Permissions**: Many-to-many relationship between roles and permissions
 3. **Plugin Tables**: Plugin registry and configuration
 4. **Tenant-specific Data**: Isolated data storage for each tenant
+
+### User Entity Model
+
+```typescript
+@Entity()
+export class User extends BaseEntity {
+  @Property({ unique: false })
+  @Index()
+  email!: string;
+
+  @Property({ hidden: true })
+  password!: string;
+
+  @Embedded()
+  profile!: UserProfile;
+
+  @ManyToOne(() => Tenant)
+  tenant!: Tenant;
+
+  @Property()
+  tenantId!: string;
+
+  @ManyToMany(() => Role)
+  roles = new Collection<Role>(this);
+
+  @Enum(() => UserStatus)
+  status: UserStatus = UserStatus.PENDING;
+}
+```
+
+### Role-Based Access Control
+
+```
+User ──┬── Role ───── Permission
+       │
+       └── Tenant
+```
+
+- **Multi-Tenant Isolation**: Users and roles are always scoped to a tenant
+- **Permission Inheritance**: Users inherit permissions from their roles
+- **Role Hierarchy**: Can be implemented for nested permission structures
+- **System Roles**: Protected roles that cannot be modified
 
 ## Caching Strategy
 

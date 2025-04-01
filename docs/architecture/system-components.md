@@ -38,10 +38,12 @@ The AuthModule is responsible for:
 
 The UserModule manages:
 
-- User profiles
-- User registration
+- User profiles and authentication data
+- Role-based access control (RBAC)
 - Permission management
-- User-related settings
+- Tenant-aware user operations
+- Password security with bcrypt hashing
+- User status management (active, inactive, locked, pending)
 
 ### TenantModule
 
@@ -141,11 +143,50 @@ The Plugin components offer:
 -- Core database entities
 CREATE TABLE users (
   id UUID PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL,
+  email VARCHAR(255) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
-  role VARCHAR(50) NOT NULL,
+  first_name VARCHAR(255) NOT NULL,
+  last_name VARCHAR(255) NOT NULL,
+  preferred_language VARCHAR(5) NOT NULL DEFAULT 'en',
+  status VARCHAR(20) NOT NULL DEFAULT 'pending',
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  last_login TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(email, tenant_id)
+);
+
+CREATE TABLE roles (
+  id UUID PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description VARCHAR(255),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  is_system BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(name, tenant_id)
+);
+
+CREATE TABLE permissions (
+  id UUID PRIMARY KEY,
+  resource VARCHAR(255) NOT NULL,
+  action VARCHAR(255) NOT NULL,
+  conditions JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(resource, action)
+);
+
+CREATE TABLE user_roles (
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  role_id UUID REFERENCES roles(id) ON DELETE CASCADE,
+  PRIMARY KEY(user_id, role_id)
+);
+
+CREATE TABLE role_permissions (
+  role_id UUID REFERENCES roles(id) ON DELETE CASCADE,
+  permission_id UUID REFERENCES permissions(id) ON DELETE CASCADE,
+  PRIMARY KEY(role_id, permission_id)
 );
 
 CREATE TABLE tenants (
@@ -188,19 +229,41 @@ CREATE TABLE tenant_plugins (
 ### Entity-Relationship Model
 
 ```
-users --< tenant_users >-- tenants
-                             |
-                             |
-plugins --< tenant_plugins >+
+users --< user_roles >-- roles
+                          |
+                          |
+permissions --< role_permissions >+
+
+tenants -+-> users
+         |
+         +-> roles
 ```
 
 ### Core Entities
 
 #### Users
 
-- Represents system users
-- Contains authentication information
-- Stores roles and basic data
+- Represents system users with authentication information
+- Contains profile data (first name, last name, language preference)
+- Stores password hashed with bcrypt
+- Tracks user status (active, inactive, locked, pending)
+- Tenant-aware with tenant isolation
+
+#### Roles
+
+- Defines user roles within the system
+- Can be system-defined or tenant-specific
+- Contains descriptive information
+- Tenant-aware with tenant isolation
+- Linked to users through many-to-many relationship
+
+#### Permissions
+
+- Represents granular access rights
+- Based on resource and action combinations
+- Can include conditional access rules
+- Global across tenants but assigned through roles
+- Provides building blocks for RBAC
 
 #### Tenants
 

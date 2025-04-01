@@ -107,6 +107,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Architecture Documentation**
+  - Enhanced database schema documentation with user management details
+  - Added detailed entity-relationship diagrams
+  - Updated component descriptions for user module
+  - Included role-based access control specifications
+
 - Updated `AppModule` to integrate caching and performance components
 - Enhanced error handling in middleware implementations
 - Improved type safety in repository classes
