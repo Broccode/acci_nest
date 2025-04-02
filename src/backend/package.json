@@ -12,11 +12,11 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "bun run dist/main",
     "lint": "bunx @biomejs/biome lint \"src/**/*.ts\" \"test/**/*.ts\"",
-    "test": "bun test",
-    "test:users": "bun test --testPathPattern=users",
-    "test:watch": "bun test --watch",
-    "test:cov": "bun test --coverage",
-    "test:debug": "bun run --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test": "jest",
+    "test:users": "jest --testPathPattern=users",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json --runInBand",
     "orm:debug": "mikro-orm debug",
     "orm:schema:create": "mikro-orm schema:create",
@@ -101,22 +101,5 @@
     "ts-node": "^10.0.0",
     "tsconfig-paths": "^4.0.0",
     "typescript": "^5.0.0"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
   }
 }

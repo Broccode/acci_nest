@@ -137,6 +137,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added safety checks for production environments to prevent accidental data seeding
   - Improved logging for seeder operations
   - Enhanced seeder structure for better organization
+- **Testing Framework Migration**
+  - Migrated from Bun's integrated Jest to standard Jest test runner
+  - Added dedicated Jest configuration for the project and backend
+  - Enhanced testing setup for better NestJS compatibility
+  - Improved foundation for future integration of Testcontainers
 
 ### Fixed
 

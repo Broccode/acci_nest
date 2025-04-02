@@ -1,22 +1,31 @@
+import { MikroORM } from '@mikro-orm/core';
+importO{ INestApplicationikro-orm/core';common
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from './../src/app.module'; // Adjust path as needed
+import { Test, TestingModule } from '@nestjs/testing';
+import * as request from 'supertest';odule';
+import { setOrmInstance } from './helpers/jest-e2e-setup';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
+  let moduleFixture: TestingModule;
+  let orm: MikroORM;
 
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+  beforeAll(async () => {
+    // Create a single TestingModule instance for all tests
+    moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    
+    // Get ORM instance for cleanup
+    orm = app.get<MikroORM>(MikroORM);
+    setOrmInstance(orm);
   });
 
   afterAll(async () => {
-    await app.close(); // Ensure the application instance is closed after tests
+    await app.close();
   });
 
   it('/ (GET)', () => {
