@@ -29,7 +29,8 @@
       ".vscode",
       "**/*.spec.ts",
       "**/*.test.ts",
-      "**/__tests__/**"
+      "**/__tests__/**",
+      "src/backend/test/**"
     ]
   },
   "formatter": {

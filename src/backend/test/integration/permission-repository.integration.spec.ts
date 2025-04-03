@@ -6,11 +6,13 @@ import { Permission } from '../../src/users/entities/permission.entity';
 import { Role } from '../../src/users/entities/role.entity';
 import { User } from '../../src/users/entities/user.entity';
 import { PermissionRepository } from '../../src/users/repositories/permission.repository';
+import { RoleRepository } from '../../src/users/repositories/role.repository';
 import { MultiTenantTestEnvironment } from '../utils/containers/multi-tenant-test-environment';
 
 describe('PermissionRepository Integration Tests', () => {
   let environment: MultiTenantTestEnvironment;
   let permissionRepository: PermissionRepository;
+  let roleRepository: RoleRepository;
   let em: EntityManager;
   let moduleRef: TestingModule;
 
@@ -26,17 +28,18 @@ describe('PermissionRepository Integration Tests', () => {
         entities: [User, Role, Permission, Tenant],
       },
       defaultTenantId: TEST_TENANT_ID,
-      providers: [PermissionRepository],
+      providers: [PermissionRepository, RoleRepository],
     });
 
     // Start environment and get the test module
     moduleRef = await environment.start();
 
-    // Get entity manager
+    // Get the entity manager
     em = moduleRef.get<EntityManager>(EntityManager);
 
-    // Get properly initialized permission repository using our helper method
+    // Get properly initialized repositories using the environment helper method
     permissionRepository = environment.getRepository<Permission>(PermissionRepository);
+    roleRepository = environment.getRepository<Role>(RoleRepository);
 
     // Get the tenant IDs created by the container
     const testTenantIds = environment.postgresContainer?.getTestTenantIds();

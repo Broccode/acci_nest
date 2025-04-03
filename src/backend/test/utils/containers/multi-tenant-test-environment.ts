@@ -422,7 +422,13 @@ export class MultiTenantTestEnvironment {
 
     // Find the entity in the metadata
     for (const entity of this.options.postgres.entities) {
-      if (entity.name === entityName) {
+      // Check if entity is a class (function) with matching name
+      if (typeof entity === 'function' && entity.name === entityName) {
+        return entity;
+      }
+      
+      // Check if entity is an object with name property
+      if (typeof entity === 'object' && entity !== null && 'name' in entity && entity.name === entityName) {
         return entity;
       }
     }
