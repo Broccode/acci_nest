@@ -1,0 +1,134 @@
+name: CI/CD Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    
+    # Configuration for Docker-in-Docker, required for Testcontainers
+    services:
+      docker:
+        image: docker:dind
+        options: >-
+          --privileged
+          -v /var/run/docker.sock:/var/run/docker.sock
+        ports:
+          - 2375:2375
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      # Bun Setup (faster than Node.js)
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      
+      # Cache for Bun dependencies
+      - name: Cache Bun dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+      
+      # Install dependencies
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      
+      # Preparation for Testcontainers
+      - name: Prepare for Testcontainers
+        run: |
+          # Ensure TestContainers can find the Docker host
+          echo "TESTCONTAINERS_HOST_OVERRIDE=localhost" >> $GITHUB_ENV
+          echo "DOCKER_HOST=unix:///var/run/docker.sock" >> $GITHUB_ENV
+          # Optional: Pull Docker images in advance to speed up tests
+          docker pull postgres:latest
+          docker pull redis:latest
+      
+      # Linting and code quality
+      - name: Run linting
+        run: bun run lint
+      
+      # Unit Tests (faster, without Testcontainers)
+      - name: Run unit tests
+        run: bun test --test-file-pattern "**/*.spec.ts" --coverage
+      
+      # Integration tests with Testcontainers
+      - name: Run integration tests
+        run: bun test --test-file-pattern "**/*.integration.spec.ts" --coverage
+        env:
+          # Important for TestContainers
+          TESTCONTAINERS_HOST_OVERRIDE: localhost
+          DOCKER_HOST: unix:///var/run/docker.sock
+          # Testcontainer reuse strategy for faster tests
+          TESTCONTAINERS_REUSE_ENABLE: true
+      
+      # E2E Tests (if available)
+      - name: Run E2E tests
+        run: bun test --test-file-pattern "**/*.e2e-spec.ts" --coverage
+        env:
+          TESTCONTAINERS_HOST_OVERRIDE: localhost
+          DOCKER_HOST: unix:///var/run/docker.sock
+          TESTCONTAINERS_REUSE_ENABLE: true
+      
+      # Generate coverage report
+      - name: Generate coverage report
+        run: bun run test:coverage
+      
+      # Save coverage report as artifact
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage/
+      
+      # Save test results as artifact
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: test-results/
+
+  # Optional: Build job for the application
+  build:
+    name: Build
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      
+      - name: Build application
+        run: bun run build
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: dist/ 

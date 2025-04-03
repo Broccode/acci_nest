@@ -54,6 +54,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Implemented
 
+- **Task 9: CI/CD Pipeline for Testcontainers-based Tests** (2025-04-03)
+  - **GitHub Actions Integration**
+    - Added workflow configuration for automated testing with Testcontainers
+    - Configured Docker-in-Docker service for container-based tests
+    - Implemented caching strategies for dependencies
+    - Set up artifact collection for test reports and coverage
+    - Enabled container reuse for improved test performance
+  
+  - **GitLab CI Integration**
+    - Created GitLab CI pipeline configuration with Docker-in-Docker
+    - Implemented multi-stage pipeline for test and build
+    - Set up consistent environment variables for Testcontainers
+    - Configured caching for faster builds and tests
+    - Added artifact collection for test results
+  
+  - **Performance Optimizations**
+    - Implemented parallel test execution strategies
+    - Added pre-pulling of container images to speed up tests
+    - Configured proper test file pattern matching for targeted runs
+    - Enabled container reuse with TESTCONTAINERS_REUSE_ENABLE flags
+  
+  - **Documentation**
+    - Added comprehensive CI/CD troubleshooting guide
+    - Updated README with Testcontainers test instructions
+    - Included examples for running tests in CI environment
+    - Added badges for build status visualization
+
 - **Story 7: Testcontainers Integration for Integration Tests**
   - **Infrastructure Components**
     - Created PostgreSQL test container for database integration testing

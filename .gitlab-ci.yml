@@ -1,0 +1,67 @@
+stages:
+  - test
+  - build
+
+variables:
+  BUN_VERSION: "latest"
+  DOCKER_HOST: tcp://docker:2375
+  TESTCONTAINERS_HOST_OVERRIDE: "docker"
+  TESTCONTAINERS_REUSE_ENABLE: "true"
+
+# Common template for Bun configuration
+.bun-setup:
+  image: oven/bun:${BUN_VERSION}
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+      - .bun-install/cache
+
+# Test job with Testcontainers
+test:
+  extends: .bun-setup
+  stage: test
+  services:
+    - name: docker:dind
+      alias: docker
+      command: ["--tls=false"]
+  before_script:
+    - apt-get update && apt-get install -y docker.io
+    - bun install --frozen-lockfile
+    # Pull Docker images in advance to speed up tests
+    - docker pull postgres:latest
+    - docker pull redis:latest
+  script:
+    # Run linting
+    - bun run lint
+    # Run unit tests
+    - bun test --test-file-pattern "**/*.spec.ts" --coverage
+    # Run integration tests with Testcontainers
+    - bun test --test-file-pattern "**/*.integration.spec.ts" --coverage
+    # Run E2E tests
+    - bun test --test-file-pattern "**/*.e2e-spec.ts" --coverage
+    # Generate coverage report
+    - bun run test:coverage
+  artifacts:
+    paths:
+      - coverage/
+      - test-results/
+    reports:
+      junit: test-results/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+
+# Build job
+build:
+  extends: .bun-setup
+  stage: build
+  only:
+    - main
+    - develop
+  script:
+    - bun install --frozen-lockfile
+    - bun run build
+  artifacts:
+    paths:
+      - dist/ 
