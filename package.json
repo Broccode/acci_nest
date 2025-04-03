@@ -20,7 +20,7 @@
     "migration:generate": "bun run --cwd src/backend migration:generate",
     "migration:run": "bun run --cwd src/backend migration:run",
     "migration:revert": "bun run --cwd src/backend migration:revert",
-    "lint": "bunx @biomejs/biome lint .",
+    "check": "bunx @biomejs/biome check .",
     "format": "bunx @biomejs/biome check --apply-unsafe ."
   },
   "keywords": [
