@@ -39,7 +39,7 @@ test:
     - if [ -S /var/run/docker.sock ]; then chmod 666 /var/run/docker.sock || true; fi
   script:
     # Run linting with continue-on-error
-    - bun run lint || echo "Linting failed, but continuing"
+    - bun run check || echo "Linting failed, but continuing"
     # Run unit tests
     - bun test --test-file-pattern "**/*.spec.ts" --coverage || echo "Unit tests failed, but continuing"
     # Run integration tests with Testcontainers

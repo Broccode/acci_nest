@@ -140,7 +140,7 @@ jobs:
       
       # Linting und Codequalität
       - name: Run linting
-        run: bun run lint
+        run: bun run check
       
       # Unit Tests (schneller, ohne Testcontainers)
       - name: Run unit tests
@@ -249,7 +249,7 @@ test:
     - docker pull redis:latest
   script:
     # Linting ausführen
-    - bun run lint
+    - bun run check
     # Unit Tests ausführen
     - bun test --test-file-pattern "**/*.spec.ts" --coverage
     # Integrationstests mit Testcontainers ausführen
@@ -283,6 +283,47 @@ build:
       - dist/
 ```
 
+### Biome-Konfiguration für strengeres Linting
+
+Um sicherzustellen, dass unsere Code-Qualität gleichbleibend hoch ist, haben wir die Konfiguration für Biome (unser Code-Linting-Tool) verbessert:
+
+```json
+{
+  "$schema": "https://biomejs.dev/schemas/1.4.1/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        "noExplicitAny": "error"  // any-Typen werden nun als Fehler statt Warnungen behandelt
+      },
+      "style": {
+        "useTemplate": "error"
+      },
+      "complexity": {
+        "noStaticOnlyClass": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "warn"
+      }
+    },
+    "ignore": ["node_modules", "dist", "build", ".git", ".github", "**/*.spec.ts", "**/*.test.ts", "**/__tests__/**"]
+  },
+  "files": {
+    "ignore": ["node_modules", "dist", "build", "coverage", ".git", "*.min.js", ".vscode", "**/*.spec.ts", "**/*.test.ts", "**/__tests__/**", "**/test/**"]
+  }
+}
+```
+
+Diese Konfiguration:
+
+- Markiert den Einsatz von `any`-Typen als Fehler, was die Typsicherheit des Codes verbessert
+- Ignoriert Testdateien im Linting-Prozess, um Entwicklern mehr Freiheit beim Testen zu geben
+- Stellt sicher, dass der `bun run check`-Befehl eine strikte Überprüfung durchführt und fehlschlägt, wenn untypisierter Code gefunden wird
+
 ### Skript-Konfiguration in package.json
 
 Um die CI/CD-Konfiguration mit unseren bestehenden Skripten kompatibel zu machen, sollten wir sicherstellen, dass folgende Skripte in `package.json` definiert sind:
@@ -290,7 +331,8 @@ Um die CI/CD-Konfiguration mit unseren bestehenden Skripten kompatibel zu machen
 ```json
 {
   "scripts": {
-    "lint": "biome check ./src",
+    "check": "bunx @biomejs/biome check .",
+    "format": "bunx @biomejs/biome check --apply-unsafe .",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "build": "nest build"

@@ -63,7 +63,7 @@ jobs:
       
       # Linting and code quality
       - name: Run linting
-        run: bun run lint
+        run: bun run check
       
       # Unit Tests (faster, without Testcontainers)
       - name: Run unit tests
