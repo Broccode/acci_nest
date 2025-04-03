@@ -283,9 +283,9 @@ build:
       - dist/
 ```
 
-### Biome-Konfiguration für strengeres Linting
+### Enhanced Biome Configuration for Stricter Linting
 
-Um sicherzustellen, dass unsere Code-Qualität gleichbleibend hoch ist, haben wir die Konfiguration für Biome (unser Code-Linting-Tool) verbessert:
+To ensure consistently high code quality, we've improved the configuration for Biome (our code linting tool):
 
 ```json
 {
@@ -298,7 +298,7 @@ Um sicherzustellen, dass unsere Code-Qualität gleichbleibend hoch ist, haben wi
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noExplicitAny": "error"  // any-Typen werden nun als Fehler statt Warnungen behandelt
+        "noExplicitAny": "error"  // any types are now treated as errors instead of warnings
       },
       "style": {
         "useTemplate": "error"
@@ -318,15 +318,15 @@ Um sicherzustellen, dass unsere Code-Qualität gleichbleibend hoch ist, haben wi
 }
 ```
 
-Diese Konfiguration:
+This configuration:
 
-- Markiert den Einsatz von `any`-Typen als Fehler, was die Typsicherheit des Codes verbessert
-- Ignoriert Testdateien im Linting-Prozess, um Entwicklern mehr Freiheit beim Testen zu geben
-- Stellt sicher, dass der `bun run check`-Befehl eine strikte Überprüfung durchführt und fehlschlägt, wenn untypisierter Code gefunden wird
+- Marks the use of `any` types as errors, which improves the type safety of the code
+- Ignores test files in the linting process, giving developers more freedom when testing
+- Ensures that the `bun run check` command performs strict validation and fails when untyped code is found
 
-### Skript-Konfiguration in package.json
+### Script Configuration in package.json
 
-Um die CI/CD-Konfiguration mit unseren bestehenden Skripten kompatibel zu machen, sollten wir sicherstellen, dass folgende Skripte in `package.json` definiert sind:
+To make the CI/CD configuration compatible with our existing scripts, we should ensure that the following scripts are defined in `package.json`:
 
 ```json
 {
