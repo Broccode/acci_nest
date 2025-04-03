@@ -54,6 +54,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Implemented
 
+- **Story 7: Testcontainers Integration for Integration Tests**
+  - **Infrastructure Components**
+    - Created PostgreSQL test container for database integration testing
+    - Implemented Redis test container for cache service testing
+    - Developed multi-tenant test environment supporting both PostgreSQL and Redis
+    - Implemented container reuse strategies for improved test performance
+    - Added proper resource cleanup for all test containers
+  
+  - **Database Integration Testing**
+    - Added integration tests for repository classes with real PostgreSQL database
+    - Implemented multi-tenant database isolation testing
+    - Created test fixtures for user, role, and permission repositories
+    - Added tests for complex entity relationships and queries
+  
+  - **Cache Integration Testing**
+    - Implemented RedisCacheService integration tests with real Redis
+    - Added tenant-aware caching tests with isolation verification
+    - Created tests for tag-based cache invalidation
+    - Added TTL and expiration verification tests
+  
+  - **Combined Infrastructure Testing**
+    - Created tests using both PostgreSQL and Redis containers simultaneously
+    - Implemented user and role service tests with database and cache dependencies
+    - Added tests for multi-tenant features across infrastructure components
+    - Ensured proper cleanup and isolation between test runs
+
 - **Story 4: Caching and Performance Foundation**
   - **Response Compression Middleware**
     - Implemented compression middleware with error handling
@@ -152,6 +178,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependency resolution errors in exception tests by implementing a simplified test exception filter
 - Added cursor rule for simplified test dependencies to improve test maintainability
 - Fixed incorrect year (2024 to 2025) in migration filename and class name to align with project timeline
+- German comments and error messages in test files translated to English for consistent code documentation
 
 ## [0.1.0] - 2025-04-02
 
