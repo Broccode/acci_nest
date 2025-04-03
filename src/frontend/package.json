@@ -21,6 +21,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "bun test",
+    "test:cov": "echo \"Frontend tests coverage skipped (no tests yet)\" && exit 0",
     "lint": "bunx @biomejs/biome lint \"src/**/*.{ts,tsx}\"",
     "format": "bunx @biomejs/biome format --write \"src/**/*.{ts,tsx}\""
   },
