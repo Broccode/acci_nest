@@ -12,7 +12,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "bun run dist/main",
     "lint": "bunx @biomejs/biome lint \"src/**/*.ts\" \"test/**/*.ts\"",
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "test:users": "jest --testPathPattern=users",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

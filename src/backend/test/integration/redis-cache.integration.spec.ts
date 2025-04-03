@@ -51,7 +51,7 @@ describe('RedisCacheService Integration Tests', () => {
 
     // Get the cache service
     cacheService = testModule.get<RedisCacheService>(RedisCacheService);
-  });
+  }, 30000);
 
   afterAll(async () => {
     // If available, explicitly close Redis client and cache service

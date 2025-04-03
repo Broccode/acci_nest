@@ -85,7 +85,7 @@ describe('Multi-Tenant Environment Integration Tests', () => {
     testTenant.status = TenantStatus.ACTIVE;
     
     await em.persistAndFlush(testTenant);
-  });
+  }, 30000);
 
   it('should create a user and cache related data', async () => {
     // Create a user

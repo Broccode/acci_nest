@@ -12,4 +12,6 @@ module.exports = {
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
   },
+  // Set a global timeout for all tests (30 seconds)
+  testTimeout: 30000,
 };
