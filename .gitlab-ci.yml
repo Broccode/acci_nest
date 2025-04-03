@@ -41,11 +41,9 @@ test:
     # Run linting with continue-on-error
     - bun run check || echo "Linting failed, but continuing"
     # Run unit tests
-    - bun test --test-file-pattern "**/*.spec.ts" --coverage || echo "Unit tests failed, but continuing"
-    # Run integration tests with Testcontainers
-    - bun test --test-file-pattern "**/*.integration.spec.ts" --coverage || echo "Integration tests failed, but continuing"
-    # Run E2E tests
-    - bun test --test-file-pattern "**/*.e2e-spec.ts" --coverage || echo "E2E tests failed, but continuing"
+    - bun run test || echo "Unit tests failed, but continuing"
+    # Run E2E tests (includes integration tests per jest-e2e.json configuration)
+    - bun run test:e2e || echo "E2E tests failed, but continuing"
     # Generate coverage report
     - bun run test:coverage || echo "Coverage report generation failed, but continuing"
     # Create directories for artifacts even if tests fail

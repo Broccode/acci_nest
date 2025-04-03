@@ -67,24 +67,16 @@ jobs:
       
       # Unit Tests (faster, without Testcontainers)
       - name: Run unit tests
-        run: bun test --test-file-pattern "**/*.spec.ts" --coverage
+        run: bun run test
       
-      # Integration tests with Testcontainers
-      - name: Run integration tests
-        run: bun test --test-file-pattern "**/*.integration.spec.ts" --coverage
+      # E2E tests with Testcontainers
+      - name: Run E2E tests
+        run: bun run test:e2e
         env:
           # Important for TestContainers
           TESTCONTAINERS_HOST_OVERRIDE: localhost
           DOCKER_HOST: unix:///var/run/docker.sock
           # Testcontainer reuse strategy for faster tests
-          TESTCONTAINERS_REUSE_ENABLE: true
-      
-      # E2E Tests (if available)
-      - name: Run E2E tests
-        run: bun test --test-file-pattern "**/*.e2e-spec.ts" --coverage
-        env:
-          TESTCONTAINERS_HOST_OVERRIDE: localhost
-          DOCKER_HOST: unix:///var/run/docker.sock
           TESTCONTAINERS_REUSE_ENABLE: true
       
       # Upload coverage report which was already generated in previous test steps
