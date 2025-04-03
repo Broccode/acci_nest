@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { PerformanceService } from './performance.service';
-import { PerformanceInterceptor } from './performance.interceptor';
 import { RedisModule } from '../redis/redis.module';
+import { PerformanceInterceptor } from './performance.interceptor';
+import { PerformanceService } from './performance.service';
 
 /**
  * Module for application performance monitoring
@@ -11,9 +11,9 @@ import { RedisModule } from '../redis/redis.module';
   imports: [
     RedisModule.register({
       isGlobal: false,
-    })
+    }),
   ],
   providers: [PerformanceService, PerformanceInterceptor],
   exports: [PerformanceService, PerformanceInterceptor],
 })
-export class PerformanceModule {} 
+export class PerformanceModule {}

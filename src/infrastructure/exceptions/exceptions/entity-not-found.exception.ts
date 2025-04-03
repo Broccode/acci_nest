@@ -20,4 +20,4 @@ export class EntityNotFoundException extends DomainException {
       context
     );
   }
-} 
+}

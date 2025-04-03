@@ -79,4 +79,4 @@ export interface LoggingModuleOptions {
    * Logging configuration
    */
   logging?: LoggingOptions;
-} 
+}

@@ -90,4 +90,4 @@ export class Migration20250401160000_CreateUserRolePermission extends Migration 
     this.addSql('DROP TABLE IF EXISTS "roles" CASCADE;');
     this.addSql('DROP TABLE IF EXISTS "permissions" CASCADE;');
   }
-} 
+}

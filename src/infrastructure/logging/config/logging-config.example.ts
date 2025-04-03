@@ -1,6 +1,6 @@
 /**
  * Example logging configuration for different environments
- * 
+ *
  * This file shows recommended logging configurations for different environments.
  * Copy the relevant section to your app.module.ts when registering the LoggingModule.
  */
@@ -82,11 +82,11 @@ export const productionLoggingConfig: LoggingModuleOptions = {
 
 /**
  * Usage example in app.module.ts:
- * 
+ *
  * ```typescript
  * import { Module } from '@nestjs/common';
  * import { LoggingModule } from './infrastructure';
- * 
+ *
  * @Module({
  *   imports: [
  *     LoggingModule.register({
@@ -106,4 +106,4 @@ export const productionLoggingConfig: LoggingModuleOptions = {
  * })
  * export class AppModule {}
  * ```
- */ 
+ */

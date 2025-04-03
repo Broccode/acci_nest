@@ -1,9 +1,9 @@
-import { Module, DynamicModule } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { RedisModule } from '../redis/redis.module';
-import { RedisCacheService } from './redis-cache.service';
-import { CacheableInterceptor } from './cacheable.interceptor';
 import { TenantsModule } from '../../tenants/tenants.module';
+import { RedisModule } from '../redis/redis.module';
+import { CacheableInterceptor } from './cacheable.interceptor';
+import { RedisCacheService } from './redis-cache.service';
 
 /**
  * Configuration options for the cache module
@@ -40,15 +40,9 @@ export class CacheModule {
         }),
         TenantsModule,
       ],
-      providers: [
-        RedisCacheService,
-        CacheableInterceptor,
-      ],
-      exports: [
-        RedisCacheService,
-        CacheableInterceptor,
-      ],
+      providers: [RedisCacheService, CacheableInterceptor],
+      exports: [RedisCacheService, CacheableInterceptor],
       global: options.isGlobal || false,
     };
   }
-} 
+}

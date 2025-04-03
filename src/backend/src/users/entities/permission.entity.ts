@@ -1,11 +1,18 @@
-import { Entity, Property, ManyToMany, Collection, Index, EntityRepositoryType } from '@mikro-orm/core';
+import {
+  Collection,
+  Entity,
+  EntityRepositoryType,
+  Index,
+  ManyToMany,
+  Property,
+} from '@mikro-orm/core';
 import { BaseEntity } from '../../common/entities/base.entity';
-import { Role } from './role.entity';
 import { PermissionRepository } from '../repositories/permission.repository';
+import { Role } from './role.entity';
 
 /**
  * Permission entity
- * 
+ *
  * @description Represents a permission in the system that can be assigned to roles
  * @global Permissions are global and not tenant-specific
  */
@@ -24,6 +31,10 @@ export class Permission extends BaseEntity {
   @Property({ type: 'json', nullable: true })
   conditions?: Record<string, any>;
 
-  @ManyToMany(() => Role, role => role.permissions, { mappedBy: 'permissions' })
+  @ManyToMany(
+    () => Role,
+    (role) => role.permissions,
+    { mappedBy: 'permissions' }
+  )
   roles = new Collection<Role>(this);
-} 
+}

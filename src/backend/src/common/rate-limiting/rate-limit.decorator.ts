@@ -1,10 +1,10 @@
 import { SetMetadata, UseGuards, applyDecorators } from '@nestjs/common';
-import { RateLimitGuard } from './rate-limit.guard';
-import { 
-  RATE_LIMIT_POINTS_KEY, 
+import {
   RATE_LIMIT_DURATION_KEY,
-  RATE_LIMIT_KEY_PREFIX_KEY
+  RATE_LIMIT_KEY_PREFIX_KEY,
+  RATE_LIMIT_POINTS_KEY,
 } from './rate-limit.constants';
+import { RateLimitGuard } from './rate-limit.guard';
 
 /**
  * Options for the RateLimit decorator
@@ -29,4 +29,4 @@ export function RateLimit(options: RateLimitOptions) {
     SetMetadata(RATE_LIMIT_KEY_PREFIX_KEY, options.keyPrefix),
     UseGuards(RateLimitGuard)
   );
-} 
+}

@@ -1,10 +1,10 @@
-import { Test } from '@nestjs/testing';
-import { getRepositoryToken } from '@mikro-orm/nestjs';
 import { EntityManager } from '@mikro-orm/core';
-import { RoleRepository } from './role.repository';
-import { Role } from '../entities/role.entity';
-import { TenantContext } from '../../tenants/services/tenant-context.service';
+import { getRepositoryToken } from '@mikro-orm/nestjs';
+import { Test } from '@nestjs/testing';
 import { TENANT_CONTEXT } from '../../common/constants';
+import { TenantContext } from '../../tenants/services/tenant-context.service';
+import { Role } from '../entities/role.entity';
+import { RoleRepository } from './role.repository';
 
 describe('RoleRepository', () => {
   let repository: RoleRepository;
@@ -55,7 +55,7 @@ describe('RoleRepository', () => {
       jest.spyOn(repository, 'findOne').mockResolvedValue(mockRole);
 
       const result = await repository.findByName('admin', 'tenant-1');
-      
+
       expect(repository.findOne).toHaveBeenCalledWith({ name: 'admin', tenantId: 'tenant-1' });
       expect(result).toEqual(mockRole);
     });
@@ -64,8 +64,11 @@ describe('RoleRepository', () => {
       jest.spyOn(repository, 'findOne').mockResolvedValue(null);
 
       const result = await repository.findByName('nonexistent', 'tenant-1');
-      
-      expect(repository.findOne).toHaveBeenCalledWith({ name: 'nonexistent', tenantId: 'tenant-1' });
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        name: 'nonexistent',
+        tenantId: 'tenant-1',
+      });
       expect(result).toBeNull();
     });
   });
@@ -80,7 +83,7 @@ describe('RoleRepository', () => {
       jest.spyOn(repository, 'find').mockResolvedValue(mockRoles);
 
       const result = await repository.findSystemRoles();
-      
+
       expect(repository.find).toHaveBeenCalledWith({ isSystem: true });
       expect(result).toEqual(mockRoles);
       expect(result.length).toBe(2);
@@ -97,7 +100,7 @@ describe('RoleRepository', () => {
       jest.spyOn(repository, 'findOne').mockResolvedValue(mockRole);
 
       const result = await repository.findWithPermissions('role-1', 'tenant-1');
-      
+
       expect(repository.findOne).toHaveBeenCalledWith(
         { id: 'role-1', tenantId: 'tenant-1' },
         { populate: ['permissions'] }
@@ -105,4 +108,4 @@ describe('RoleRepository', () => {
       expect(result).toEqual(mockRole);
     });
   });
-}); 
+});

@@ -9,4 +9,4 @@ export const CACHE_KEY_GENERATOR_METADATA = 'cache:key_generator';
 
 // Default values
 export const DEFAULT_CACHE_TTL = 3600; // 1 hour
-export const DEFAULT_CACHE_PREFIX = 'acci:'; 
+export const DEFAULT_CACHE_PREFIX = 'acci:';

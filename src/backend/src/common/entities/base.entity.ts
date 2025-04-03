@@ -10,4 +10,4 @@ export abstract class BaseEntity {
 
   @Property({ onUpdate: () => new Date() })
   updatedAt: Date = new Date();
-} 
+}

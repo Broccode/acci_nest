@@ -64,4 +64,4 @@ export interface UpdatePermissionDto {
   resource?: string;
   action?: string;
   conditions?: Record<string, any>;
-} 
+}

@@ -1,7 +1,7 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { RedisProvider } from './redis.provider';
 import { RedisHealthIndicator } from './redis.health';
+import { RedisProvider } from './redis.provider';
 
 export interface RedisModuleOptions {
   connectionName?: string;
@@ -24,4 +24,4 @@ export class RedisModule {
       global: options.isGlobal || false,
     };
   }
-} 
+}

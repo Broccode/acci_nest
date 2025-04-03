@@ -5,4 +5,4 @@ export * from './pino-logging.interface';
 export * from './logging-config.interface';
 
 // Re-export the implementation class to fix the test
-export { PinoLoggingServiceImpl as LoggingService } from '../services/pino-logging.service'; 
+export { PinoLoggingServiceImpl as LoggingService } from '../services/pino-logging.service';

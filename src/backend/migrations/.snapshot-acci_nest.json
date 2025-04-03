@@ -1,7 +1,5 @@
 {
-  "namespaces": [
-    "public"
-  ],
+  "namespaces": ["public"],
   "name": "public",
   "tables": [
     {
@@ -63,12 +61,7 @@
           "primary": false,
           "nullable": false,
           "default": "'trial'",
-          "enumItems": [
-            "active",
-            "suspended",
-            "trial",
-            "archived"
-          ],
+          "enumItems": ["active", "suspended", "trial", "archived"],
           "mappedType": "enum"
         },
         "plan": {
@@ -104,9 +97,7 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "name"
-          ],
+          "columnNames": ["name"],
           "composite": false,
           "keyName": "tenants_name_unique",
           "constraint": true,
@@ -114,9 +105,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "domain"
-          ],
+          "columnNames": ["domain"],
           "composite": false,
           "keyName": "tenants_domain_unique",
           "constraint": true,
@@ -125,9 +114,7 @@
         },
         {
           "keyName": "tenants_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,

@@ -1,4 +1,4 @@
-import { Injectable, Scope, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Scope } from '@nestjs/common';
 
 /**
  * Service to manage the current tenant context
@@ -47,4 +47,4 @@ export class TenantContext {
   clearCurrentTenant(): void {
     this.currentTenantId = null;
   }
-} 
+}

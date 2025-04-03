@@ -13,7 +13,7 @@ describe('PermissionRepository Integration Tests', () => {
   let permissionRepository: PermissionRepository;
   let em: EntityManager;
   let moduleRef: TestingModule;
-  
+
   let TEST_TENANT_ID = uuidv4();
   let OTHER_TENANT_ID = uuidv4();
   let testTenant1: Tenant;
@@ -34,10 +34,10 @@ describe('PermissionRepository Integration Tests', () => {
 
     // Get entity manager
     em = moduleRef.get<EntityManager>(EntityManager);
-    
+
     // Get properly initialized permission repository using our helper method
     permissionRepository = environment.getRepository<Permission>(PermissionRepository);
-    
+
     // Get the tenant IDs created by the container
     const testTenantIds = environment.postgresContainer?.getTestTenantIds();
     if (testTenantIds) {
@@ -57,19 +57,19 @@ describe('PermissionRepository Integration Tests', () => {
   beforeEach(async () => {
     // Clean the database before each test
     await environment.clearDatabase();
-    
+
     // Use a fresh entity manager for each test
     em = moduleRef.get<EntityManager>(EntityManager);
-    
+
     // Re-initialize the permission repository with fresh EntityManager
     permissionRepository = environment.getRepository<Permission>(PermissionRepository);
 
     // Clear entity manager
     em.clear();
-    
+
     // Set the tenant context
     environment.setTenantId(TEST_TENANT_ID);
-    
+
     // Fetch the tenants created by the test environment instead of creating new ones
     const tenants = await em.find(Tenant, {});
     if (tenants.length >= 2) {
@@ -82,13 +82,13 @@ describe('PermissionRepository Integration Tests', () => {
       testTenant1.name = 'Test Tenant 1';
       testTenant1.domain = 'test1.example.com';
       testTenant1.status = TenantStatus.ACTIVE;
-      
+
       testTenant2 = new Tenant();
       testTenant2.id = OTHER_TENANT_ID;
       testTenant2.name = 'Test Tenant 2';
       testTenant2.domain = 'test2.example.com';
       testTenant2.status = TenantStatus.ACTIVE;
-      
+
       await em.persistAndFlush([testTenant1, testTenant2]);
     }
   });
@@ -98,12 +98,12 @@ describe('PermissionRepository Integration Tests', () => {
     const permission = new Permission();
     permission.resource = 'users';
     permission.action = 'read';
-    
+
     await em.persistAndFlush(permission);
-    
+
     // Find the permission
     const foundPermission = await permissionRepository.findByResourceAndAction('users', 'read');
-    
+
     // Verify the permission was found
     expect(foundPermission).toBeDefined();
     expect(foundPermission?.resource).toBe('users');
@@ -119,12 +119,12 @@ describe('PermissionRepository Integration Tests', () => {
       ownerOnly: true,
       maxSize: 1024,
     };
-    
+
     await em.persistAndFlush(permission);
-    
+
     // Find the permission
     const foundPermission = await permissionRepository.findByResourceAndAction('documents', 'read');
-    
+
     // Verify the permission was found with conditions
     expect(foundPermission).toBeDefined();
     expect(foundPermission?.conditions).toEqual({
@@ -138,39 +138,39 @@ describe('PermissionRepository Integration Tests', () => {
     const createPermission = new Permission();
     createPermission.resource = 'users';
     createPermission.action = 'create';
-    
+
     const readPermission = new Permission();
     readPermission.resource = 'users';
     readPermission.action = 'read';
-    
+
     const updatePermission = new Permission();
     updatePermission.resource = 'users';
     updatePermission.action = 'update';
-    
+
     // Create a role
     const role = new Role();
     role.name = 'UserEditor';
     role.description = 'Can edit users';
     role.tenantId = TEST_TENANT_ID;
     role.tenant = testTenant1; // Set the tenant reference
-    
+
     // Save permissions and role
     await em.persistAndFlush([createPermission, readPermission, updatePermission, role]);
-    
+
     // Assign only read and update permissions to role
     role.permissions.add(readPermission, updatePermission);
     await em.flush();
-    
+
     // Find permissions for the role
     const permissions = await permissionRepository.findForRole(role.id);
-    
+
     // Verify the correct permissions were found
     expect(permissions).toBeDefined();
     expect(permissions.length).toBe(2);
-    
-    const resources = permissions.map(p => p.resource);
-    const actions = permissions.map(p => p.action);
-    
+
+    const resources = permissions.map((p) => p.resource);
+    const actions = permissions.map((p) => p.action);
+
     expect(resources).toEqual(['users', 'users']);
     expect(actions).toContain('read');
     expect(actions).toContain('update');
@@ -182,42 +182,42 @@ describe('PermissionRepository Integration Tests', () => {
     const createPermission = new Permission();
     createPermission.resource = 'posts';
     createPermission.action = 'create';
-    
+
     const readPermission = new Permission();
     readPermission.resource = 'posts';
     readPermission.action = 'read';
-    
+
     const deletePermission = new Permission();
     deletePermission.resource = 'posts';
     deletePermission.action = 'delete';
-    
+
     // Create roles
     const authorRole = new Role();
     authorRole.name = 'Author';
     authorRole.description = 'Can create and read posts';
     authorRole.tenantId = TEST_TENANT_ID;
     authorRole.tenant = testTenant1; // Set the tenant reference
-    
+
     const editorRole = new Role();
     editorRole.name = 'Editor';
     editorRole.description = 'Can read and delete posts';
     editorRole.tenantId = TEST_TENANT_ID;
     editorRole.tenant = testTenant1; // Set the tenant reference
-    
+
     // Save all entities
     await em.persistAndFlush([
-      createPermission, 
-      readPermission, 
-      deletePermission, 
-      authorRole, 
-      editorRole
+      createPermission,
+      readPermission,
+      deletePermission,
+      authorRole,
+      editorRole,
     ]);
-    
+
     // Assign permissions to roles
     authorRole.permissions.add(createPermission, readPermission);
     editorRole.permissions.add(readPermission, deletePermission);
     await em.flush();
-    
+
     // Create user with both roles
     const user = new User();
     user.email = 'multi-role@example.com';
@@ -230,25 +230,25 @@ describe('PermissionRepository Integration Tests', () => {
     user.tenantId = TEST_TENANT_ID;
     user.tenant = testTenant1; // Set the tenant reference
     user.roles.add(authorRole, editorRole);
-    
+
     await em.persistAndFlush(user);
-    
+
     // Get combined unique permissions for the user
     const authorPermissions = await permissionRepository.findForRole(authorRole.id);
     const editorPermissions = await permissionRepository.findForRole(editorRole.id);
-    
+
     // Verify correct permissions for each role
     expect(authorPermissions.length).toBe(2);
     expect(editorPermissions.length).toBe(2);
-    
+
     // Combine permissions and ensure uniqueness
     const allPermissions = [...authorPermissions, ...editorPermissions];
-    const uniqueActions = new Set(allPermissions.map(p => p.action));
-    
+    const uniqueActions = new Set(allPermissions.map((p) => p.action));
+
     // Verify combined permissions
     expect(uniqueActions.size).toBe(3);
     expect(uniqueActions.has('create')).toBe(true);
     expect(uniqueActions.has('read')).toBe(true);
     expect(uniqueActions.has('delete')).toBe(true);
   });
-}); 
+});

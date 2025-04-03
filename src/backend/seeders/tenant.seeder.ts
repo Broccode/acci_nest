@@ -1,8 +1,8 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { Tenant, TenantStatus } from '../src/tenants/entities/tenant.entity';
-import * as path from 'path';
-import * as fs from 'fs';
 
 // Partial type for seeding, MikroORM will handle timestamps automatically
 interface TenantSeedData {
@@ -24,7 +24,7 @@ export class TenantSeeder extends Seeder {
   private loadTenantSeedData(): TenantSeedData[] {
     // Try to load from seed data file if it exists
     const seedDataPath = path.resolve(__dirname, '../seed-data/tenants.json');
-    
+
     try {
       if (fs.existsSync(seedDataPath)) {
         console.log(`Loading tenant data from ${seedDataPath}`);
@@ -34,7 +34,7 @@ export class TenantSeeder extends Seeder {
     } catch (error) {
       console.warn(`Could not load seed data from ${seedDataPath}:`, error);
     }
-    
+
     // Default seed data if no file is found
     return [
       {
@@ -101,7 +101,7 @@ export class TenantSeeder extends Seeder {
     // Create tenant entities
     for (const tenantData of tenants) {
       const existingTenant = await em.findOne(Tenant, { domain: tenantData.domain });
-      
+
       if (!existingTenant) {
         // MikroORM will handle the creation of timestamps
         const tenant = em.create(Tenant, tenantData as unknown as Tenant);
@@ -115,4 +115,4 @@ export class TenantSeeder extends Seeder {
     // Flush to database
     await em.flush();
   }
-} 
+}

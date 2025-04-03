@@ -1,10 +1,10 @@
-import { Test } from '@nestjs/testing';
 import { EntityManager } from '@mikro-orm/core';
-import { UserService } from './user.service';
-import { User, UserStatus } from '../entities/user.entity';
-import { Role } from '../entities/role.entity';
-import { CreateUserDto, UpdateUserDto } from '../types/user.types';
+import { Test } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
+import { Role } from '../entities/role.entity';
+import { User, UserStatus } from '../entities/user.entity';
+import { CreateUserDto, UpdateUserDto } from '../types/user.types';
+import { UserService } from './user.service';
 
 // Manually mock bcrypt module
 jest.spyOn(bcrypt, 'genSalt').mockResolvedValue('salt' as never);
@@ -58,7 +58,7 @@ describe('UserService', () => {
       };
 
       const tenantId = 'tenant-1';
-      
+
       const mockUser = Object.assign(new User(), {
         id: 'user-1',
         email: 'test@example.com',
@@ -80,7 +80,10 @@ describe('UserService', () => {
       const result = await service.createUser(createUserDto, tenantId);
 
       // Assert the expected behavior
-      expect(mockEntityManager.findOne).toHaveBeenCalledWith(User, { email: createUserDto.email, tenantId });
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith(User, {
+        email: createUserDto.email,
+        tenantId,
+      });
       expect(bcrypt.genSalt).toHaveBeenCalledWith(10);
       expect(bcrypt.hash).toHaveBeenCalledWith(createUserDto.password, 'salt');
       expect(mockEntityManager.create).toHaveBeenCalledWith(User, {
@@ -106,7 +109,7 @@ describe('UserService', () => {
       };
 
       const tenantId = 'tenant-1';
-      
+
       const existingUser = Object.assign(new User(), {
         id: 'existing-user',
         email: 'existing@example.com',
@@ -116,8 +119,13 @@ describe('UserService', () => {
       mockEntityManager.findOne.mockResolvedValue(existingUser); // User already exists
 
       // Assert the expected behavior
-      await expect(service.createUser(createUserDto, tenantId)).rejects.toThrow('User with this email already exists');
-      expect(mockEntityManager.findOne).toHaveBeenCalledWith(User, { email: createUserDto.email, tenantId });
+      await expect(service.createUser(createUserDto, tenantId)).rejects.toThrow(
+        'User with this email already exists'
+      );
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith(User, {
+        email: createUserDto.email,
+        tenantId,
+      });
       expect(mockEntityManager.create).not.toHaveBeenCalled();
       expect(mockEntityManager.persistAndFlush).not.toHaveBeenCalled();
     });
@@ -227,7 +235,11 @@ describe('UserService', () => {
       await service.assignRoles(userId, roleIds, tenantId);
 
       // Assert the expected behavior
-      expect(mockEntityManager.findOne).toHaveBeenCalledWith(User, { id: userId, tenantId }, { populate: ['roles'] });
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith(
+        User,
+        { id: userId, tenantId },
+        { populate: ['roles'] }
+      );
       expect(mockEntityManager.find).toHaveBeenCalledWith(Role, { id: { $in: roleIds }, tenantId });
       expect(mockUser.roles.add).toHaveBeenCalledTimes(2);
       expect(mockEntityManager.flush).toHaveBeenCalled();
@@ -243,8 +255,14 @@ describe('UserService', () => {
       mockEntityManager.findOne.mockResolvedValue(null);
 
       // Assert the expected behavior
-      await expect(service.assignRoles(userId, roleIds, tenantId)).rejects.toThrow('User not found');
-      expect(mockEntityManager.findOne).toHaveBeenCalledWith(User, { id: userId, tenantId }, { populate: ['roles'] });
+      await expect(service.assignRoles(userId, roleIds, tenantId)).rejects.toThrow(
+        'User not found'
+      );
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith(
+        User,
+        { id: userId, tenantId },
+        { populate: ['roles'] }
+      );
       expect(mockEntityManager.find).not.toHaveBeenCalled();
       expect(mockEntityManager.flush).not.toHaveBeenCalled();
     });
@@ -253,20 +271,20 @@ describe('UserService', () => {
   describe('validatePassword', () => {
     it('should return true for valid password', async () => {
       (bcrypt.compare as jest.Mock).mockResolvedValueOnce(true);
-      
+
       const result = await service.validatePassword('correct_password', 'hashed_password');
-      
+
       expect(bcrypt.compare).toHaveBeenCalledWith('correct_password', 'hashed_password');
       expect(result).toBe(true);
     });
 
     it('should return false for invalid password', async () => {
       (bcrypt.compare as jest.Mock).mockResolvedValueOnce(false);
-      
+
       const result = await service.validatePassword('wrong_password', 'hashed_password');
-      
+
       expect(bcrypt.compare).toHaveBeenCalledWith('wrong_password', 'hashed_password');
       expect(result).toBe(false);
     });
   });
-}); 
+});

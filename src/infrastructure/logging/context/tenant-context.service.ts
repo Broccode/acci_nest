@@ -48,4 +48,4 @@ export class TenantContextService {
   private getStore(): Map<string, any> | undefined {
     return this.storage.getStore();
   }
-} 
+}

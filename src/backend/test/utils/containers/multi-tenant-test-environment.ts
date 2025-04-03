@@ -17,22 +17,22 @@ export interface MultiTenantTestEnvironmentOptions {
    * PostgreSQL container options
    */
   postgres: Omit<PostgresContainerOptions, 'providers' | 'imports'>;
-  
+
   /**
    * Redis container options
    */
   redis?: Omit<RedisContainerOptions, 'providers' | 'imports'>;
-  
+
   /**
    * Additional providers to register in the testing module
    */
   providers?: any[];
-  
+
   /**
    * Additional imports to include in the testing module
    */
   imports?: any[];
-  
+
   /**
    * Default tenant ID to use for tests
    */
@@ -51,7 +51,7 @@ export class MultiTenantTestEnvironment {
   private redisClient: Redis | null = null;
   private mikroOrm: MikroORM | null = null;
   private entityManager: EntityManager | null = null;
-  
+
   private readonly options: MultiTenantTestEnvironmentOptions & {
     defaultTenantId: string;
   };
@@ -61,7 +61,7 @@ export class MultiTenantTestEnvironment {
       defaultTenantId: options.defaultTenantId || uuidv4(),
       ...options,
     };
-    
+
     // Create mock tenant context
     this.mockTenantContext = {
       getCurrentTenant: jest.fn().mockReturnValue(this.options.defaultTenantId),
@@ -98,11 +98,11 @@ export class MultiTenantTestEnvironment {
       providers: [],
       imports: [],
     });
-    
+
     const postgresModule = await this.postgresContainer.start();
     this.mikroOrm = this.postgresContainer.getMikroORM();
     this.entityManager = this.postgresContainer.getEntityManager();
-    
+
     // Start Redis container if enabled
     if (this.options.redis) {
       this.redisContainer = new RedisTestContainer({
@@ -110,21 +110,19 @@ export class MultiTenantTestEnvironment {
         providers: [],
         imports: [],
       });
-      
+
       await this.redisContainer.start();
-      
+
       // Get Redis client from the container
       this.redisClient = this.redisContainer.getRedisClient();
     }
-    
+
     // Initialize repository providers
     const repositoryProviders = this.initializeRepositoryProviders();
-    
+
     // Create combined module with both containers
     this.moduleRef = await Test.createTestingModule({
-      imports: [
-        ...(this.options.imports || []),
-      ],
+      imports: [...(this.options.imports || [])],
       providers: [
         // Mock tenant context
         {
@@ -141,22 +139,24 @@ export class MultiTenantTestEnvironment {
           useFactory: () => this.entityManager,
         },
         // Redis client if available
-        ...(this.redisClient ? [
-          {
-            provide: REDIS_CLIENT,
-            useValue: this.redisClient,
-          },
-          RedisCacheService,
-        ] : []),
+        ...(this.redisClient
+          ? [
+              {
+                provide: REDIS_CLIENT,
+                useValue: this.redisClient,
+              },
+              RedisCacheService,
+            ]
+          : []),
         // Include repository providers
         ...repositoryProviders,
         ...(this.options.providers || []),
       ],
     }).compile();
-    
+
     return this.moduleRef;
   }
-  
+
   /**
    * Initialize repository providers from the options.providers list
    * to ensure they are properly configured with the EntityManager
@@ -165,15 +165,16 @@ export class MultiTenantTestEnvironment {
     if (!this.options.providers || !this.entityManager || !this.mikroOrm) {
       return [];
     }
-    
+
     const repositoryProviders: any[] = [];
-    
+
     // Find all repository classes in the providers list
     for (const provider of this.options.providers) {
-      if (typeof provider === 'function' && 
-          (provider.name.includes('Repository') || 
-           (provider.prototype?.constructor?.name.includes('Repository')))) {
-        
+      if (
+        typeof provider === 'function' &&
+        (provider.name.includes('Repository') ||
+          provider.prototype?.constructor?.name.includes('Repository'))
+      ) {
         // Register the repository with proper factory initialization
         repositoryProviders.push({
           provide: provider,
@@ -183,7 +184,7 @@ export class MultiTenantTestEnvironment {
             if (entityName) {
               return this.entityManager.getRepository(entityName);
             }
-            
+
             // Fallback to direct instantiation if entity name cannot be determined
             const repo = new provider();
             repo.em = this.entityManager;
@@ -192,7 +193,7 @@ export class MultiTenantTestEnvironment {
         });
       }
     }
-    
+
     return repositoryProviders;
   }
 
@@ -202,14 +203,18 @@ export class MultiTenantTestEnvironment {
   private findEntityNameForRepository(repositoryName: string): string | null {
     // Extract entity name from repository name (e.g., "UserRepository" -> "User")
     const entityName = repositoryName.replace('Repository', '');
-    
+
     // Find the matching entity class in the registered entities
-    const entityClass = this.options.postgres.entities.find(entity => {
+    const entityClass = this.options.postgres.entities.find((entity) => {
       const name = typeof entity === 'function' ? entity.name : entity.constructor?.name;
       return name === entityName;
     });
-    
-    return entityClass ? (typeof entityClass === 'function' ? entityClass.name : entityClass.constructor?.name) : null;
+
+    return entityClass
+      ? typeof entityClass === 'function'
+        ? entityClass.name
+        : entityClass.constructor?.name
+      : null;
   }
 
   /**
@@ -221,14 +226,14 @@ export class MultiTenantTestEnvironment {
     }
     return this.moduleRef.get<T>(typeOrToken);
   }
-  
+
   /**
    * Get the mock tenant context to adjust tenant behavior during tests
    */
   getTenantContext(): Partial<TenantContext> {
     return this.mockTenantContext;
   }
-  
+
   /**
    * Set the current tenant ID for test scenarios
    */
@@ -236,7 +241,7 @@ export class MultiTenantTestEnvironment {
     (this.mockTenantContext.getCurrentTenant as jest.Mock).mockReturnValue(tenantId);
     (this.mockTenantContext.getCurrentTenantOrDefault as jest.Mock).mockReturnValue(tenantId);
   }
-  
+
   /**
    * Clear database between tests (useful in beforeEach)
    */
@@ -244,14 +249,14 @@ export class MultiTenantTestEnvironment {
     if (!this.postgresContainer) {
       throw new Error('PostgreSQL container not started');
     }
-    
+
     const em = this.postgresContainer.getEntityManager();
-    
+
     // Only clear the entity manager without flushing
     // This prevents validation errors for unsaved entities
     em.clear();
   }
-  
+
   /**
    * Clear Redis cache between tests (useful in beforeEach)
    */
@@ -274,13 +279,13 @@ export class MultiTenantTestEnvironment {
         try {
           // First call disconnect, then quit
           await this.redisClient.disconnect();
-          
+
           // Short pause to allow the connection to close
-          await new Promise(resolve => setTimeout(resolve, 100));
-          
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
           // Then try to quit
           await this.redisClient.quit();
-          
+
           // Explicitly remove all remaining listeners
           this.redisClient.removeAllListeners();
         } catch (error) {
@@ -289,7 +294,7 @@ export class MultiTenantTestEnvironment {
           this.redisClient = null;
         }
       }
-      
+
       // Close testing module
       if (this.moduleRef) {
         try {
@@ -300,7 +305,7 @@ export class MultiTenantTestEnvironment {
           this.moduleRef = null;
         }
       }
-      
+
       // Stop Redis container
       if (this.redisContainer) {
         try {
@@ -311,7 +316,7 @@ export class MultiTenantTestEnvironment {
           this.redisContainer = null;
         }
       }
-      
+
       // Explicitly close MikroORM
       if (this.mikroOrm) {
         try {
@@ -338,7 +343,7 @@ export class MultiTenantTestEnvironment {
       console.error('Unexpected error shutting down test environment:', error);
       throw error;
     }
-    
+
     // We can't directly clean up timers, but we can
     // call unref() on a new timer to ensure the process isn't blocked
     setTimeout(() => {
@@ -348,28 +353,28 @@ export class MultiTenantTestEnvironment {
 
   /**
    * Get a properly initialized repository instance
-   * 
+   *
    * This method solves a critical issue with MikroORM repositories in tests:
-   * 
-   * The problem: When repositories extend from EntityRepository, they need to be properly 
-   * initialized with an EntityManager. In tests, simply getting a repository via DI sometimes 
-   * fails to properly set up the internal methods like findOne, find, etc., leading to 
+   *
+   * The problem: When repositories extend from EntityRepository, they need to be properly
+   * initialized with an EntityManager. In tests, simply getting a repository via DI sometimes
+   * fails to properly set up the internal methods like findOne, find, etc., leading to
    * "Cannot read properties of undefined" errors when those methods are called.
-   * 
+   *
    * This solution:
    * 1. Locates the entity class that corresponds to the repository by name convention
    * 2. Gets a properly initialized repository from the EntityManager for that entity
    * 3. Ensures the repository has access to the EntityManager for its operations
-   * 
+   *
    * Usage example:
    * ```typescript
    * // Instead of this:
    * repository = moduleRef.get<UserRepository>(UserRepository);
-   * 
+   *
    * // Use this:
    * repository = environment.getRepository<User>(UserRepository);
    * ```
-   * 
+   *
    * @param repository The repository class to initialize
    * @returns A properly initialized repository instance
    */
@@ -377,50 +382,50 @@ export class MultiTenantTestEnvironment {
     if (!this.entityManager) {
       throw new Error('Environment not started. Call start() before accessing repositories.');
     }
-    
+
     // For MikroORM repositories, we need to properly initialize them
     const entityClass = this.findEntityClassForRepository(repository);
     if (entityClass) {
       // Get the actual entity repository from MikroORM
       const mikroRepo = this.entityManager.getRepository(entityClass);
-      
+
       // Create an instance of our custom repository
       const customRepo = new repository();
-      
+
       // Assign important EntityRepository methods to our custom repository
       for (const prop of Object.getOwnPropertyNames(Object.getPrototypeOf(mikroRepo))) {
         if (typeof mikroRepo[prop] === 'function' && prop !== 'constructor') {
           customRepo[prop] = mikroRepo[prop].bind(mikroRepo);
         }
       }
-      
+
       // Set entityName and em
       customRepo.entityName = entityClass.name;
       customRepo.em = this.entityManager;
-      
+
       return customRepo;
     }
-    
-    // Return the repository if it's not an entity repository 
+
+    // Return the repository if it's not an entity repository
     return this.moduleRef?.get(repository);
   }
-  
+
   /**
    * Find the entity class for a repository by checking entity metadata
    */
   private findEntityClassForRepository(repoClass: new (...args: any[]) => any): any {
     if (!this.mikroOrm) return null;
-    
+
     const repoName = repoClass.name;
     const entityName = repoName.replace('Repository', '');
-    
+
     // Find the entity in the metadata
     for (const entity of this.options.postgres.entities) {
       if (entity.name === entityName) {
         return entity;
       }
     }
-    
+
     return null;
   }
-} 
+}

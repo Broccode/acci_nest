@@ -1,1 +1,1 @@
-export * from './pino-logging.service'; 
+export * from './pino-logging.service';

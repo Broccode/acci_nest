@@ -1,4 +1,4 @@
-import { Injectable, Logger, Inject } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import { REDIS_CLIENT } from '../constants';
 
@@ -28,9 +28,7 @@ export class PerformanceService {
   private readonly METRICS_KEY_PREFIX = 'metrics:';
   private readonly MAX_METRICS_PER_KEY = 1000; // Limit to prevent memory issues
 
-  constructor(
-    @Inject(REDIS_CLIENT) private readonly redis: Redis,
-  ) {}
+  constructor(@Inject(REDIS_CLIENT) private readonly redis: Redis) {}
 
   /**
    * Records a performance metric
@@ -54,19 +52,22 @@ export class PerformanceService {
       });
 
       const pipeline = this.redis.pipeline();
-      
+
       // Add to sorted set with timestamp as score for time-based queries
       pipeline.zadd(metricKey, timestamp, metricValue);
-      
+
       // Trim old entries to maintain fixed size
       pipeline.zremrangebyrank(metricKey, 0, -(this.MAX_METRICS_PER_KEY + 1));
-      
+
       // Set expiration to auto-cleanup old metrics (30 days)
       pipeline.expire(metricKey, 30 * 24 * 60 * 60);
-      
+
       await pipeline.exec();
     } catch (error) {
-      this.logger.error(`Failed to record metric: ${name}`, error instanceof Error ? error.stack : String(error));
+      this.logger.error(
+        `Failed to record metric: ${name}`,
+        error instanceof Error ? error.stack : String(error)
+      );
       // Non-critical operation, continue execution
     }
   }
@@ -86,25 +87,26 @@ export class PerformanceService {
     try {
       const metricKey = this.buildMetricKey(name);
       const now = Date.now();
-      const minTime = now - (timeRange * 1000);
-      
+      const minTime = now - timeRange * 1000;
+
       // Get metrics within time range, sorted by timestamp
-      const results = await this.redis.zrangebyscore(
-        metricKey,
-        minTime,
-        now,
-      );
-      
-      return results.map(result => {
-        try {
-          return JSON.parse(result);
-        } catch (error) {
-          this.logger.warn(`Failed to parse metric: ${result}`);
-          return null;
-        }
-      }).filter(Boolean);
+      const results = await this.redis.zrangebyscore(metricKey, minTime, now);
+
+      return results
+        .map((result) => {
+          try {
+            return JSON.parse(result);
+          } catch (error) {
+            this.logger.warn(`Failed to parse metric: ${result}`);
+            return null;
+          }
+        })
+        .filter(Boolean);
     } catch (error) {
-      this.logger.error(`Failed to get metrics: ${name}`, error instanceof Error ? error.stack : String(error));
+      this.logger.error(
+        `Failed to get metrics: ${name}`,
+        error instanceof Error ? error.stack : String(error)
+      );
       return [];
     }
   }
@@ -117,11 +119,11 @@ export class PerformanceService {
    */
   async getAverageMetric(name: string, timeRange: MetricsTimeRange): Promise<number | null> {
     const metrics = await this.getMetrics(name, timeRange);
-    
+
     if (!metrics.length) {
       return null;
     }
-    
+
     const sum = metrics.reduce((acc, metric) => acc + metric.value, 0);
     return sum / metrics.length;
   }
@@ -134,4 +136,4 @@ export class PerformanceService {
   private buildMetricKey(name: string): string {
     return `${this.METRICS_KEY_PREFIX}${name}`;
   }
-} 
+}

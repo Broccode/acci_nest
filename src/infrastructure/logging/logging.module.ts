@@ -1,8 +1,22 @@
-import { DynamicModule, Global, MiddlewareConsumer, Module, NestModule, Provider, Type, Optional } from '@nestjs/common';
+import {
+  DynamicModule,
+  Global,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  Optional,
+  Provider,
+  Type,
+} from '@nestjs/common';
 import { CorrelationIdService, TenantContextService } from './context';
-import { CorrelationIdMiddleware, DefaultTenantResolver, TenantContextMiddleware, TenantResolver } from './middleware';
-import { PinoLoggingOptions, PinoLoggingServiceImpl } from './services';
 import { LoggingService as LoggingServiceInterface } from './interfaces';
+import {
+  CorrelationIdMiddleware,
+  DefaultTenantResolver,
+  TenantContextMiddleware,
+  TenantResolver,
+} from './middleware';
+import { PinoLoggingOptions, PinoLoggingServiceImpl } from './services';
 
 // Token für den LoggingService
 export const LOGGING_SERVICE = 'LOGGING_SERVICE';
@@ -15,19 +29,19 @@ export interface LoggingModuleOptions {
    * Pino logging configuration
    */
   logging?: PinoLoggingOptions;
-  
+
   /**
    * Whether to automatically apply correlation ID middleware
    * @default true
    */
   enableCorrelationId?: boolean;
-  
+
   /**
    * Whether to automatically apply tenant context middleware
    * @default true
    */
   enableTenantContext?: boolean;
-  
+
   /**
    * Custom tenant resolver implementation
    */
@@ -48,7 +62,7 @@ const defaultOptions: LoggingModuleOptions = {
 export class LoggingModule implements NestModule {
   static register(options: LoggingModuleOptions = {}): DynamicModule {
     const moduleOptions = { ...defaultOptions, ...options };
-    
+
     // Configure providers
     const providers: Provider[] = [
       CorrelationIdService,
@@ -74,23 +88,16 @@ export class LoggingModule implements NestModule {
         inject: [TenantContextService, TENANT_RESOLVER],
       },
     ];
-    
+
     return {
       module: LoggingModule,
       providers,
-      exports: [
-        LOGGING_SERVICE,
-        CorrelationIdService,
-        TenantContextService,
-        TENANT_RESOLVER,
-      ],
+      exports: [LOGGING_SERVICE, CorrelationIdService, TenantContextService, TENANT_RESOLVER],
     };
   }
-  
-  constructor(
-    @Optional() private readonly options: LoggingModuleOptions = defaultOptions,
-  ) {}
-  
+
+  constructor(@Optional() private readonly options: LoggingModuleOptions = defaultOptions) {}
+
   /**
    * Configure middleware for correlation ID and tenant context
    */
@@ -99,10 +106,10 @@ export class LoggingModule implements NestModule {
     if (this.options.enableCorrelationId !== false) {
       consumer.apply(CorrelationIdMiddleware).forRoutes('*');
     }
-    
+
     // Apply tenant context middleware if enabled
     if (this.options.enableTenantContext !== false) {
       consumer.apply(TenantContextMiddleware).forRoutes('*');
     }
   }
-} 
+}

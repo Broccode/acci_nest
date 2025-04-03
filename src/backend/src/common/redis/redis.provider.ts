@@ -10,7 +10,7 @@ import { REDIS_CLIENT } from '../constants';
  */
 export const createRedisClient = (configService: ConfigService): Redis => {
   const redisConfig = configService.get('redis');
-  
+
   const redisOptions: RedisOptions = {
     host: redisConfig.host,
     port: redisConfig.port,
@@ -31,22 +31,22 @@ export const createRedisClient = (configService: ConfigService): Redis => {
   };
 
   const redisClient = new Redis(redisOptions);
-  
+
   // Add error handler
   redisClient.on('error', (err) => {
     console.error('Redis connection error:', err);
   });
-  
+
   // Cleanup logic on termination
   redisClient.on('end', () => {
     console.log('Redis connection properly terminated');
   });
-  
+
   // Log connection status
   redisClient.on('connect', () => {
     console.log('Redis connection established');
   });
-  
+
   // On Node process exit, client should be properly disconnected
   process.on('beforeExit', async () => {
     try {
@@ -70,4 +70,4 @@ export const RedisProvider: Provider = {
   provide: REDIS_CLIENT,
   inject: [ConfigService],
   useFactory: createRedisClient,
-}; 
+};

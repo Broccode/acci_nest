@@ -41,10 +41,10 @@ export abstract class BaseRepository<T extends BaseEntity> extends EntityReposit
    * Find all entities with pagination
    */
   async findWithPagination(
-    page: number = 1,
-    limit: number = 10,
+    page = 1,
+    limit = 10,
     where: FilterQuery<T> = {},
-    orderBy: QueryOrderMap<T> = { createdAt: 'DESC' } as unknown as QueryOrderMap<T>,
+    orderBy: QueryOrderMap<T> = { createdAt: 'DESC' } as unknown as QueryOrderMap<T>
   ): Promise<{ items: T[]; total: number; page: number; limit: number; pages: number }> {
     const [items, total] = await Promise.all([
       this.find(where, {
@@ -93,4 +93,4 @@ export abstract class BaseRepository<T extends BaseEntity> extends EntityReposit
     await this.getEntityManager().removeAndFlush(entity);
     return true;
   }
-} 
+}

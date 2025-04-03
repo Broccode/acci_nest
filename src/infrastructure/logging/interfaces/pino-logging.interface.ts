@@ -10,4 +10,4 @@ export interface PinoLoggingService extends LoggingService {
    * For advanced use cases requiring direct Pino access
    */
   getPinoLogger(): PinoLogger;
-} 
+}

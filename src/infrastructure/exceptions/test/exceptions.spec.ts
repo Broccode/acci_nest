@@ -1,15 +1,21 @@
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpStatus,
+  INestApplication,
+} from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus, INestApplication, ArgumentsHost, ExceptionFilter, Catch } from '@nestjs/common';
 import supertest from 'supertest';
-import { ExceptionsModule } from '../exceptions.module';
-import { 
+import {
+  BusinessRuleException,
   DomainException,
   EntityNotFoundException,
-  ValidationException,
   UnauthorizedException,
-  BusinessRuleException
+  ValidationException,
 } from '../exceptions';
-import { APP_FILTER } from '@nestjs/core';
+import { ExceptionsModule } from '../exceptions.module';
 
 // Create a simple test controller that throws exceptions
 import { Controller, Get, Module } from '@nestjs/common';
@@ -44,12 +50,9 @@ class TestExceptionController {
 
   @Get('domain')
   throwDomain() {
-    throw new DomainException(
-      'Generic domain error',
-      'GENERIC_ERROR',
-      undefined,
-      { additionalInfo: 'Some context' }
-    );
+    throw new DomainException('Generic domain error', 'GENERIC_ERROR', undefined, {
+      additionalInfo: 'Some context',
+    });
   }
 
   @Get('unexpected')
@@ -70,7 +73,7 @@ class TestExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
-    
+
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let errorResponse: any = {
       statusCode: status,
@@ -79,13 +82,13 @@ class TestExceptionFilter implements ExceptionFilter {
       message: 'Internal server error',
       errorCode: 'INTERNAL_SERVER_ERROR',
     };
-    
+
     // Process different exception types
     if (exception instanceof DomainException) {
       // Domain exception with standardized format
       status = exception.getStatus();
       const responseData = exception.getResponse() as any;
-      
+
       errorResponse = {
         ...errorResponse,
         statusCode: status,
@@ -93,12 +96,12 @@ class TestExceptionFilter implements ExceptionFilter {
         errorCode: exception.errorCode,
         ...responseData,
       };
-      
+
       // Add errors for ValidationException
       if (exception instanceof ValidationException && responseData.errors) {
         errorResponse.errors = responseData.errors;
       }
-      
+
       // Add context for DomainException
       if (exception.context) {
         errorResponse = { ...errorResponse, ...exception.context };
@@ -107,7 +110,7 @@ class TestExceptionFilter implements ExceptionFilter {
       // Unexpected error
       errorResponse.message = exception.message;
     }
-    
+
     // Send response
     response.status(status).json(errorResponse);
   }
@@ -118,15 +121,13 @@ describe('ExceptionsModule', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        TestModule,
-      ],
+      imports: [TestModule],
       providers: [
         // Provide the simplified exception filter
         {
           provide: APP_FILTER,
           useClass: TestExceptionFilter,
-        }
+        },
       ],
     }).compile();
 
@@ -162,7 +163,7 @@ describe('ExceptionsModule', () => {
         expect(res.body).toHaveProperty('errors');
         expect(res.body).toHaveProperty('timestamp');
         expect(res.body).toHaveProperty('path', '/test-exceptions/validation');
-        
+
         // Validation exception includes the validation errors
         expect(res.body.errors).toHaveProperty('email');
         expect(res.body.errors).toHaveProperty('password');
@@ -221,4 +222,4 @@ describe('ExceptionsModule', () => {
         expect(res.body).toHaveProperty('path', '/test-exceptions/unexpected');
       });
   });
-}); 
+});

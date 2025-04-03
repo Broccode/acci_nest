@@ -1,10 +1,10 @@
-import { Test } from '@nestjs/testing';
-import { getRepositoryToken } from '@mikro-orm/nestjs';
 import { EntityManager } from '@mikro-orm/core';
-import { UserRepository } from './user.repository';
-import { User } from '../entities/user.entity';
-import { TenantContext } from '../../tenants/services/tenant-context.service';
+import { getRepositoryToken } from '@mikro-orm/nestjs';
+import { Test } from '@nestjs/testing';
 import { TENANT_CONTEXT } from '../../common/constants';
+import { TenantContext } from '../../tenants/services/tenant-context.service';
+import { User } from '../entities/user.entity';
+import { UserRepository } from './user.repository';
 
 describe('UserRepository', () => {
   let repository: UserRepository;
@@ -55,8 +55,11 @@ describe('UserRepository', () => {
       jest.spyOn(repository, 'findOne').mockResolvedValue(mockUser);
 
       const result = await repository.findByEmail('test@example.com', 'tenant-1');
-      
-      expect(repository.findOne).toHaveBeenCalledWith({ email: 'test@example.com', tenantId: 'tenant-1' });
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        email: 'test@example.com',
+        tenantId: 'tenant-1',
+      });
       expect(result).toEqual(mockUser);
     });
 
@@ -64,8 +67,11 @@ describe('UserRepository', () => {
       jest.spyOn(repository, 'findOne').mockResolvedValue(null);
 
       const result = await repository.findByEmail('nonexistent@example.com', 'tenant-1');
-      
-      expect(repository.findOne).toHaveBeenCalledWith({ email: 'nonexistent@example.com', tenantId: 'tenant-1' });
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        email: 'nonexistent@example.com',
+        tenantId: 'tenant-1',
+      });
       expect(result).toBeNull();
     });
   });
@@ -80,7 +86,7 @@ describe('UserRepository', () => {
       jest.spyOn(repository, 'findOne').mockResolvedValue(mockUser);
 
       const result = await repository.findWithRoles('user-1', 'tenant-1');
-      
+
       expect(repository.findOne).toHaveBeenCalledWith(
         { id: 'user-1', tenantId: 'tenant-1' },
         { populate: ['roles'] }
@@ -96,11 +102,11 @@ describe('UserRepository', () => {
       jest.spyOn(repository, 'nativeUpdate').mockResolvedValue({ affectedRows: 1 } as any);
 
       await repository.updateLastLogin('user-1', 'tenant-1');
-      
+
       expect(repository.nativeUpdate).toHaveBeenCalledWith(
         { id: 'user-1', tenantId: 'tenant-1' },
         { lastLogin: now }
       );
     });
   });
-}); 
+});

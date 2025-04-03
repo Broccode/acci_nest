@@ -1,9 +1,9 @@
 import { FilterQuery, QueryOrderMap } from '@mikro-orm/core';
 import { Inject } from '@nestjs/common';
-import { BaseRepository } from './base.repository';
-import { BaseEntity } from '../entities/base.entity';
-import { TENANT_CONTEXT } from '../constants';
 import { TenantContext } from '../../tenants/services/tenant-context.service';
+import { TENANT_CONTEXT } from '../constants';
+import { BaseEntity } from '../entities/base.entity';
+import { BaseRepository } from './base.repository';
 
 /**
  * Repository that automatically applies tenant filtering to all queries
@@ -43,14 +43,14 @@ export abstract class TenantAwareRepository<T extends BaseEntity> extends BaseRe
    * Find entities with pagination and automatic tenant filtering
    */
   async findWithTenantAndPagination(
-    page: number = 1,
-    limit: number = 10,
+    page = 1,
+    limit = 10,
     where: FilterQuery<T> = {},
-    orderBy: QueryOrderMap<T> = { createdAt: 'DESC' } as QueryOrderMap<T>,
+    orderBy: QueryOrderMap<T> = { createdAt: 'DESC' } as QueryOrderMap<T>
   ): Promise<{ items: T[]; total: number; page: number; limit: number; pages: number }> {
     const tenantId = this.tenantContext.getCurrentTenant();
     const filter: FilterQuery<T> = { ...(where as object), tenantId } as FilterQuery<T>;
-    
+
     const [items, total] = await Promise.all([
       this.find(filter, {
         limit,
@@ -78,4 +78,4 @@ export abstract class TenantAwareRepository<T extends BaseEntity> extends BaseRe
     const count = await this.count(filter);
     return count > 0;
   }
-} 
+}

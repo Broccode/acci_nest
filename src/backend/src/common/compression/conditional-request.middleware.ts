@@ -1,6 +1,6 @@
-import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
-import { NextFunction, Request, Response } from 'express';
 import * as crypto from 'crypto';
+import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
+import { NextFunction, Request, Response } from 'express';
 
 /**
  * Middleware for handling conditional requests with ETags and Last-Modified headers
@@ -9,8 +9,6 @@ import * as crypto from 'crypto';
 @Injectable()
 export class ConditionalRequestMiddleware implements NestMiddleware {
   private readonly logger = new Logger(ConditionalRequestMiddleware.name);
-
-  constructor() {}
 
   /**
    * Applies conditional request handling to responses
@@ -27,10 +25,10 @@ export class ConditionalRequestMiddleware implements NestMiddleware {
     // Store the original end method to intercept it
     const originalEnd = res.end;
     const originalWrite = res.write;
-    let responseBody: Buffer[] = [];
+    const responseBody: Buffer[] = [];
 
     // Collect response data
-    res.write = function(chunk: any, ...args: any[]): boolean {
+    res.write = (chunk: any, ...args: any[]): boolean => {
       if (chunk) {
         responseBody.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
       }
@@ -38,13 +36,13 @@ export class ConditionalRequestMiddleware implements NestMiddleware {
     } as any;
 
     // Handle the end of the response to add conditional headers
-    res.end = function(chunk: any, ...args: any): Response {
+    res.end = function (chunk: any, ...args: any): Response {
       if (chunk) {
         responseBody.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
       }
 
       const completeBody = Buffer.concat(responseBody);
-      
+
       try {
         // Skip if status is not 200 OK
         if (res.statusCode !== 200) {
@@ -52,25 +50,23 @@ export class ConditionalRequestMiddleware implements NestMiddleware {
         }
 
         // Add ETag header
-        const hash = crypto.createHash('md5')
-          .update(completeBody)
-          .digest('hex');
-        
+        const hash = crypto.createHash('md5').update(completeBody).digest('hex');
+
         const etagValue = `W/"${hash}"`;
-        
+
         res.setHeader('ETag', etagValue);
-        
+
         // Check If-None-Match header
         const ifNoneMatch = req.headers['if-none-match'];
         if (ifNoneMatch && ifNoneMatch === etagValue) {
           res.statusCode = 304;
           return originalEnd.apply(res, [null, 'utf-8']);
         }
-        
+
         // Add Last-Modified header
         const lastModified = new Date().toUTCString();
         res.setHeader('Last-Modified', lastModified);
-        
+
         // Check If-Modified-Since header
         const ifModifiedSince = req.headers['if-modified-since'];
         if (ifModifiedSince && ifModifiedSince === lastModified) {
@@ -78,7 +74,10 @@ export class ConditionalRequestMiddleware implements NestMiddleware {
           return originalEnd.apply(res, [null, 'utf-8']);
         }
       } catch (error) {
-        this.logger.error('Error in conditional request middleware', error instanceof Error ? error.stack : String(error));
+        this.logger.error(
+          'Error in conditional request middleware',
+          error instanceof Error ? error.stack : String(error)
+        );
       }
 
       return originalEnd.apply(res, [chunk, ...args]);
@@ -86,4 +85,4 @@ export class ConditionalRequestMiddleware implements NestMiddleware {
 
     next();
   }
-} 
+}

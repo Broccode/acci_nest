@@ -20,13 +20,7 @@
         "useExhaustiveDependencies": "warn"
       }
     },
-    "ignore": [
-      "node_modules",
-      "dist",
-      "build",
-      ".git",
-      ".github"
-    ]
+    "ignore": ["node_modules", "dist", "build", ".git", ".github"]
   },
   "formatter": {
     "enabled": true,
@@ -49,13 +43,6 @@
     }
   },
   "files": {
-    "ignore": [
-      "node_modules",
-      "dist",
-      "build",
-      "coverage",
-      ".git",
-      "*.min.js"
-    ]
+    "ignore": ["node_modules", "dist", "build", "coverage", ".git", "*.min.js"]
   }
-} 
+}

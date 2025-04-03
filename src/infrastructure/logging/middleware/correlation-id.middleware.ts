@@ -1,5 +1,5 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { CorrelationIdService } from '../context';
 
 /**
@@ -31,4 +31,4 @@ export class CorrelationIdMiddleware implements NestMiddleware {
       next();
     });
   }
-} 
+}

@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/core';
+import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
@@ -21,7 +21,7 @@ export class AppService {
     } catch (error) {
       this.logger.error('Database connection failed', {
         error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined
+        stack: error instanceof Error ? error.stack : undefined,
       });
       return false;
     }
@@ -48,35 +48,37 @@ export class AppService {
     try {
       // Check basic connectivity
       const connected = await this.checkDbConnection();
-      
+
       if (!connected) {
         this.logger.warn('Database connection check failed during health check');
         return defaultResponse;
       }
-      
+
       try {
         // Fetch PostgreSQL version
         const versionResult = await this.em.getConnection().execute('SELECT version()');
         const version = versionResult[0]?.version || 'Unknown';
-        
+
         // Get migration status
         const migrationsTable = 'mikro_orm_migrations';
-        let pending = 0;
+        const pending = 0;
         let applied = 0;
-        
+
         try {
-          const migrationsResult = await this.em.getConnection().execute(
-            `SELECT COUNT(*) as count FROM ${migrationsTable}`
-          );
+          const migrationsResult = await this.em
+            .getConnection()
+            .execute(`SELECT COUNT(*) as count FROM ${migrationsTable}`);
           applied = parseInt(migrationsResult[0]?.count || '0', 10);
-          
+
           // In a real app, we would check pending migrations
           // This would require access to the MikroORM Migrator
         } catch (e) {
           // Migrations table might not exist yet
-          this.logger.warn(`Could not fetch migration data: ${e instanceof Error ? e.message : String(e)}`);
+          this.logger.warn(
+            `Could not fetch migration data: ${e instanceof Error ? e.message : String(e)}`
+          );
         }
-        
+
         // Get connection pool stats - Use a simplified approach with defaults
         // as the internal pool structure can vary between drivers
         const connectionPool = {
@@ -84,7 +86,7 @@ export class AppService {
           size: 10, // This matches our configuration
           waiting: 0,
         };
-        
+
         // Get table and schema statistics
         const statsQuery = `
           SELECT 
@@ -92,10 +94,10 @@ export class AppService {
             (SELECT COUNT(*) FROM information_schema.sequences WHERE sequence_schema NOT IN ('pg_catalog', 'information_schema')) as sequences,
             (SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name NOT IN ('pg_catalog', 'information_schema')) as schemas
         `;
-        
+
         const statsResult = await this.em.getConnection().execute(statsQuery);
         const stats = statsResult[0] || { tables: 0, sequences: 0, schemas: 0 };
-        
+
         return {
           connected,
           version: version.split(' ')[0] || version,
@@ -110,7 +112,7 @@ export class AppService {
       } catch (error) {
         this.logger.error('Error retrieving database details during health check', {
           error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : undefined
+          stack: error instanceof Error ? error.stack : undefined,
         });
         return {
           ...defaultResponse,
@@ -120,9 +122,9 @@ export class AppService {
     } catch (error) {
       this.logger.error('Failed to retrieve database health', {
         error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined
+        stack: error instanceof Error ? error.stack : undefined,
       });
       return defaultResponse;
     }
   }
-} 
+}

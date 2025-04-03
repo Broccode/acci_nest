@@ -3,13 +3,13 @@ import { User } from '../entities/user.entity';
 
 /**
  * User repository
- * 
+ *
  * @description Repository for the User entity with tenant-aware operations
  */
 export class UserRepository extends TenantAwareRepository<User> {
   /**
    * Find a user by email address within a tenant
-   * 
+   *
    * @param email User's email address
    * @param tenantId Tenant ID
    * @returns The user or null if not found
@@ -20,7 +20,7 @@ export class UserRepository extends TenantAwareRepository<User> {
 
   /**
    * Find a user with their roles loaded
-   * 
+   *
    * @param id User ID
    * @param tenantId Tenant ID
    * @returns The user with roles or null if not found
@@ -31,11 +31,11 @@ export class UserRepository extends TenantAwareRepository<User> {
 
   /**
    * Update a user's last login timestamp
-   * 
+   *
    * @param id User ID
    * @param tenantId Tenant ID
    */
   async updateLastLogin(id: string, tenantId: string): Promise<void> {
     await this.nativeUpdate({ id, tenantId }, { lastLogin: new Date() });
   }
-} 
+}

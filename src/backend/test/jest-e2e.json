@@ -10,4 +10,4 @@
     "^src/(.*)$": "<rootDir>/src/$1"
   },
   "setupFilesAfterEnv": ["<rootDir>/test/helpers/jest-e2e-setup.ts"]
-} 
+}

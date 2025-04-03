@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { Module } from '@nestjs/common';
+import { TENANT_CONTEXT } from '../common/constants';
 import { Tenant } from './entities/tenant.entity';
 import { TenantContext } from './services/tenant-context.service';
-import { TENANT_CONTEXT } from '../common/constants';
 
 @Module({
   imports: [
@@ -23,4 +23,4 @@ import { TENANT_CONTEXT } from '../common/constants';
     TENANT_CONTEXT,
   ],
 })
-export class TenantsModule {} 
+export class TenantsModule {}

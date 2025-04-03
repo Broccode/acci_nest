@@ -17,12 +17,12 @@ export class DatabaseSeeder extends Seeder {
     }
 
     console.log('📝 Running database seeders...');
-    
+
     // Run tenant seeder first since other entities may depend on tenants
     await this.call(em, [TenantSeeder]);
-    
+
     // Add additional seeders here
-    
+
     console.log('✅ Database seeding completed successfully');
   }
-} 
+}

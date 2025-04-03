@@ -1,8 +1,8 @@
-import { Test } from '@nestjs/testing';
-import { getRepositoryToken } from '@mikro-orm/nestjs';
 import { EntityManager } from '@mikro-orm/core';
-import { PermissionRepository } from './permission.repository';
+import { getRepositoryToken } from '@mikro-orm/nestjs';
+import { Test } from '@nestjs/testing';
 import { Permission } from '../entities/permission.entity';
+import { PermissionRepository } from './permission.repository';
 
 describe('PermissionRepository', () => {
   let repository: PermissionRepository;
@@ -43,7 +43,7 @@ describe('PermissionRepository', () => {
       jest.spyOn(repository, 'findOne').mockResolvedValue(mockPermission);
 
       const result = await repository.findByResourceAndAction('users', 'create');
-      
+
       expect(repository.findOne).toHaveBeenCalledWith({ resource: 'users', action: 'create' });
       expect(result).toEqual(mockPermission);
     });
@@ -52,8 +52,11 @@ describe('PermissionRepository', () => {
       jest.spyOn(repository, 'findOne').mockResolvedValue(null);
 
       const result = await repository.findByResourceAndAction('nonexistent', 'invalid');
-      
-      expect(repository.findOne).toHaveBeenCalledWith({ resource: 'nonexistent', action: 'invalid' });
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        resource: 'nonexistent',
+        action: 'invalid',
+      });
       expect(result).toBeNull();
     });
   });
@@ -61,14 +64,22 @@ describe('PermissionRepository', () => {
   describe('findForRole', () => {
     it('should find all permissions for a specific role', async () => {
       const mockPermissions = [
-        Object.assign(new Permission(), { id: 'permission-1', resource: 'users', action: 'create' }),
-        Object.assign(new Permission(), { id: 'permission-2', resource: 'users', action: 'update' }),
+        Object.assign(new Permission(), {
+          id: 'permission-1',
+          resource: 'users',
+          action: 'create',
+        }),
+        Object.assign(new Permission(), {
+          id: 'permission-2',
+          resource: 'users',
+          action: 'update',
+        }),
       ];
 
       jest.spyOn(repository, 'find').mockResolvedValue(mockPermissions);
 
       const result = await repository.findForRole('role-1');
-      
+
       expect(repository.find).toHaveBeenCalledWith({ roles: { id: 'role-1' } });
       expect(result).toEqual(mockPermissions);
       expect(result.length).toBe(2);
@@ -78,10 +89,10 @@ describe('PermissionRepository', () => {
       jest.spyOn(repository, 'find').mockResolvedValue([]);
 
       const result = await repository.findForRole('role-without-permissions');
-      
+
       expect(repository.find).toHaveBeenCalledWith({ roles: { id: 'role-without-permissions' } });
       expect(result).toEqual([]);
       expect(result.length).toBe(0);
     });
   });
-}); 
+});

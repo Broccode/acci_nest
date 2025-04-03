@@ -11,4 +11,4 @@ export const RATE_LIMIT_DURATION_KEY = 'rate-limit:duration';
 /**
  * Rate limiting metadata key for Redis key prefix
  */
-export const RATE_LIMIT_KEY_PREFIX_KEY = 'rate-limit:key-prefix'; 
+export const RATE_LIMIT_KEY_PREFIX_KEY = 'rate-limit:key-prefix';

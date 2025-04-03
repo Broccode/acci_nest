@@ -1,6 +1,6 @@
+import { randomUUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
-import { randomUUID } from 'crypto';
 
 /**
  * Service to manage correlation IDs throughout the request lifecycle
@@ -9,7 +9,7 @@ import { randomUUID } from 'crypto';
 @Injectable()
 export class CorrelationIdService {
   private readonly storage = new AsyncLocalStorage<Map<string, any>>();
-  
+
   /**
    * Header name for the correlation ID in HTTP requests
    */
@@ -62,4 +62,4 @@ export class CorrelationIdService {
   private getStore(): Map<string, any> | undefined {
     return this.storage.getStore();
   }
-} 
+}

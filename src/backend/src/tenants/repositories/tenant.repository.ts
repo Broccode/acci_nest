@@ -16,7 +16,7 @@ export class TenantRepository extends BaseRepository<Tenant> {
    */
   async findActive(): Promise<Tenant[]> {
     const filter: FilterQuery<Tenant> = {
-      status: { $in: [TenantStatus.ACTIVE, TenantStatus.TRIAL] }
+      status: { $in: [TenantStatus.ACTIVE, TenantStatus.TRIAL] },
     };
     return this.find(filter);
   }
@@ -26,8 +26,9 @@ export class TenantRepository extends BaseRepository<Tenant> {
    */
   async isActive(id: string): Promise<boolean> {
     const tenant = await this.findById(id);
-    return !!tenant && 
-      (tenant.status === TenantStatus.ACTIVE || tenant.status === TenantStatus.TRIAL);
+    return (
+      !!tenant && (tenant.status === TenantStatus.ACTIVE || tenant.status === TenantStatus.TRIAL)
+    );
   }
 
   /**
@@ -38,9 +39,9 @@ export class TenantRepository extends BaseRepository<Tenant> {
     if (!tenant) {
       return null;
     }
-    
+
     tenant.status = status;
     await this.getEntityManager().persistAndFlush(tenant);
     return tenant;
   }
-} 
+}

@@ -10,4 +10,4 @@ export interface LogContext {
   userId?: string;
   /** Additional context details */
   [key: string]: any;
-} 
+}

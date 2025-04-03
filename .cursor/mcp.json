@@ -1,67 +1,44 @@
 {
-    "mcpServers": {
-      "Skeet": {
-        "url": "https://skeet.sh/ot/144c4aaf31c522ffafe66385ad163e89f86761190acf52d469165b01a7005307"    
-      },
-        "browser": {
-            "command": "npx",
-            "args": [
-              "-y",
-              "@agentdeskai/browser-tools-mcp@1.1.0"
-            ]
-          },
+  "mcpServers": {
+    "Skeet": {
+      "url": "https://skeet.sh/ot/144c4aaf31c522ffafe66385ad163e89f86761190acf52d469165b01a7005307"
+    },
+    "browser": {
+      "command": "npx",
+      "args": ["-y", "@agentdeskai/browser-tools-mcp@1.1.0"]
+    },
 
-          "sequential": {
-            "command": "npx",
-            "args": [
-              "-y",
-              "@modelcontextprotocol/server-sequential-thinking"
-            ]
-          },
+    "sequential": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
 
-          "filesystem": {
-            "command": "npx",
-            "args": [
-              "-y",
-              "@modelcontextprotocol/server-filesystem",
-              "/Users/michael"
-            ]
-          },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/michael"]
+    },
 
-          "git": {
-            "command": "uvx",
-            "args": [
-              "mcp-server-git",
-              "--repository",
-              "/Users/michael/CursorProjects/acci_nest"
-            ]
-          },
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", "/Users/michael/CursorProjects/acci_nest"]
+    },
 
-          "playwright": {
-            "command": "npx",
-            "args": [
-              "-y",
-              "@executeautomation/playwright-mcp-server"
-            ]
-          },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@executeautomation/playwright-mcp-server"]
+    },
 
-          "tavily": {
-            "command": "npx",
-            "args": [
-              "-y",
-              "tavily-mcp"
-            ],
-            "env": {
-              "TAVILY_API_KEY": "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"
-            }
-          },
+    "tavily": {
+      "command": "npx",
+      "args": ["-y", "tavily-mcp"],
+      "env": {
+        "TAVILY_API_KEY": "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"
+      }
+    },
 
-        "time": {
-            "command": "uvx",
-            "args": [
-              "mcp-server-time"
-            ]
-          }
+    "time": {
+      "command": "uvx",
+      "args": ["mcp-server-time"]
     }
   }
-  
+}

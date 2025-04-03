@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { LoggingModule, ExceptionsModule } from './infrastructure';
 import { ExamplesModule } from './examples/examples.module';
+import { ExceptionsModule, LoggingModule } from './infrastructure';
 
 /**
  * Root application module
@@ -14,12 +14,12 @@ import { ExamplesModule } from './examples/examples.module';
         prettyPrint: process.env.NODE_ENV !== 'production',
       },
     }),
-    
+
     // Configure exceptions handling
     ExceptionsModule.register(),
-    
+
     // Example module for testing
     ExamplesModule,
   ],
 })
-export class AppModule {} 
+export class AppModule {}

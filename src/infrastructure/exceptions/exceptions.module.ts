@@ -23,9 +23,9 @@ const defaultOptions: ExceptionsModuleOptions = {
 export class ExceptionsModule {
   static register(options: ExceptionsModuleOptions = {}): DynamicModule {
     const moduleOptions = { ...defaultOptions, ...options };
-    
+
     const providers: Provider[] = [];
-    
+
     // Register global exception filter if enabled
     if (moduleOptions.enableGlobalFilter !== false) {
       providers.push({
@@ -33,11 +33,11 @@ export class ExceptionsModule {
         useClass: GlobalExceptionFilter,
       });
     }
-    
+
     return {
       module: ExceptionsModule,
       providers,
       exports: [],
     };
   }
-} 
+}

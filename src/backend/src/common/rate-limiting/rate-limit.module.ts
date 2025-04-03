@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { RateLimiterService } from './rate-limiter.service';
-import { RateLimitGuard } from './rate-limit.guard';
-import { RedisModule } from '../redis/redis.module';
 import { TenantsModule } from '../../tenants/tenants.module';
+import { RedisModule } from '../redis/redis.module';
+import { RateLimitGuard } from './rate-limit.guard';
+import { RateLimiterService } from './rate-limiter.service';
 
 /**
  * Module for rate limiting functionality
@@ -13,9 +13,9 @@ import { TenantsModule } from '../../tenants/tenants.module';
     RedisModule.register({
       isGlobal: false,
     }),
-    TenantsModule
+    TenantsModule,
   ],
   providers: [RateLimiterService, RateLimitGuard],
   exports: [RateLimiterService, RateLimitGuard],
 })
-export class RateLimitModule {} 
+export class RateLimitModule {}

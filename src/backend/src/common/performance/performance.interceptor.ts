@@ -1,8 +1,8 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
+import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { PerformanceService } from './performance.service';
-import { Request } from 'express';
 
 /**
  * Interceptor for measuring and recording API request performance
@@ -29,7 +29,7 @@ export class PerformanceInterceptor implements NestInterceptor {
     const start = Date.now();
     const httpContext = context.switchToHttp();
     const request = httpContext.getRequest<Request>();
-    
+
     // Extract useful information for metrics
     const method = request.method;
     const route = this.normalizeRoute(request);
@@ -40,7 +40,7 @@ export class PerformanceInterceptor implements NestInterceptor {
       tap({
         next: () => this.recordSuccess(start, method, route, tenantId, userAgent),
         error: (error) => this.recordError(start, method, route, tenantId, userAgent, error),
-      }),
+      })
     );
   }
 
@@ -57,10 +57,10 @@ export class PerformanceInterceptor implements NestInterceptor {
     method: string,
     route: string,
     tenantId: string,
-    userAgent: string,
+    userAgent: string
   ): void {
     const duration = Date.now() - start;
-    
+
     try {
       // Record endpoint-specific duration
       this.performanceService.recordMetric(`request.duration.${method}.${route}`, duration, {
@@ -69,7 +69,7 @@ export class PerformanceInterceptor implements NestInterceptor {
         tenantId,
         status: 'success',
       });
-      
+
       // Record overall API response time
       this.performanceService.recordMetric('request.duration.all', duration, {
         method,
@@ -77,13 +77,16 @@ export class PerformanceInterceptor implements NestInterceptor {
         tenantId,
         status: 'success',
       });
-      
+
       // Log slow requests for investigation
       if (duration > 1000) {
         this.logger.warn(`Slow request: ${method} ${route} took ${duration}ms`);
       }
     } catch (error) {
-      this.logger.error('Failed to record performance metric', error instanceof Error ? error.stack : String(error));
+      this.logger.error(
+        'Failed to record performance metric',
+        error instanceof Error ? error.stack : String(error)
+      );
       // Non-critical, continue execution
     }
   }
@@ -103,10 +106,10 @@ export class PerformanceInterceptor implements NestInterceptor {
     route: string,
     tenantId: string,
     userAgent: string,
-    error: Error,
+    error: Error
   ): void {
     const duration = Date.now() - start;
-    
+
     try {
       // Record endpoint-specific error
       this.performanceService.recordMetric(`request.error.${method}.${route}`, duration, {
@@ -116,7 +119,7 @@ export class PerformanceInterceptor implements NestInterceptor {
         status: 'error',
         errorType: error.name,
       });
-      
+
       // Record overall API error rate
       this.performanceService.recordMetric('request.error.all', duration, {
         method,
@@ -126,7 +129,10 @@ export class PerformanceInterceptor implements NestInterceptor {
         errorType: error.name,
       });
     } catch (metricError) {
-      this.logger.error('Failed to record error metric', metricError instanceof Error ? metricError.stack : String(metricError));
+      this.logger.error(
+        'Failed to record error metric',
+        metricError instanceof Error ? metricError.stack : String(metricError)
+      );
       // Non-critical, continue execution
     }
   }
@@ -141,17 +147,20 @@ export class PerformanceInterceptor implements NestInterceptor {
     if (!request.route) {
       return 'unknown';
     }
-    
+
     try {
       // Extract base route path from route definition
       const routePath = request.route.path;
-      
+
       // For NestJS routes, this will give us the pattern like "/users/:id"
       // We keep this format which naturally groups routes with the same pattern
       return routePath;
     } catch (error) {
-      this.logger.warn('Failed to normalize route', error instanceof Error ? error.stack : String(error));
+      this.logger.warn(
+        'Failed to normalize route',
+        error instanceof Error ? error.stack : String(error)
+      );
       return 'unknown';
     }
   }
-} 
+}

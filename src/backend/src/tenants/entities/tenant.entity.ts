@@ -1,4 +1,4 @@
-import { Entity, Enum, Property, Unique, EntityRepositoryType as ERT } from '@mikro-orm/core';
+import { Entity, EntityRepositoryType as ERT, Enum, Property, Unique } from '@mikro-orm/core';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { TenantRepository } from '../repositories/tenant.repository';
 
@@ -6,7 +6,7 @@ export enum TenantStatus {
   ACTIVE = 'active',
   SUSPENDED = 'suspended',
   TRIAL = 'trial',
-  ARCHIVED = 'archived'
+  ARCHIVED = 'archived',
 }
 
 @Entity({ tableName: 'tenants', repository: () => TenantRepository })
@@ -37,4 +37,4 @@ export class Tenant extends BaseEntity {
     security?: Record<string, any>;
     integrations?: Record<string, any>[];
   } = {};
-} 
+}

@@ -7,4 +7,4 @@ import { LoggingExampleController } from './logging.controller';
 @Module({
   controllers: [LoggingExampleController],
 })
-export class ExamplesModule {} 
+export class ExamplesModule {}

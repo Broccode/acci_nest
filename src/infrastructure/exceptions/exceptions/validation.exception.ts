@@ -12,11 +12,9 @@ export class ValidationException extends DomainException {
    * @param context - Additional context information
    */
   constructor(errors: Record<string, string[]>, context?: Record<string, any>) {
-    super(
-      'Validation failed',
-      'VALIDATION_FAILED',
-      HttpStatus.BAD_REQUEST,
-      { ...context, validationErrors: errors }
-    );
+    super('Validation failed', 'VALIDATION_FAILED', HttpStatus.BAD_REQUEST, {
+      ...context,
+      validationErrors: errors,
+    });
   }
-} 
+}

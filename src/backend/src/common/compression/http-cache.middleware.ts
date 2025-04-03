@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
+import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 
 /**
@@ -8,8 +8,6 @@ import { NextFunction, Request, Response } from 'express';
 @Injectable()
 export class HttpCacheMiddleware implements NestMiddleware {
   private readonly logger = new Logger(HttpCacheMiddleware.name);
-
-  constructor() {}
 
   /**
    * Applies cache control headers to responses
@@ -28,4 +26,4 @@ export class HttpCacheMiddleware implements NestMiddleware {
 
     next();
   }
-} 
+}

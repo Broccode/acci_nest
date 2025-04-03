@@ -1,5 +1,5 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { TenantContextService } from '../context';
 
 /**
@@ -36,7 +36,7 @@ export class DefaultTenantResolver implements TenantResolver {
 export class TenantContextMiddleware implements NestMiddleware {
   constructor(
     private readonly tenantContext: TenantContextService,
-    private readonly tenantResolver: TenantResolver,
+    private readonly tenantResolver: TenantResolver
   ) {}
 
   /**
@@ -59,4 +59,4 @@ export class TenantContextMiddleware implements NestMiddleware {
       next();
     }
   }
-} 
+}

@@ -1,19 +1,23 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
-import configuration from './config/configuration';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CacheModule } from './common/cache/cache.module';
+import {
+  CompressionMiddleware,
+  ConditionalRequestMiddleware,
+  HttpCacheMiddleware,
+} from './common/compression';
+import { PerformanceModule } from './common/performance';
+import { PerformanceInterceptor } from './common/performance';
+import { RateLimitModule } from './common/rate-limiting';
+import { RedisModule } from './common/redis/redis.module';
+import configuration from './config/configuration';
 import { TenantsModule } from './tenants/tenants.module';
 import { UsersModule } from './users/users.module';
-import { RedisModule } from './common/redis/redis.module';
-import { CacheModule } from './common/cache/cache.module';
-import { RateLimitModule } from './common/rate-limiting';
-import { PerformanceModule } from './common/performance';
-import { CompressionMiddleware, HttpCacheMiddleware, ConditionalRequestMiddleware } from './common/compression';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { PerformanceInterceptor } from './common/performance';
 
 @Module({
   imports: [
@@ -22,7 +26,7 @@ import { PerformanceInterceptor } from './common/performance';
       isGlobal: true,
       load: [configuration],
     }),
-    
+
     // Database - MikroORM
     MikroOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
@@ -39,18 +43,18 @@ import { PerformanceInterceptor } from './common/performance';
       }),
       inject: [ConfigService],
     }),
-    
+
     // Cache module
     CacheModule.register({
       isGlobal: true, // Make cache services available globally
     }),
-    
+
     // Rate limiting module
     RateLimitModule,
-    
+
     // Performance monitoring module
     PerformanceModule,
-    
+
     // Application modules
     TenantsModule,
     UsersModule,
@@ -69,10 +73,8 @@ import { PerformanceInterceptor } from './common/performance';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     // Apply compression for all routes
-    consumer
-      .apply(CompressionMiddleware)
-      .forRoutes('*');
-    
+    consumer.apply(CompressionMiddleware).forRoutes('*');
+
     // Apply HTTP caching and conditional requests for specific routes
     consumer
       .apply(HttpCacheMiddleware, ConditionalRequestMiddleware)

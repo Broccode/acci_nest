@@ -1,7 +1,7 @@
 import { Inject, Injectable, Optional } from '@nestjs/common';
-import { Logger as PinoLogger, pino, LoggerOptions } from 'pino';
-import { PinoLoggingService, LogContext } from '../interfaces';
+import { Logger as PinoLogger, LoggerOptions, pino } from 'pino';
 import { CorrelationIdService, TenantContextService } from '../context';
+import { LogContext, PinoLoggingService } from '../interfaces';
 
 /**
  * Configuration options for the Pino logging service
@@ -12,19 +12,19 @@ export interface PinoLoggingOptions {
    * @default 'info'
    */
   level?: string;
-  
+
   /**
    * Pretty print logs (development only)
    * @default false
    */
   prettyPrint?: boolean;
-  
+
   /**
    * Array of sensitive fields to redact from logs
    * @default ['password', 'token', 'authorization', 'cookie']
    */
   redactFields?: string[];
-  
+
   /**
    * Base context to include in all logs
    */
@@ -68,10 +68,10 @@ export class PinoLoggingServiceImpl implements PinoLoggingService {
   constructor(
     @Optional() private readonly correlationService: CorrelationIdService,
     @Optional() private readonly tenantContext: TenantContextService,
-    @Optional() @Inject('PINO_OPTIONS') options: PinoLoggingOptions = {},
+    @Optional() @Inject('PINO_OPTIONS') options: PinoLoggingOptions = {}
   ) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
-    
+
     // Configure Pino logger
     const loggerOptions: LoggerOptions = {
       level: this.options.level,
@@ -94,7 +94,7 @@ export class PinoLoggingServiceImpl implements PinoLoggingService {
         },
       };
     }
-    
+
     this.logger = pino(loggerOptions);
   }
 
@@ -145,7 +145,7 @@ export class PinoLoggingServiceImpl implements PinoLoggingService {
             }
           : undefined,
       },
-      message,
+      message
     );
   }
 
@@ -164,7 +164,7 @@ export class PinoLoggingServiceImpl implements PinoLoggingService {
             }
           : undefined,
       },
-      message,
+      message
     );
   }
 
@@ -181,7 +181,7 @@ export class PinoLoggingServiceImpl implements PinoLoggingService {
     const childService = new PinoLoggingServiceImpl(
       this.correlationService,
       this.tenantContext,
-      childOptions,
+      childOptions
     );
 
     return childService;
@@ -193,4 +193,4 @@ export class PinoLoggingServiceImpl implements PinoLoggingService {
   getPinoLogger(): PinoLogger {
     return this.logger;
   }
-} 
+}

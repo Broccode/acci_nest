@@ -13,11 +13,6 @@ export class BusinessRuleException extends DomainException {
    * @param context - Additional context information
    */
   constructor(message: string, ruleCode: string, context?: Record<string, any>) {
-    super(
-      message,
-      `BUSINESS_RULE_${ruleCode}`,
-      HttpStatus.CONFLICT,
-      context
-    );
+    super(message, `BUSINESS_RULE_${ruleCode}`, HttpStatus.CONFLICT, context);
   }
-} 
+}

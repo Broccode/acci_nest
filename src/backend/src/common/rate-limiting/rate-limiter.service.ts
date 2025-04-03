@@ -1,4 +1,4 @@
-import { Injectable, Logger, Inject } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import { REDIS_CLIENT } from '../constants';
 
@@ -32,11 +32,9 @@ export interface RateLimitResult {
 @Injectable()
 export class RateLimiterService {
   private readonly logger = new Logger(RateLimiterService.name);
-  
-  constructor(
-    @Inject(REDIS_CLIENT) private readonly redis: Redis,
-  ) {}
-  
+
+  constructor(@Inject(REDIS_CLIENT) private readonly redis: Redis) {}
+
   /**
    * Lua script for atomic rate limiting
    * Ensures thread-safe rate limiting operations
@@ -67,7 +65,7 @@ export class RateLimiterService {
     -- Return remaining points and reset time
     return {tostring(points - count - (allowed and 1 or 0)), tostring(now + duration * 1000)}
   `;
-  
+
   /**
    * Checks if a request is allowed based on rate limiting rules
    * @param key - Unique identifier for the rate limit (e.g., IP, userId)
@@ -79,39 +77,42 @@ export class RateLimiterService {
       this.logger.warn('Attempted to check rate limit with empty key');
       return { remainingPoints: 0, isAllowed: false, resetTime: new Date() };
     }
-    
+
     try {
       const { points, duration, keyPrefix = 'rate-limit:' } = options;
       const redisKey = `${keyPrefix}${key}`;
       const now = Date.now();
-      
-      const [remainingPointsResult, resetTimeResult]: [string, string] = await this.redis.eval(
+
+      const [remainingPointsResult, resetTimeResult]: [string, string] = (await this.redis.eval(
         this.rateLimitScript,
         1, // number of keys
         redisKey,
         String(points),
         String(duration),
         String(now)
-      ) as [string, string];
-      
+      )) as [string, string];
+
       const remainingPoints = parseInt(remainingPointsResult, 10);
       const resetTime = new Date(parseInt(resetTimeResult, 10));
-      
+
       return {
         remainingPoints,
         isAllowed: remainingPoints >= 0,
-        resetTime
+        resetTime,
       };
     } catch (error) {
-      this.logger.error(`Rate limiting error for key ${key}`, error instanceof Error ? error.stack : String(error));
-      
+      this.logger.error(
+        `Rate limiting error for key ${key}`,
+        error instanceof Error ? error.stack : String(error)
+      );
+
       // Fail open or fail closed based on security requirements
       // Here we fail closed (deny request) to be more secure
       return {
         remainingPoints: 0,
         isAllowed: false,
-        resetTime: new Date(Date.now() + 60000) // Default 1 minute reset
+        resetTime: new Date(Date.now() + 60000), // Default 1 minute reset
       };
     }
   }
-} 
+}

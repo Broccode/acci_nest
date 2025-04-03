@@ -1,7 +1,7 @@
-import { defineConfig, LoadStrategy, Options } from '@mikro-orm/core';
+import { LoadStrategy, Options, defineConfig } from '@mikro-orm/core';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
-import configuration from './src/config/configuration';
 import { DatabaseSeeder } from './seeders/DatabaseSeeder';
+import configuration from './src/config/configuration';
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -20,7 +20,7 @@ const configOptions: Options = {
   debug: config.environment === 'development',
   loadStrategy: LoadStrategy.JOINED,
   highlighter: new SqlHighlighter(),
-  
+
   // Optimized connection pool settings
   pool: {
     min: 2,
@@ -28,13 +28,13 @@ const configOptions: Options = {
     idleTimeoutMillis: 30000,
     acquireTimeoutMillis: 20000,
   },
-  
+
   // Optimized query cache
   resultCache: {
     expiration: 1000 * 60 * 60, // 1 hour
     global: config.environment === 'production',
   },
-  
+
   // Retry configuration for improved resilience
   driverOptions: {
     connection: {
@@ -44,7 +44,7 @@ const configOptions: Options = {
       retry_interval: 1000, // 1 second between retries
     },
   },
-  
+
   migrations: {
     tableName: 'mikro_orm_migrations',
     path: './migrations',
@@ -54,7 +54,7 @@ const configOptions: Options = {
     dropTables: false,
     safe: true,
   },
-  
+
   seeder: {
     path: './seeders',
     pathTs: './seeders',
@@ -63,7 +63,7 @@ const configOptions: Options = {
     emit: 'ts',
     fileName: (className: string) => className,
   },
-  
+
   allowGlobalContext: true,
   tsNode: true, // Enable when running via ts-node or compiling
   discovery: {
@@ -71,4 +71,4 @@ const configOptions: Options = {
   },
 };
 
-export default configOptions; 
+export default configOptions;

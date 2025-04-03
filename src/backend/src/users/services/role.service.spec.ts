@@ -1,9 +1,9 @@
-import { Test } from '@nestjs/testing';
 import { EntityManager } from '@mikro-orm/core';
-import { RoleService } from './role.service';
-import { Role } from '../entities/role.entity';
+import { Test } from '@nestjs/testing';
 import { Permission } from '../entities/permission.entity';
+import { Role } from '../entities/role.entity';
 import { CreateRoleDto, UpdateRoleDto } from '../types/user.types';
+import { RoleService } from './role.service';
 
 describe('RoleService', () => {
   let service: RoleService;
@@ -47,7 +47,7 @@ describe('RoleService', () => {
       };
 
       const tenantId = 'tenant-1';
-      
+
       const mockRole = Object.assign(new Role(), {
         id: 'role-1',
         name: 'editor',
@@ -64,7 +64,10 @@ describe('RoleService', () => {
       const result = await service.createRole(createRoleDto, tenantId);
 
       // Assert the expected behavior
-      expect(mockEntityManager.findOne).toHaveBeenCalledWith(Role, { name: createRoleDto.name, tenantId });
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith(Role, {
+        name: createRoleDto.name,
+        tenantId,
+      });
       expect(mockEntityManager.create).toHaveBeenCalledWith(Role, {
         name: createRoleDto.name,
         description: createRoleDto.description,
@@ -82,7 +85,7 @@ describe('RoleService', () => {
       };
 
       const tenantId = 'tenant-1';
-      
+
       const existingRole = Object.assign(new Role(), {
         id: 'existing-role',
         name: 'existing',
@@ -92,8 +95,13 @@ describe('RoleService', () => {
       mockEntityManager.findOne.mockResolvedValue(existingRole); // Role already exists
 
       // Assert the expected behavior
-      await expect(service.createRole(createRoleDto, tenantId)).rejects.toThrow('Role with this name already exists');
-      expect(mockEntityManager.findOne).toHaveBeenCalledWith(Role, { name: createRoleDto.name, tenantId });
+      await expect(service.createRole(createRoleDto, tenantId)).rejects.toThrow(
+        'Role with this name already exists'
+      );
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith(Role, {
+        name: createRoleDto.name,
+        tenantId,
+      });
       expect(mockEntityManager.create).not.toHaveBeenCalled();
       expect(mockEntityManager.persistAndFlush).not.toHaveBeenCalled();
     });
@@ -107,7 +115,7 @@ describe('RoleService', () => {
         permissions: permissionIds,
       };
       const tenantId = 'tenant-1';
-      
+
       const mockRole = Object.assign(new Role(), {
         id: 'role-1',
         name: 'editor',
@@ -121,8 +129,16 @@ describe('RoleService', () => {
       });
 
       const mockPermissions = [
-        Object.assign(new Permission(), { id: 'permission-1', resource: 'content', action: 'create' }),
-        Object.assign(new Permission(), { id: 'permission-2', resource: 'content', action: 'update' }),
+        Object.assign(new Permission(), {
+          id: 'permission-1',
+          resource: 'content',
+          action: 'create',
+        }),
+        Object.assign(new Permission(), {
+          id: 'permission-2',
+          resource: 'content',
+          action: 'update',
+        }),
       ];
 
       // Mock the EntityManager methods
@@ -137,7 +153,9 @@ describe('RoleService', () => {
 
       // Assert the expected behavior
       expect(mockEntityManager.findOne).toHaveBeenCalledTimes(2);
-      expect(mockEntityManager.find).toHaveBeenCalledWith(Permission, { id: { $in: permissionIds } });
+      expect(mockEntityManager.find).toHaveBeenCalledWith(Permission, {
+        id: { $in: permissionIds },
+      });
       expect(mockRole.permissions.add).toHaveBeenCalledTimes(2);
       expect(mockEntityManager.flush).toHaveBeenCalled();
     });
@@ -197,7 +215,9 @@ describe('RoleService', () => {
       mockEntityManager.findOneOrFail.mockResolvedValue(systemRole);
 
       // Assert the expected behavior
-      await expect(service.updateRole(roleId, updateRoleDto, tenantId)).rejects.toThrow('System roles cannot be modified');
+      await expect(service.updateRole(roleId, updateRoleDto, tenantId)).rejects.toThrow(
+        'System roles cannot be modified'
+      );
       expect(mockEntityManager.findOneOrFail).toHaveBeenCalledWith(Role, { id: roleId, tenantId });
       expect(mockEntityManager.assign).not.toHaveBeenCalled();
       expect(mockEntityManager.flush).not.toHaveBeenCalled();
@@ -222,8 +242,16 @@ describe('RoleService', () => {
       });
 
       const mockPermissions = [
-        Object.assign(new Permission(), { id: 'permission-1', resource: 'content', action: 'create' }),
-        Object.assign(new Permission(), { id: 'permission-2', resource: 'content', action: 'update' }),
+        Object.assign(new Permission(), {
+          id: 'permission-1',
+          resource: 'content',
+          action: 'create',
+        }),
+        Object.assign(new Permission(), {
+          id: 'permission-2',
+          resource: 'content',
+          action: 'update',
+        }),
       ];
 
       // Mock the EntityManager methods
@@ -234,8 +262,14 @@ describe('RoleService', () => {
       await service.assignPermissions(roleId, permissionIds, tenantId);
 
       // Assert the expected behavior
-      expect(mockEntityManager.findOne).toHaveBeenCalledWith(Role, { id: roleId, tenantId }, { populate: ['permissions'] });
-      expect(mockEntityManager.find).toHaveBeenCalledWith(Permission, { id: { $in: permissionIds } });
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith(
+        Role,
+        { id: roleId, tenantId },
+        { populate: ['permissions'] }
+      );
+      expect(mockEntityManager.find).toHaveBeenCalledWith(Permission, {
+        id: { $in: permissionIds },
+      });
       expect(mockRole.permissions.add).toHaveBeenCalledTimes(2);
       expect(mockEntityManager.flush).toHaveBeenCalled();
     });
@@ -250,8 +284,14 @@ describe('RoleService', () => {
       mockEntityManager.findOne.mockResolvedValue(null);
 
       // Assert the expected behavior
-      await expect(service.assignPermissions(roleId, permissionIds, tenantId)).rejects.toThrow('Role not found');
-      expect(mockEntityManager.findOne).toHaveBeenCalledWith(Role, { id: roleId, tenantId }, { populate: ['permissions'] });
+      await expect(service.assignPermissions(roleId, permissionIds, tenantId)).rejects.toThrow(
+        'Role not found'
+      );
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith(
+        Role,
+        { id: roleId, tenantId },
+        { populate: ['permissions'] }
+      );
       expect(mockEntityManager.find).not.toHaveBeenCalled();
       expect(mockEntityManager.flush).not.toHaveBeenCalled();
     });
@@ -264,8 +304,16 @@ describe('RoleService', () => {
       const permissionIds = ['permission-1', 'permission-2'];
       const tenantId = 'tenant-1';
 
-      const permission1 = Object.assign(new Permission(), { id: 'permission-1', resource: 'content', action: 'create' });
-      const permission2 = Object.assign(new Permission(), { id: 'permission-2', resource: 'content', action: 'update' });
+      const permission1 = Object.assign(new Permission(), {
+        id: 'permission-1',
+        resource: 'content',
+        action: 'create',
+      });
+      const permission2 = Object.assign(new Permission(), {
+        id: 'permission-2',
+        resource: 'content',
+        action: 'update',
+      });
 
       const mockRole = Object.assign(new Role(), {
         id: roleId,
@@ -285,7 +333,11 @@ describe('RoleService', () => {
       await service.removePermissions(roleId, permissionIds, tenantId);
 
       // Assert the expected behavior
-      expect(mockEntityManager.findOne).toHaveBeenCalledWith(Role, { id: roleId, tenantId }, { populate: ['permissions'] });
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith(
+        Role,
+        { id: roleId, tenantId },
+        { populate: ['permissions'] }
+      );
       expect(mockRole.permissions.remove).toHaveBeenCalledTimes(2);
       expect(mockEntityManager.flush).toHaveBeenCalled();
     });
@@ -307,9 +359,15 @@ describe('RoleService', () => {
       mockEntityManager.findOne.mockResolvedValue(systemRole);
 
       // Assert the expected behavior
-      await expect(service.removePermissions(roleId, permissionIds, tenantId)).rejects.toThrow('Permissions cannot be removed from system roles');
-      expect(mockEntityManager.findOne).toHaveBeenCalledWith(Role, { id: roleId, tenantId }, { populate: ['permissions'] });
+      await expect(service.removePermissions(roleId, permissionIds, tenantId)).rejects.toThrow(
+        'Permissions cannot be removed from system roles'
+      );
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith(
+        Role,
+        { id: roleId, tenantId },
+        { populate: ['permissions'] }
+      );
       expect(mockEntityManager.flush).not.toHaveBeenCalled();
     });
   });
-}); 
+});

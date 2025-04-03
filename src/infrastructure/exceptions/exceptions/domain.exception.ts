@@ -7,10 +7,10 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 export class DomainException extends HttpException {
   /** Error code for programmatic handling */
   public readonly errorCode: string;
-  
+
   /** Additional error context */
   public readonly context?: Record<string, any>;
-  
+
   /**
    * Create a new domain exception
    * @param message - Human-readable error message
@@ -34,8 +34,8 @@ export class DomainException extends HttpException {
       },
       status
     );
-    
+
     this.errorCode = errorCode;
     this.context = context;
   }
-} 
+}

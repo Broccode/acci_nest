@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { HealthIndicator, HealthIndicatorResult, HealthCheckError } from '@nestjs/terminus';
+import { HealthCheckError, HealthIndicator, HealthIndicatorResult } from '@nestjs/terminus';
 import { Redis } from 'ioredis';
 import { REDIS_CLIENT } from '../constants';
 
@@ -20,7 +20,7 @@ export class RedisHealthIndicator extends HealthIndicator {
     try {
       // Test connection with PING command
       const pong = await this.redis.ping();
-      
+
       if (pong !== 'PONG') {
         throw new Error('Redis server did not respond correctly to PING');
       }
@@ -28,15 +28,18 @@ export class RedisHealthIndicator extends HealthIndicator {
       // Get server info for additional diagnostics
       const info = await this.redis.info();
       const infoLines = info.split('\r\n');
-      
+
       // Extract useful metrics
       const metrics: Record<string, any> = {};
       const metricsToExtract = [
-        'redis_version', 'uptime_in_seconds', 'connected_clients',
-        'used_memory_human', 'total_connections_received'
+        'redis_version',
+        'uptime_in_seconds',
+        'connected_clients',
+        'used_memory_human',
+        'total_connections_received',
       ];
-      
-      infoLines.forEach(line => {
+
+      infoLines.forEach((line) => {
         const parts = line.split(':');
         if (parts.length === 2) {
           const key = parts[0].trim();
@@ -46,17 +49,19 @@ export class RedisHealthIndicator extends HealthIndicator {
         }
       });
 
-      return this.getStatus(key, true, { 
+      return this.getStatus(key, true, {
         ...metrics,
-        responseTime: await this.measureResponseTime()
+        responseTime: await this.measureResponseTime(),
       });
     } catch (error) {
-      this.logger.error(`Redis health check failed: ${error instanceof Error ? error.message : String(error)}`, 
-                       error instanceof Error ? error.stack : undefined);
-      
+      this.logger.error(
+        `Redis health check failed: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined
+      );
+
       throw new HealthCheckError(
-        'Redis health check failed', 
-        this.getStatus(key, false, { 
+        'Redis health check failed',
+        this.getStatus(key, false, {
           message: error instanceof Error ? error.message : 'Unknown error',
         })
       );
@@ -73,8 +78,12 @@ export class RedisHealthIndicator extends HealthIndicator {
       await this.redis.ping();
       return Date.now() - start;
     } catch (error) {
-      this.logger.warn(`Could not measure Redis response time: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.warn(
+        `Could not measure Redis response time: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
       return -1;
     }
   }
-} 
+}
