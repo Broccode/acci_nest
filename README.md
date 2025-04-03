@@ -26,7 +26,8 @@ ACCI Nest is a scalable, multi-tenant application platform that supports plugin-
 - **Authentication**: JWT, Passport.js
 - **API Documentation**: Swagger/OpenAPI
 - **Containerization**: Docker, Docker Compose
-- **CI/CD**: GitHub Actions
+- **CI/CD**: GitHub Actions, GitLab CI
+- **Testing**: Jest, Testcontainers
 - **Monitoring**: Prometheus, Grafana
 
 ## 📋 Prerequisites
@@ -77,6 +78,92 @@ bun run start:frontend:dev
 bun run build
 ```
 
+### Running Tests
+
+The project uses Testcontainers for integration testing, which requires Docker to be running:
+
+```bash
+# Run all tests (unit, integration, e2e)
+bun run test
+
+# Run tests with coverage
+bun run test:cov
+
+# Run only integration tests
+bun test --test-file-pattern "**/*.integration.spec.ts"
+
+# Run only E2E tests
+bun run test:e2e
+```
+
+## 🧪 Testing Strategy
+
+### Integration Tests with Testcontainers
+
+The project uses Testcontainers to run integration tests against real infrastructure components:
+
+- **PostgreSQL Tests**: Test repositories and database interactions with real PostgreSQL instances
+- **Redis Tests**: Test caching and messaging with real Redis instances
+- **Combined Tests**: Test interactions between multiple infrastructure components
+
+Testcontainers automatically starts and stops Docker containers for your tests, providing isolated, reproducible test environments.
+
+Example of a PostgreSQL integration test:
+
+```typescript
+// Example of a repository integration test with Testcontainers
+describe('UserRepository Integration Tests', () => {
+  let pgContainer: StartedPostgreSqlContainer;
+  let orm: MikroORM;
+  let repository: UserRepository;
+
+  beforeAll(async () => {
+    // Start a PostgreSQL container
+    pgContainer = await new PostgreSqlContainer()
+      .withDatabase('test_db')
+      .start();
+    
+    // Initialize MikroORM with the container
+    // Run tests...
+  });
+
+  afterAll(async () => {
+    await orm.close();
+    await pgContainer.stop();
+  });
+
+  // Test cases...
+});
+```
+
+## 🔄 CI/CD Pipelines
+
+The project includes CI/CD configurations for both GitHub Actions and GitLab CI:
+
+### GitHub Actions
+
+The GitHub Actions workflow runs on push to main/develop branches and pull requests:
+
+- Runs linting and formatting checks
+- Executes unit tests
+- Runs integration tests with Testcontainers
+- Executes E2E tests
+- Generates coverage reports
+- Builds the application
+
+To view the workflow, check `.github/workflows/test.yml`.
+
+### GitLab CI
+
+The GitLab CI pipeline provides similar functionality:
+
+- Multi-stage pipeline (test, build)
+- Docker-in-Docker support for Testcontainers
+- Test coverage reporting
+- Artifact generation
+
+To view the configuration, check `.gitlab-ci.yml`.
+
 ## 📂 Directory Structure
 
 ```
@@ -103,6 +190,8 @@ acci-nest/
 ├── deploy/                  # Deployment configurations
 │   ├── docker-compose/      # Docker Compose files and Dockerfiles
 │   └── scripts/             # Deployment scripts
+├── .github/workflows/       # GitHub Actions workflows
+├── .gitlab-ci.yml           # GitLab CI configuration
 ├── .env.example             # Example environment variables
 ├── docker-compose.yml       # Docker Compose configuration
 ├── package.json             # Project configuration
@@ -124,3 +213,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - MikroORM - The TypeScript ORM
 - PostgreSQL - The database
 - Docker - Containerization platform
+- Testcontainers - Integration testing framework
