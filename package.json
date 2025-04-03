@@ -21,7 +21,7 @@
     "migration:run": "bun run --cwd src/backend migration:run",
     "migration:revert": "bun run --cwd src/backend migration:revert",
     "lint": "bunx @biomejs/biome lint .",
-    "format": "bunx @biomejs/biome format --write ."
+    "format": "bunx @biomejs/biome check --apply-unsafe ."
   },
   "keywords": [
     "nestjs",
