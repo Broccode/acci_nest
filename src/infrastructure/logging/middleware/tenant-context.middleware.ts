@@ -3,6 +3,13 @@ import { NextFunction, Request, Response } from 'express';
 import { TenantContextService } from '../context';
 
 /**
+ * Extended request with tenant information
+ */
+export interface RequestWithTenant extends Request {
+  tenantId?: string;
+}
+
+/**
  * Interface for tenant resolver strategies
  */
 export interface TenantResolver {
@@ -48,7 +55,7 @@ export class TenantContextMiddleware implements NestMiddleware {
 
     if (tenantId) {
       // Add tenant ID to request object for easy access
-      (req as any).tenantId = tenantId;
+      (req as RequestWithTenant).tenantId = tenantId;
 
       // Run the next middleware in a tenant context
       this.tenantContext.runWithTenant(tenantId, () => {

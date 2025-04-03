@@ -145,7 +145,9 @@ export class RedisCacheService implements CacheService {
 
         // Get all keys for this tag
         const keys = await this.redis.smembers(tagKey);
-        keys.forEach((key) => keysToDelete.add(key));
+        for (const key of keys) {
+          keysToDelete.add(key);
+        }
 
         // Delete the tag set itself
         pipeline.del(tagKey);

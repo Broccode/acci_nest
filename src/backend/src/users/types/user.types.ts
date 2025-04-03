@@ -54,7 +54,7 @@ export interface UpdateRoleDto {
 export interface CreatePermissionDto {
   resource: string;
   action: string;
-  conditions?: Record<string, any>;
+  conditions?: Record<string, unknown>;
 }
 
 /**
@@ -63,5 +63,5 @@ export interface CreatePermissionDto {
 export interface UpdatePermissionDto {
   resource?: string;
   action?: string;
-  conditions?: Record<string, any>;
+  conditions?: Record<string, unknown>;
 }

@@ -2,6 +2,12 @@ import { EntityRepository, FilterQuery, QueryOrderMap } from '@mikro-orm/core';
 import { BaseEntity } from '../entities/base.entity';
 
 /**
+ * Internal type for MikroORM entity data to avoid 'any' usage
+ * This is used instead of the complex MikroORM types for better readability
+ */
+type EntityData<T> = unknown;
+
+/**
  * Base repository that provides common functionality for all entity repositories
  */
 export abstract class BaseRepository<T extends BaseEntity> extends EntityRepository<T> {
@@ -68,7 +74,8 @@ export abstract class BaseRepository<T extends BaseEntity> extends EntityReposit
    * Create a new entity and persist it
    */
   async createAndSave(data: Partial<T>): Promise<T> {
-    const entity = this.create(data as unknown as any);
+    // Cast to EntityData for compatibility with MikroORM's internal types
+    const entity = this.create(data as EntityData<T>);
     await this.getEntityManager().persistAndFlush(entity);
     return entity;
   }
@@ -77,7 +84,8 @@ export abstract class BaseRepository<T extends BaseEntity> extends EntityReposit
    * Update an entity and persist changes
    */
   async updateAndSave(entity: T, data: Partial<T>): Promise<T> {
-    this.assign(entity, data as unknown as any);
+    // Cast to EntityData for compatibility with MikroORM's internal types
+    this.assign(entity, data as EntityData<T>);
     await this.getEntityManager().persistAndFlush(entity);
     return entity;
   }

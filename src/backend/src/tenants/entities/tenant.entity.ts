@@ -29,12 +29,12 @@ export class Tenant extends BaseEntity {
   plan?: string;
 
   @Property({ type: 'json', nullable: true })
-  features?: Record<string, any>[] = [];
+  features?: Record<string, unknown>[] = [];
 
   @Property({ type: 'json', nullable: true })
   configuration?: {
-    theme?: Record<string, any>;
-    security?: Record<string, any>;
-    integrations?: Record<string, any>[];
+    theme?: Record<string, unknown>;
+    security?: Record<string, unknown>;
+    integrations?: Record<string, unknown>[];
   } = {};
 }

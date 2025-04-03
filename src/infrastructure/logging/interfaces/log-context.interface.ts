@@ -9,5 +9,5 @@ export interface LogContext {
   /** User ID if authenticated */
   userId?: string;
   /** Additional context details */
-  [key: string]: any;
+  [key: string]: unknown;
 }

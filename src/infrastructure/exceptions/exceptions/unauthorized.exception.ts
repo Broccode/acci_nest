@@ -11,7 +11,7 @@ export class UnauthorizedException extends DomainException {
    * @param message - Custom message for the unauthorized exception
    * @param context - Additional context information
    */
-  constructor(message = 'Unauthorized access', context?: Record<string, any>) {
+  constructor(message = 'Unauthorized access', context?: Record<string, unknown>) {
     super(message, 'UNAUTHORIZED', HttpStatus.UNAUTHORIZED, context);
   }
 }

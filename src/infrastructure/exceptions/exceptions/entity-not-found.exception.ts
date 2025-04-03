@@ -12,7 +12,7 @@ export class EntityNotFoundException extends DomainException {
    * @param id - ID that was searched for
    * @param context - Additional context information
    */
-  constructor(entityName: string, id: string | number, context?: Record<string, any>) {
+  constructor(entityName: string, id: string | number, context?: Record<string, unknown>) {
     super(
       `${entityName} with ID '${id}' not found`,
       'ENTITY_NOT_FOUND',

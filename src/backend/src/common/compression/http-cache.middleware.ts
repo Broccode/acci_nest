@@ -18,7 +18,8 @@ export class HttpCacheMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction): void {
     // Skip cache headers for non-GET methods
     if (req.method !== 'GET') {
-      return next();
+      next();
+      return;
     }
 
     // Set default cache control header

@@ -28,7 +28,7 @@ export interface PinoLoggingOptions {
   /**
    * Base context to include in all logs
    */
-  baseContext?: Record<string, any>;
+  baseContext?: Record<string, unknown>;
 }
 
 /**
@@ -101,7 +101,7 @@ export class PinoLoggingServiceImpl implements PinoLoggingService {
   /**
    * Get the base context with correlation ID and tenant ID
    */
-  private getBaseContext(additionalContext?: LogContext): Record<string, any> {
+  private getBaseContext(additionalContext?: LogContext): Record<string, unknown> {
     return {
       correlationId: this.correlationService?.getCurrentCorrelationId(),
       tenantId: this.tenantContext?.getCurrentTenant(),

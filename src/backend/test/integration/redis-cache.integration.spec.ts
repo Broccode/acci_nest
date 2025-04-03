@@ -5,9 +5,14 @@ import { REDIS_CLIENT, TENANT_CONTEXT } from '../../src/common/constants';
 import { TenantContext } from '../../src/tenants/services/tenant-context.service';
 import { RedisTestContainer } from '../utils/containers';
 
+// Extended interface for cache service with close method
+interface CacheServiceWithClose extends RedisCacheService {
+  close?: () => Promise<void>;
+}
+
 describe('RedisCacheService Integration Tests', () => {
   let container: RedisTestContainer;
-  let cacheService: RedisCacheService;
+  let cacheService: CacheServiceWithClose;
   let redisClient: Redis;
   let mockTenantContext: Partial<TenantContext>;
 
@@ -55,9 +60,9 @@ describe('RedisCacheService Integration Tests', () => {
 
   afterAll(async () => {
     // If available, explicitly close Redis client and cache service
-    if (cacheService && typeof (cacheService as any).close === 'function') {
+    if (cacheService && typeof cacheService.close === 'function') {
       try {
-        await (cacheService as any).close();
+        await cacheService.close();
       } catch (error) {
         console.error('Error closing cache service:', error);
       }

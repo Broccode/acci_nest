@@ -8,9 +8,14 @@ import { Role } from '../../src/users/entities/role.entity';
 import { User } from '../../src/users/entities/user.entity';
 import { MultiTenantTestEnvironment } from '../utils/containers/multi-tenant-test-environment';
 
+// Extended interface for cache service with close method
+interface CacheServiceWithClose extends RedisCacheService {
+  close?: () => Promise<void>;
+}
+
 describe('Multi-Tenant Environment Integration Tests', () => {
   let env: MultiTenantTestEnvironment;
-  let cacheService: RedisCacheService;
+  let cacheService: CacheServiceWithClose;
   let em: EntityManager;
 
   const TEST_TENANT_ID = uuidv4();
@@ -56,8 +61,8 @@ describe('Multi-Tenant Environment Integration Tests', () => {
     if (cacheService) {
       try {
         // If the cache service has a close method
-        if (typeof (cacheService as any).close === 'function') {
-          await (cacheService as any).close();
+        if (typeof cacheService.close === 'function') {
+          await cacheService.close();
         }
       } catch (error) {
         console.error('Error closing cache service:', error);

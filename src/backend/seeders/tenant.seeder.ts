@@ -11,7 +11,7 @@ interface TenantSeedData {
   status: TenantStatus;
   plan: string;
   features: Array<{ name: string; limit: number }>;
-  configuration: Record<string, any>;
+  configuration: Record<string, unknown>;
 }
 
 /**

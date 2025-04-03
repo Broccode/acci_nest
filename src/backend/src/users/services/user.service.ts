@@ -90,7 +90,9 @@ export class UserService {
     const roles = await this.em.find(Role, { id: { $in: roleIds }, tenantId });
 
     // Add roles to user
-    roles.forEach((role) => user.roles.add(role));
+    for (const role of roles) {
+      user.roles.add(role);
+    }
     await this.em.flush();
   }
 
@@ -108,12 +110,12 @@ export class UserService {
     }
 
     // Remove specified roles
-    roleIds.forEach((roleId) => {
+    for (const roleId of roleIds) {
       const role = user.roles.getItems().find((r) => r.id === roleId);
       if (role) {
         user.roles.remove(role);
       }
-    });
+    }
 
     await this.em.flush();
   }

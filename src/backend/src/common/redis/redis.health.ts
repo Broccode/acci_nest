@@ -30,7 +30,7 @@ export class RedisHealthIndicator extends HealthIndicator {
       const infoLines = info.split('\r\n');
 
       // Extract useful metrics
-      const metrics: Record<string, any> = {};
+      const metrics: Record<string, string | number> = {};
       const metricsToExtract = [
         'redis_version',
         'uptime_in_seconds',
@@ -39,7 +39,7 @@ export class RedisHealthIndicator extends HealthIndicator {
         'total_connections_received',
       ];
 
-      infoLines.forEach((line) => {
+      for (const line of infoLines) {
         const parts = line.split(':');
         if (parts.length === 2) {
           const key = parts[0].trim();
@@ -47,7 +47,7 @@ export class RedisHealthIndicator extends HealthIndicator {
             metrics[key] = parts[1].trim();
           }
         }
-      });
+      }
 
       return this.getStatus(key, true, {
         ...metrics,

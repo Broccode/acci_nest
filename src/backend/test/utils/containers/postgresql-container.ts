@@ -1,7 +1,13 @@
-import { EntityManager, MikroORM } from '@mikro-orm/core';
+import {
+  EntityClass,
+  EntityClassGroup,
+  EntityManager,
+  EntitySchema,
+  MikroORM,
+} from '@mikro-orm/core';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { PostgreSqlDriver, SchemaGenerator } from '@mikro-orm/postgresql';
-import { DynamicModule } from '@nestjs/common';
+import { DynamicModule, ForwardReference, Provider, Type } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { v4 as uuidv4 } from 'uuid';
@@ -35,11 +41,16 @@ export interface PostgresContainerOptions {
   /** Password (default: 'postgres') */
   password?: string;
   /** Entities to register in MikroORM */
-  entities: any[];
+  entities: (
+    | string
+    | EntityClass<unknown>
+    | EntityClassGroup<unknown>
+    | EntitySchema<unknown, never>
+  )[];
   /** Additional providers to register in the testing module */
-  providers?: any[];
+  providers?: Provider[];
   /** Additional imports to include in the testing module */
-  imports?: any[];
+  imports?: (Type<unknown> | DynamicModule | Promise<DynamicModule> | ForwardReference<unknown>)[];
   /** Set to true to generate schema on start (default: true) */
   generateSchema?: boolean;
 }
@@ -71,6 +82,7 @@ export class PostgresTestContainer {
   private entityManager: EntityManager | null = null;
   private schemaGenerator: SchemaGenerator | null = null;
   private orm: MikroORM | null = null;
+  private testTenantIds: { tenant1: string; tenant2: string } | null = null;
 
   private readonly options: Required<PostgresContainerOptions>;
 
@@ -232,11 +244,18 @@ export class PostgresTestContainer {
 
     try {
       // Check if Tenant entity exists in the registered entities
-      const tenantEntityClass = this.options.entities.find(
-        (entity) =>
-          entity.name === 'Tenant' ||
-          (typeof entity === 'function' && entity.prototype?.constructor?.name === 'Tenant')
-      );
+      const tenantEntityClass = this.options.entities.find((entity) => {
+        if (typeof entity === 'string') {
+          return entity === 'Tenant';
+        }
+        if (typeof entity === 'function') {
+          return entity.prototype?.constructor?.name === 'Tenant';
+        }
+        if ('name' in entity) {
+          return entity.name === 'Tenant';
+        }
+        return false;
+      });
 
       if (tenantEntityClass) {
         console.log('Creating test tenants...');
@@ -271,7 +290,7 @@ export class PostgresTestContainer {
           console.log(`Created tenants via SQL with IDs: ${tenant1Id}, ${tenant2Id}`);
 
           // Store tenant IDs for tests to access
-          (this as any).testTenantIds = {
+          this.testTenantIds = {
             tenant1: tenant1Id,
             tenant2: tenant2Id,
           };
@@ -299,7 +318,7 @@ export class PostgresTestContainer {
    * Get test tenant IDs
    */
   getTestTenantIds(): { tenant1: string; tenant2: string } | null {
-    return (this as any).testTenantIds || null;
+    return this.testTenantIds;
   }
 
   /**

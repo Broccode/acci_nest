@@ -8,7 +8,7 @@ import { AsyncLocalStorage } from 'async_hooks';
  */
 @Injectable()
 export class CorrelationIdService {
-  private readonly storage = new AsyncLocalStorage<Map<string, any>>();
+  private readonly storage = new AsyncLocalStorage<Map<string, unknown>>();
 
   /**
    * Header name for the correlation ID in HTTP requests
@@ -21,7 +21,7 @@ export class CorrelationIdService {
    */
   getCurrentCorrelationId(): string | undefined {
     const store = this.getStore();
-    return store?.get('correlationId');
+    return store?.get('correlationId') as string | undefined;
   }
 
   /**
@@ -42,7 +42,7 @@ export class CorrelationIdService {
    * @returns The result of the callback function
    */
   runWithCorrelationId<T>(correlationId: string, callback: () => T): T {
-    const store = new Map<string, any>();
+    const store = new Map<string, unknown>();
     store.set('correlationId', correlationId);
     return this.storage.run(store, callback);
   }
@@ -59,7 +59,7 @@ export class CorrelationIdService {
    * Get the current store from AsyncLocalStorage
    * @returns The current store or undefined if not within a context
    */
-  private getStore(): Map<string, any> | undefined {
+  private getStore(): Map<string, unknown> | undefined {
     return this.storage.getStore();
   }
 }

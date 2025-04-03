@@ -7,7 +7,7 @@ import { AsyncLocalStorage } from 'async_hooks';
  */
 @Injectable()
 export class TenantContextService {
-  private readonly storage = new AsyncLocalStorage<Map<string, any>>();
+  private readonly storage = new AsyncLocalStorage<Map<string, unknown>>();
 
   /**
    * Get the current tenant ID from the context
@@ -15,7 +15,7 @@ export class TenantContextService {
    */
   getCurrentTenant(): string | undefined {
     const store = this.getStore();
-    return store?.get('tenantId');
+    return store?.get('tenantId') as string | undefined;
   }
 
   /**
@@ -36,7 +36,7 @@ export class TenantContextService {
    * @returns The result of the callback function
    */
   runWithTenant<T>(tenantId: string, callback: () => T): T {
-    const store = new Map<string, any>();
+    const store = new Map<string, unknown>();
     store.set('tenantId', tenantId);
     return this.storage.run(store, callback);
   }
@@ -45,7 +45,7 @@ export class TenantContextService {
    * Get the current store from AsyncLocalStorage
    * @returns The current store or undefined if not within a context
    */
-  private getStore(): Map<string, any> | undefined {
+  private getStore(): Map<string, unknown> | undefined {
     return this.storage.getStore();
   }
 }

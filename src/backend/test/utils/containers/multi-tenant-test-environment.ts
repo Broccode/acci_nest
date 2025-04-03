@@ -1,4 +1,5 @@
 import { EntityManager, MikroORM } from '@mikro-orm/core';
+import { DynamicModule, ForwardReference, Provider, Type } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Redis } from 'ioredis';
 import { v4 as uuidv4 } from 'uuid';
@@ -26,12 +27,12 @@ export interface MultiTenantTestEnvironmentOptions {
   /**
    * Additional providers to register in the testing module
    */
-  providers?: any[];
+  providers?: Provider[];
 
   /**
    * Additional imports to include in the testing module
    */
-  imports?: any[];
+  imports?: (Type<unknown> | DynamicModule | Promise<DynamicModule> | ForwardReference<unknown>)[];
 
   /**
    * Default tenant ID to use for tests
@@ -161,12 +162,12 @@ export class MultiTenantTestEnvironment {
    * Initialize repository providers from the options.providers list
    * to ensure they are properly configured with the EntityManager
    */
-  private initializeRepositoryProviders(): any[] {
+  private initializeRepositoryProviders(): Provider[] {
     if (!this.options.providers || !this.entityManager || !this.mikroOrm) {
       return [];
     }
 
-    const repositoryProviders: any[] = [];
+    const repositoryProviders: Provider[] = [];
 
     // Find all repository classes in the providers list
     for (const provider of this.options.providers) {
@@ -220,7 +221,7 @@ export class MultiTenantTestEnvironment {
   /**
    * Get a service or repository from the testing module
    */
-  get<T>(typeOrToken: any): T {
+  get<T>(typeOrToken: Type<T> | string | symbol): T {
     if (!this.moduleRef) {
       throw new Error('Environment not started. Call start() before accessing services.');
     }

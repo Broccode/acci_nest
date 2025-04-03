@@ -35,7 +35,7 @@ export class CacheableInterceptor implements NestInterceptor {
    * @param args - Method arguments
    * @returns Generated cache key
    */
-  private generateCacheKey(className: string, methodName: string, args: any[]): string {
+  private generateCacheKey(className: string, methodName: string, args: unknown[]): string {
     const argsString = args
       .map((arg) => {
         try {
@@ -59,7 +59,7 @@ export class CacheableInterceptor implements NestInterceptor {
    * @param next - Call handler
    * @returns Observable with the method result (cached or fresh)
    */
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const methodName = context.getHandler().name;
     const className = context.getClass().name;
 

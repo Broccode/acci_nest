@@ -12,7 +12,7 @@ export class BusinessRuleException extends DomainException {
    * @param ruleCode - Specific code for the business rule that was violated
    * @param context - Additional context information
    */
-  constructor(message: string, ruleCode: string, context?: Record<string, any>) {
+  constructor(message: string, ruleCode: string, context?: Record<string, unknown>) {
     super(message, `BUSINESS_RULE_${ruleCode}`, HttpStatus.CONFLICT, context);
   }
 }

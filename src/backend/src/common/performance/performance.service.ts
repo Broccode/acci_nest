@@ -20,6 +20,15 @@ export interface MetricTags {
 }
 
 /**
+ * Structure of a performance metric
+ */
+export interface Metric {
+  timestamp: number;
+  value: number;
+  tags: MetricTags;
+}
+
+/**
  * Service for tracking and analyzing performance metrics
  */
 @Injectable()
@@ -78,7 +87,7 @@ export class PerformanceService {
    * @param timeRange - Time range in seconds
    * @returns Array of metrics
    */
-  async getMetrics(name: string, timeRange: MetricsTimeRange): Promise<any[]> {
+  async getMetrics(name: string, timeRange: MetricsTimeRange): Promise<Metric[]> {
     if (!name) {
       this.logger.warn('Attempted to get metrics with empty name');
       return [];
@@ -95,13 +104,13 @@ export class PerformanceService {
       return results
         .map((result) => {
           try {
-            return JSON.parse(result);
+            return JSON.parse(result) as Metric;
           } catch (error) {
             this.logger.warn(`Failed to parse metric: ${result}`);
             return null;
           }
         })
-        .filter(Boolean);
+        .filter(Boolean) as Metric[];
     } catch (error) {
       this.logger.error(
         `Failed to get metrics: ${name}`,

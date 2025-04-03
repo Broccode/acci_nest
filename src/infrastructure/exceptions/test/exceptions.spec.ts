@@ -69,13 +69,13 @@ class TestModule {}
 // Fully independent test exception filter without external dependencies
 @Catch()
 class TestExceptionFilter implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let errorResponse: any = {
+    let errorResponse: Record<string, unknown> = {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
@@ -87,7 +87,7 @@ class TestExceptionFilter implements ExceptionFilter {
     if (exception instanceof DomainException) {
       // Domain exception with standardized format
       status = exception.getStatus();
-      const responseData = exception.getResponse() as any;
+      const responseData = exception.getResponse() as Record<string, unknown>;
 
       errorResponse = {
         ...errorResponse,

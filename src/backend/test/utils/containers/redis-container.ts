@@ -1,12 +1,12 @@
-import { DynamicModule } from '@nestjs/common';
+import { DynamicModule, ForwardReference, Provider, Type } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RedisContainer, StartedRedisContainer } from '@testcontainers/redis';
 import { Redis } from 'ioredis';
 
 // Define interfaces for our cache service to avoid direct imports
 interface RedisCacheService {
-  get(key: string): Promise<any>;
-  set(key: string, value: any, ttl?: number): Promise<void>;
+  get(key: string): Promise<unknown>;
+  set(key: string, value: unknown, ttl?: number): Promise<void>;
   del(key: string): Promise<void>;
 }
 
@@ -30,9 +30,9 @@ export interface RedisContainerOptions {
   /** Redis version to use (default: 'redis:7-alpine') */
   image?: string;
   /** Additional providers to register in the testing module */
-  providers?: any[];
+  providers?: Provider[];
   /** Additional imports to include in the testing module */
-  imports?: any[];
+  imports?: (Type<unknown> | DynamicModule | Promise<DynamicModule> | ForwardReference<unknown>)[];
   /** Whether to register the Redis cache service (default: true) */
   registerCacheService?: boolean;
 }

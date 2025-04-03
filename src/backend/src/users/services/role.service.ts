@@ -96,7 +96,9 @@ export class RoleService {
     const permissions = await this.em.find(Permission, { id: { $in: permissionIds } });
 
     // Add permissions to role
-    permissions.forEach((permission) => role.permissions.add(permission));
+    for (const permission of permissions) {
+      role.permissions.add(permission);
+    }
     await this.em.flush();
   }
 
@@ -127,12 +129,12 @@ export class RoleService {
     }
 
     // Remove specified permissions
-    permissionIds.forEach((permissionId) => {
+    for (const permissionId of permissionIds) {
       const permission = role.permissions.getItems().find((p) => p.id === permissionId);
       if (permission) {
         role.permissions.remove(permission);
       }
-    });
+    }
 
     await this.em.flush();
   }

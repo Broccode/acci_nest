@@ -15,12 +15,12 @@ export class PerformanceInterceptor implements NestInterceptor {
   constructor(private readonly performanceService: PerformanceService) {}
 
   /**
-   * Intercepts requests to measure and record performance metrics
+   * Intercepts HTTP requests to collect performance metrics
    * @param context - Execution context
    * @param next - Call handler
    * @returns Observable with the handler result
    */
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     // Sample requests to reduce overhead (adjusted based on load)
     if (Math.random() > this.SAMPLE_RATE) {
       return next.handle();
@@ -34,7 +34,10 @@ export class PerformanceInterceptor implements NestInterceptor {
     const method = request.method;
     const route = this.normalizeRoute(request);
     const userAgent = request.headers['user-agent'] || 'unknown';
-    const tenantId = (request as any).tenantId || 'unknown';
+
+    // Safe access to tenantId
+    // @ts-ignore - tenantId is added by TenantMiddleware
+    const tenantId = request.tenantId || 'unknown';
 
     return next.handle().pipe(
       tap({

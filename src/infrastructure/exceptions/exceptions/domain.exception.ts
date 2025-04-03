@@ -9,7 +9,7 @@ export class DomainException extends HttpException {
   public readonly errorCode: string;
 
   /** Additional error context */
-  public readonly context?: Record<string, any>;
+  public readonly context?: Record<string, unknown>;
 
   /**
    * Create a new domain exception
@@ -22,7 +22,7 @@ export class DomainException extends HttpException {
     message: string,
     errorCode: string,
     status: HttpStatus = HttpStatus.BAD_REQUEST,
-    context?: Record<string, any>
+    context?: Record<string, unknown>
   ) {
     super(
       {

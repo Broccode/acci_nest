@@ -29,7 +29,7 @@ export class Permission extends BaseEntity {
   action!: string;
 
   @Property({ type: 'json', nullable: true })
-  conditions?: Record<string, any>;
+  conditions?: Record<string, unknown>;
 
   @ManyToMany(
     () => Role,

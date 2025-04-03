@@ -13,6 +13,25 @@ import { LOGGING_SERVICE } from '../../logging/logging.module';
 import { DomainException } from '../exceptions';
 
 /**
+ * Error response interface for consistent response structure
+ */
+interface ErrorResponse {
+  statusCode: number;
+  timestamp: string;
+  path: string;
+  correlationId?: string;
+  message: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Extended request interface with tenant information
+ */
+interface RequestWithTenant extends Request {
+  tenantId?: string;
+}
+
+/**
  * Global exception filter that handles all exceptions in the application
  * Provides consistent error responses and logging
  */
@@ -26,7 +45,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
    * @param exception - The caught exception
    * @param host - Arguments host
    */
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
@@ -35,7 +54,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const correlationId = request.headers['x-correlation-id'] as string;
 
     // Extract tenant ID if available
-    const tenantId = (request as any).tenantId;
+    const tenantId = (request as RequestWithTenant).tenantId;
 
     // Prepare log context
     const logContext = {
@@ -47,7 +66,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     // Determine status code and error details
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let errorResponse: any = {
+    let errorResponse: ErrorResponse = {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
@@ -82,7 +101,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message:
           typeof exceptionResponse === 'string'
             ? exceptionResponse
-            : (exceptionResponse as any).message || 'HTTP exception',
+            : ((exceptionResponse as Record<string, unknown>).message as string) ||
+              'HTTP exception',
       };
 
       // Log with appropriate level based on status code
