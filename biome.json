@@ -8,7 +8,7 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noExplicitAny": "warn"
+        "noExplicitAny": "error"
       },
       "style": {
         "useTemplate": "error"
@@ -20,7 +20,17 @@
         "useExhaustiveDependencies": "warn"
       }
     },
-    "ignore": ["node_modules", "dist", "build", ".git", ".github"]
+    "ignore": [
+      "node_modules",
+      "dist",
+      "build",
+      ".git",
+      ".github",
+      ".vscode",
+      "**/*.spec.ts",
+      "**/*.test.ts",
+      "**/__tests__/**"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -43,6 +53,18 @@
     }
   },
   "files": {
-    "ignore": ["node_modules", "dist", "build", "coverage", ".git", "*.min.js", ".vscode"]
+    "ignore": [
+      "node_modules",
+      "dist",
+      "build",
+      "coverage",
+      ".git",
+      "*.min.js",
+      ".vscode",
+      "**/*.spec.ts",
+      "**/*.test.ts",
+      "**/__tests__/**",
+      "**/test/**"
+    ]
   }
 }
