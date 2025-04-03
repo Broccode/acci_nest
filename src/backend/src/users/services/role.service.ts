@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/core';
-import { Role } from '../entities/role.entity';
+import { Injectable } from '@nestjs/common';
+import { Tenant } from '../../tenants/entities/tenant.entity';
 import { Permission } from '../entities/permission.entity';
+import { Role } from '../entities/role.entity';
 import { CreateRoleDto, UpdateRoleDto } from '../types/user.types';
 
 /**
@@ -31,10 +32,14 @@ export class RoleService {
       throw new Error('Role with this name already exists');
     }
 
+    // Find tenant
+    const tenant = await this.em.findOneOrFail(Tenant, { id: tenantId });
+
     // Create new role
     const role = this.em.create(Role, {
       ...roleData,
       tenantId,
+      tenant, // Set the tenant reference
     });
 
     await this.em.persistAndFlush(role);

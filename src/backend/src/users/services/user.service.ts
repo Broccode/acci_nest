@@ -1,8 +1,9 @@
+import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { EntityManager } from '@mikro-orm/core';
-import { User, UserStatus } from '../entities/user.entity';
+import { Tenant } from '../../tenants/entities/tenant.entity';
 import { Role } from '../entities/role.entity';
+import { User, UserStatus } from '../entities/user.entity';
 import { CreateUserDto, UpdateUserDto } from '../types/user.types';
 
 /**
@@ -32,10 +33,14 @@ export class UserService {
       throw new Error('User with this email already exists');
     }
 
+    // Find tenant
+    const tenant = await this.em.findOneOrFail(Tenant, { id: tenantId });
+
     // Create new user
     const user = this.em.create(User, {
       ...userData,
       tenantId,
+      tenant, // Set the tenant reference
       password: await this.hashPassword(password),
     });
 
