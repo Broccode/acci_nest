@@ -8,6 +8,45 @@ export default () => ({
     expiresIn: parseInt(process.env.JWT_EXPIRES_IN || '3600', 10),
   },
 
+  auth: {
+    jwtSecret: process.env.JWT_SECRET || 'dev-jwt-secret',
+    jwtExpiresIn: parseInt(process.env.JWT_EXPIRES_IN || '900', 10), // 15 minutes
+    refreshTokenExpiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN || '604800', 10), // 7 days
+    passwordResetTokenExpiresIn: parseInt(process.env.PASSWORD_RESET_TOKEN_EXPIRES_IN || '3600', 10), // 1 hour
+    mfaTokenLength: 6,
+    passwordMinLength: 8,
+    maxLoginAttempts: 5,
+    lockoutTime: 15 * 60, // 15 minutes in seconds
+  },
+
+  oauth: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackUrl: process.env.GOOGLE_CALLBACK_URL,
+    },
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      callbackUrl: process.env.GITHUB_CALLBACK_URL,
+    },
+  },
+
+  ldap: {
+    url: process.env.LDAP_URL || 'ldap://ldap.example.com:389',
+    bindDN: process.env.LDAP_BIND_DN || 'cn=admin,dc=example,dc=com',
+    bindCredentials: process.env.LDAP_BIND_CREDENTIALS || 'admin_password',
+    searchBase: process.env.LDAP_SEARCH_BASE || 'ou=users,dc=example,dc=com',
+    searchFilter: process.env.LDAP_SEARCH_FILTER || '(mail={{username}})',
+    tlsOptions: {
+      rejectUnauthorized: process.env.LDAP_REJECT_UNAUTHORIZED !== 'false',
+    },
+    defaultTenantId: process.env.LDAP_DEFAULT_TENANT_ID || 'default',
+    defaultTenantName: process.env.LDAP_DEFAULT_TENANT_NAME || 'ldap',
+    defaultTenantDomain: process.env.LDAP_DEFAULT_TENANT_DOMAIN || 'ldap.domain',
+    useTLS: process.env.LDAP_USE_TLS === 'true',
+  },
+
   database: {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
@@ -43,5 +82,9 @@ export default () => ({
     description: 'The ACCI Nest API documentation',
     version: '1.0',
     path: 'api/docs',
+  },
+
+  app: {
+    name: process.env.APP_NAME || 'ACCI Nest',
   },
 });

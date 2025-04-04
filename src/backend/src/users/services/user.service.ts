@@ -74,6 +74,28 @@ export class UserService {
   }
 
   /**
+   * Find a user by ID with tenant isolation
+   *
+   * @param id User ID
+   * @param tenantId Tenant ID
+   * @returns User if found, null otherwise
+   */
+  async findById(id: string, tenantId: string): Promise<User | null> {
+    return this.em.findOne(User, { id, tenantId }, { populate: ['roles'] });
+  }
+
+  /**
+   * Find a user by email with tenant isolation
+   *
+   * @param email User email
+   * @param tenantId Tenant ID
+   * @returns User if found, null otherwise
+   */
+  async findByEmail(email: string, tenantId: string): Promise<User | null> {
+    return this.em.findOne(User, { email, tenantId }, { populate: ['roles'] });
+  }
+
+  /**
    * Assign roles to a user
    *
    * @param userId User ID

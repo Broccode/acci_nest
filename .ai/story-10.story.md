@@ -8,7 +8,7 @@ Authentication System Implementation
 
 ## Status
 
-Draft
+In Progress
 
 ## Context
 
@@ -35,22 +35,27 @@ Draft
    - Implementation of OAuth2/OpenID Connect flows
    - User profile synchronization from external providers
 
-4. **Refresh Token Mechanism**
+4. **LDAP/Active Directory Integration**
+   - Implementation of LDAP authentication strategy
+   - Support for Active Directory authentication
+   - User synchronization from LDAP/AD directories
+
+5. **Refresh Token Mechanism**
    - Implementation of refresh tokens for enhanced security
    - Token rotation and invalidation
    - Secure token storage
 
-5. **Multi-Factor Authentication (MFA)**
+6. **Multi-Factor Authentication (MFA)**
    - Implementation of TOTP (Time-based One-Time Password)
    - QR code generation for authenticator app integration
    - MFA activation/deactivation
 
-6. **Guards and Decorators**
+7. **Guards and Decorators**
    - Implementation of authentication guards
    - Tenant-aware authentication
    - Custom decorators for access control
 
-7. **Test Coverage**
+8. **Test Coverage**
    - Unit tests for authentication logic
    - Integration tests with simulated authentication flows
    - E2E tests for critical authentication paths
@@ -61,48 +66,55 @@ Story Points: 8
 
 ## Tasks
 
-1. - [ ] JWT Authentication
-   1. - [ ] Set up JWT module and service
-   2. - [ ] Implement token generation
-   3. - [ ] Implement token validation
-   4. - [ ] Write unit tests for JWT service
+1. - [x] JWT Authentication
+   1. - [x] Set up JWT module and service
+   2. - [x] Implement token generation
+   3. - [x] Implement token validation
+   4. - [x] Write unit tests for JWT service
 
-2. - [ ] Local Authentication with Passport.js
-   1. - [ ] Create auth module and controller
-   2. - [ ] Set up Local Strategy for Passport.js
-   3. - [ ] Implement login/logout endpoints
-   4. - [ ] Write tests for local authentication
+2. - [x] Local Authentication with Passport.js
+   1. - [x] Create auth module and controller
+   2. - [x] Set up Local Strategy for Passport.js
+   3. - [x] Implement login/logout endpoints
+   4. - [x] Write tests for local authentication
 
-3. - [ ] OAuth2/OpenID Connect
-   1. - [ ] Install necessary dependencies
-   2. - [ ] Implement Google OAuth2 strategy
-   3. - [ ] Implement GitHub OAuth2 strategy
-   4. - [ ] Implement callback handlers and profile synchronization
-   5. - [ ] Write tests for OAuth2 authentication
+3. - [x] OAuth2/OpenID Connect
+   1. - [x] Install necessary dependencies
+   2. - [x] Implement Google OAuth2 strategy
+   3. - [x] Implement GitHub OAuth2 strategy
+   4. - [x] Implement callback handlers and profile synchronization
+   5. - [x] Write tests for OAuth2 authentication
 
-4. - [ ] Refresh Token Mechanism
-   1. - [ ] Implement refresh token generation
-   2. - [ ] Create refresh endpoint for token renewal
-   3. - [ ] Implement token rotation and blacklisting
-   4. - [ ] Write tests for refresh token mechanism
+4. - [x] LDAP/Active Directory Integration
+   1. - [x] Install necessary dependencies (passport-ldapauth)
+   2. - [x] Implement LDAP/AD strategy
+   3. - [x] Configure LDAP connection and authentication options
+   4. - [x] Implement user synchronization from LDAP/AD
+   5. - [x] Write tests for LDAP/AD authentication
 
-5. - [ ] Multi-Factor Authentication
-   1. - [ ] Integrate TOTP library
-   2. - [ ] Implement MFA activation process
-   3. - [ ] Set up QR code generation
-   4. - [ ] Implement MFA validation during login
-   5. - [ ] Write tests for MFA flow
+5. - [x] Refresh Token Mechanism
+   1. - [x] Implement refresh token generation
+   2. - [x] Create refresh endpoint for token renewal
+   3. - [x] Implement token rotation and blacklisting
+   4. - [x] Write tests for refresh token mechanism
 
-6. - [ ] Guards and Decorators
-   1. - [ ] Implement JwtAuthGuard
-   2. - [ ] Implement TenantAuthGuard
-   3. - [ ] Create CurrentUser decorator
-   4. - [ ] Write tests for guards and decorators
+6. - [x] Multi-Factor Authentication
+   1. - [x] Integrate TOTP library
+   2. - [x] Implement MFA activation process
+   3. - [x] Set up QR code generation
+   4. - [x] Implement MFA validation during login
+   5. - [x] Write tests for MFA flow
 
-7. - [ ] Documentation
-   1. - [ ] Create API documentation with Swagger
-   2. - [ ] Write authentication flow documentation
-   3. - [ ] Update user manual for authentication
+7. - [x] Guards and Decorators
+   1. - [x] Implement JwtAuthGuard
+   2. - [x] Implement TenantAuthGuard
+   3. - [x] Create CurrentUser decorator
+   4. - [x] Write tests for guards and decorators
+
+8. - [x] Documentation
+   1. - [x] Create API documentation with Swagger
+   2. - [x] Write authentication flow documentation
+   3. - [x] Update user manual for authentication
 
 ## Implementation Details
 
@@ -120,6 +132,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { GithubStrategy } from './strategies/github.strategy';
+import { LdapStrategy } from './strategies/ldap.strategy';
 import { AuthController } from './controllers/auth.controller';
 import { RefreshTokenService } from './services/refresh-token.service';
 import { MfaService } from './services/mfa.service';
@@ -148,13 +161,132 @@ import { MfaService } from './services/mfa.service';
     LocalStrategy,
     GoogleStrategy,
     GithubStrategy,
+    LdapStrategy,
   ],
   exports: [AuthService, MfaService, JwtModule],
 })
 export class AuthModule {}
 ```
 
-### Authentication Service
+### LDAP Strategy
+
+```typescript
+// src/backend/src/auth/strategies/ldap.strategy.ts
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { Strategy } from 'passport-ldapauth';
+import { ConfigService } from '@nestjs/config';
+import { EntityManager } from '@mikro-orm/core';
+import { User, UserStatus } from '../../users/entities/user.entity';
+import { Tenant, TenantStatus } from '../../tenants/entities/tenant.entity';
+
+/**
+ * LDAP/Active Directory authentication strategy
+ * 
+ * @description Passport strategy for LDAP/AD authentication
+ */
+@Injectable()
+export class LdapStrategy extends PassportStrategy(Strategy, 'ldap') {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly em: EntityManager,
+  ) {
+    super({
+      server: {
+        url: configService.get('ldap.url'),
+        bindDN: configService.get('ldap.bindDN'),
+        bindCredentials: configService.get('ldap.bindCredentials'),
+        searchBase: configService.get('ldap.searchBase'),
+        searchFilter: configService.get('ldap.searchFilter'),
+        searchAttributes: ['displayName', 'mail', 'sAMAccountName'],
+      },
+      usernameField: 'email',
+      passwordField: 'password',
+    });
+  }
+
+  /**
+   * Validate LDAP user and find or create local user
+   * 
+   * @param ldapUser User data from LDAP/AD
+   * @returns Local user
+   */
+  async validate(ldapUser: Record<string, any>): Promise<User> {
+    try {
+      // Extract user information from LDAP response
+      const email = ldapUser.mail || '';
+      const firstName = ldapUser.givenName || '';
+      const lastName = ldapUser.sn || '';
+      const username = ldapUser.sAMAccountName || '';
+      
+      if (!email) {
+        throw new UnauthorizedException('Email not provided by LDAP server');
+      }
+      
+      // Get tenant ID from request context or use a default tenant
+      // For LDAP users, we might determine tenant based on LDAP groups or OU
+      const tenantId = this.configService.get('ldap.defaultTenantId');
+      
+      // Find or create the tenant
+      const tenant = await this.em.findOne(Tenant, { id: tenantId }) || 
+        await this.createDefaultTenant();
+      
+      // Find existing user
+      let user = await this.em.findOne(User, { email, tenantId: tenant.id });
+      
+      // Create user if not exists
+      if (!user) {
+        user = this.em.create(User, {
+          email,
+          // For LDAP users, we don't store the password locally
+          password: Math.random().toString(36).substring(2, 15),
+          profile: {
+            firstName,
+            lastName,
+          },
+          tenantId: tenant.id,
+          tenant,
+          status: UserStatus.ACTIVE,
+          // Store LDAP-specific fields in a custom attribute
+          ldapUsername: username,
+        });
+        
+        await this.em.persistAndFlush(user);
+      }
+      
+      // Update user profile if needed
+      if (user.profile.firstName !== firstName || user.profile.lastName !== lastName) {
+        user.profile.firstName = firstName;
+        user.profile.lastName = lastName;
+        await this.em.flush();
+      }
+      
+      return user;
+    } catch (error) {
+      throw new UnauthorizedException('LDAP authentication failed');
+    }
+  }
+  
+  /**
+   * Create default tenant for LDAP users if needed
+   */
+  private async createDefaultTenant(): Promise<Tenant> {
+    const defaultTenantName = this.configService.get('ldap.defaultTenantName', 'ldap');
+    const defaultTenantDomain = this.configService.get('ldap.defaultTenantDomain', 'ldap.domain');
+    
+    const tenant = this.em.create(Tenant, {
+      name: defaultTenantName,
+      domain: defaultTenantDomain,
+      status: TenantStatus.ACTIVE,
+    });
+    
+    await this.em.persistAndFlush(tenant);
+    return tenant;
+  }
+}
+```
+
+### Authentication Service (Update for LDAP)
 
 ```typescript
 // src/backend/src/auth/services/auth.service.ts
@@ -274,49 +406,7 @@ export class AuthService {
 }
 ```
 
-### JWT Strategy
-
-```typescript
-// src/backend/src/auth/strategies/jwt.strategy.ts
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { ConfigService } from '@nestjs/config';
-import { UserService } from '../../users/services/user.service';
-import { JwtPayload } from '../types/auth.types';
-
-@Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly userService: UserService,
-  ) {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: configService.get('auth.jwtSecret'),
-    });
-  }
-
-  async validate(payload: JwtPayload) {
-    // Find the user by ID and tenant
-    const user = await this.userService.findById(payload.sub, payload.tenantId);
-    
-    if (!user) {
-      throw new UnauthorizedException('User not found or not authorized');
-    }
-
-    return {
-      id: user.id,
-      email: user.email,
-      tenantId: user.tenantId,
-      roles: payload.roles,
-    };
-  }
-}
-```
-
-### Auth Controller
+### Auth Controller (Update for LDAP)
 
 ```typescript
 // src/backend/src/auth/controllers/auth.controller.ts
@@ -350,6 +440,12 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   async login(@Request() req, @Body() loginDto: LoginDto) {
     return this.authService.login(req.user, loginDto.mfaCode);
+  }
+
+  @Post('ldap/login')
+  @UseGuards(AuthGuard('ldap'))
+  async ldapLogin(@Request() req) {
+    return this.authService.login(req.user);
   }
 
   @Post('refresh')
@@ -427,31 +523,27 @@ export class AuthController {
 }
 ```
 
-### AppModule Update
+### Configuration Update for LDAP
 
-We also need to update the AppModule to integrate the new AuthModule:
+Add LDAP configuration to the config file:
 
 ```typescript
-// src/backend/src/app.module.ts (excerpt)
-import { AuthModule } from './auth/auth.module';
-
-@Module({
-  imports: [
-    // Existing modules...
-    
-    // Authentication module
-    AuthModule,
-    
-    // Application modules
-    TenantsModule,
-    UsersModule,
-    RedisModule,
-  ],
-  // ...
-})
-export class AppModule implements NestModule {
-  // ...
-}
+// src/backend/src/config/configuration.ts (excerpt)
+export default () => ({
+  // ... existing config
+  
+  // LDAP configuration
+  ldap: {
+    url: process.env.LDAP_URL || 'ldap://ldap.example.com:389',
+    bindDN: process.env.LDAP_BIND_DN || 'cn=admin,dc=example,dc=com',
+    bindCredentials: process.env.LDAP_BIND_CREDENTIALS || 'admin_password',
+    searchBase: process.env.LDAP_SEARCH_BASE || 'ou=users,dc=example,dc=com',
+    searchFilter: process.env.LDAP_SEARCH_FILTER || '(mail={{username}})',
+    defaultTenantId: process.env.LDAP_DEFAULT_TENANT_ID || 'default',
+    defaultTenantName: process.env.LDAP_DEFAULT_TENANT_NAME || 'ldap',
+    defaultTenantDomain: process.env.LDAP_DEFAULT_TENANT_DOMAIN || 'ldap.domain',
+  },
+});
 ```
 
 ## Constraints
@@ -463,6 +555,7 @@ export class AppModule implements NestModule {
 - Tokens must have an appropriate expiration time (15 minutes for JWT, 7 days for refresh tokens)
 - MFA secrets must be encrypted in the database
 - Rate limiting must be implemented for all authentication endpoints
+- LDAP connections must use TLS/SSL for secure communication
 
 ## References
 
@@ -473,9 +566,10 @@ export class AppModule implements NestModule {
 - [Passport.js Documentation](http://www.passportjs.org/)
 - [JWT Documentation](https://jwt.io/introduction)
 - [OWASP Authentication Best Practices](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
+- [LDAP Authentication Best Practices](https://ldap.com/ldap-security-best-practices/)
 
 ## Conclusion
 
-The successful implementation of the authentication system is a fundamental building block for the ACCI Nest Enterprise Application Framework. It forms the basis for secure user authentication and authorization and enables seamless integration with various identity providers. The implementation of JWT, OAuth2, refresh tokens, and MFA ensures that the system meets modern security standards and provides users with a flexible and secure authentication experience.
+The successful implementation of the authentication system is a fundamental building block for the ACCI Nest Enterprise Application Framework. It forms the basis for secure user authentication and authorization and enables seamless integration with various identity providers. The implementation of JWT, OAuth2, LDAP/AD, refresh tokens, and MFA ensures that the system meets modern security standards and provides users with a flexible and secure authentication experience.
 
 ## Chat Log

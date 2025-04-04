@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { CacheModule } from './common/cache/cache.module';
 import {
   CompressionMiddleware,
@@ -54,6 +55,9 @@ import { UsersModule } from './users/users.module';
 
     // Performance monitoring module
     PerformanceModule,
+
+    // Authentication module
+    AuthModule,
 
     // Application modules
     TenantsModule,
