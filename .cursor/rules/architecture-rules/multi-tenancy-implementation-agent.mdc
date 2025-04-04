@@ -13,6 +13,8 @@ alwaysApply: false
 - Reference when implementing tenant context management
 - Follow when creating APIs that must respect tenant boundaries
 - Check when implementing cross-tenant operations
+- Apply when designing the tenant management Control Plane
+- Use when implementing performance isolation mechanisms
 
 ## Critical Rules
 
@@ -24,6 +26,33 @@ alwaysApply: false
 - ENSURE secure cross-tenant operations with explicit authorization checks
 - ISOLATE tenant-specific configurations and customizations
 - IMPLEMENT tenant-specific database schemas or row-level security
+- CREATE a centralized Control Plane for tenant management operations
+- IMPLEMENT resource limits and rate limiting for performance isolation
+- MONITOR tenant-specific usage and performance metrics
+- PROVIDE tenant-specific logging with proper context information
+
+## Control Plane Implementation
+
+The Control Plane is a central system for managing tenant operations:
+
+- IMPLEMENT automated tenant onboarding workflows
+- CENTRALIZE tenant configuration and metadata management
+- PROVIDE tenant resource provisioning and management
+- ENSURE secure tenant administration and access controls
+- IMPLEMENT tenant-specific monitoring and alerting
+- CREATE tenant lifecycle management (creation, suspension, deletion)
+
+## Performance Isolation
+
+Prevent "noisy neighbor" problems with proper performance isolation:
+
+- IMPLEMENT tenant-specific rate limiting and request throttling
+- DEFINE resource quotas for each tenant (CPU, memory, DB connections)
+- MEASURE and TRACK tenant-specific resource usage metrics
+- ALERT when tenants approach or exceed resource limits
+- PROVIDE tenant-specific database connection pooling
+- IMPLEMENT tenant-aware caching strategies
+- ENSURE fair resource allocation across all tenants
 
 ## Examples
 
@@ -80,6 +109,76 @@ export class ProductRepository extends TenantAwareRepository<Product> {
   
   // Product-specific repository methods...
 }
+
+// src/core/multi-tenancy/control-plane/tenant-management.service.ts
+@Injectable()
+export class TenantManagementService {
+  constructor(
+    @InjectRepository(Tenant) private tenantRepository: Repository<Tenant>,
+    private configService: ConfigService,
+    private databaseService: DatabaseService,
+  ) {}
+
+  async createTenant(createTenantDto: CreateTenantDto): Promise<Tenant> {
+    // 1. Persistieren der Tenant-Metadaten
+    const tenant = await this.tenantRepository.save({
+      ...createTenantDto,
+      status: TenantStatus.INITIALIZING,
+    });
+    
+    try {
+      // 2. Ressourcen-Zuweisung/Erstellung
+      await this.provisionResources(tenant);
+      
+      // 3. Initialisieren tenant-spezifischer Konfigurationen
+      await this.initializeTenantConfig(tenant);
+      
+      // 4. Setzen des Status auf ACTIVE
+      tenant.status = TenantStatus.ACTIVE;
+      await this.tenantRepository.save(tenant);
+      
+      return tenant;
+    } catch (error) {
+      // Rollback bei Fehlern
+      tenant.status = TenantStatus.ERROR;
+      await this.tenantRepository.save(tenant);
+      throw error;
+    }
+  }
+  
+  // Additional management functions...
+}
+
+// src/core/multi-tenancy/middleware/tenant-rate-limiter.middleware.ts
+@Injectable()
+export class TenantRateLimiterMiddleware implements NestMiddleware {
+  constructor(
+    private tenantConfigService: TenantConfigService,
+    private rateLimiterService: RateLimiterService,
+  ) {}
+
+  async use(req: Request, res: Response, next: NextFunction) {
+    const tenantId = req.headers['x-tenant-id'] as string;
+    
+    // Get tenant-specific limits
+    const tenantLimits = await this.tenantConfigService.getTenantLimits(tenantId);
+    
+    // Apply rate limiting
+    const rateLimitResult = await this.rateLimiterService.checkLimit({
+      key: tenantId,
+      pointsToConsume: 1,
+      maxPoints: tenantLimits.requestsPerMinute,
+      duration: 60,
+    });
+    
+    if (rateLimitResult.rejected) {
+      res.status(429).json({ message: 'Rate limit exceeded' });
+      return;
+    }
+    
+    next();
+  }
+}
 </example>
 
 <example type="invalid">
@@ -103,6 +202,24 @@ export class UserRepository {
   // Direct save without tenant assignment - data isolation issue
   async save(user: User): Promise<User> {
     return this.repository.save(user);
+  }
+}
+
+// src/core/multi-tenancy/control-plane/tenant-management.controller.ts - Lacks proper access controls
+@Controller('tenants')
+export class TenantManagementController {
+  constructor(private tenantService: TenantService) {}
+  
+  // Missing authorization checks for sensitive tenant operations
+  @Post()
+  createTenant(@Body() createTenantDto: CreateTenantDto) {
+    return this.tenantService.createTenant(createTenantDto);
+  }
+  
+  // No rate limiting for resource-intensive operations
+  @Get()
+  getAllTenants() {
+    return this.tenantService.findAll();
   }
 }
 </example> 

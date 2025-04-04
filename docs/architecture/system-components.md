@@ -23,6 +23,12 @@
   - Services: PluginLoaderService, PluginRegistryService
   - Controllers: PluginController
   - Interfaces: IPlugin, IPluginConfig
+
+- TenantControlPlaneModule
+  - Services: TenantManagementService, TenantProvisioningService, TenantConfigurationService
+  - Controllers: TenantControlPlaneController
+  - Guards: TenantAdminGuard, ControlPlaneAccessGuard
+  - Entities: TenantProvisioning, TenantOperationLog
 ```
 
 ### AuthModule
@@ -63,6 +69,19 @@ The PluginModule enables:
 - Per-tenant plugin configuration
 - Plugin hooks and event handling
 
+### TenantControlPlaneModule
+
+The TenantControlPlaneModule provides a centralized management system for tenants:
+
+- Tenant provisioning and onboarding
+- Tenant resource allocation and scaling
+- Tenant configuration management
+- Tenant monitoring and alerting
+- Tenant lifecycle management (creation, suspension, deletion)
+- Secure tenant administration with enhanced access controls
+- Audit logging for tenant operations
+- Tenant-specific performance monitoring
+
 ## Frontend Components
 
 ```typescript
@@ -90,6 +109,13 @@ The PluginModule enables:
   - PluginGallery.tsx
   - PluginCard.tsx
   - PluginConfiguration.tsx
+
+- TenantControlPlane
+  - TenantManagement.tsx
+  - TenantProvisioning.tsx
+  - TenantMonitoring.tsx
+  - TenantResourceAllocation.tsx
+  - TenantAuditLog.tsx
 ```
 
 ### Layout Components
@@ -136,6 +162,17 @@ The Plugin components offer:
 - Installation and configuration of plugins
 - Plugin status management
 - Plugin-specific user interfaces
+
+### TenantControlPlane Components
+
+The TenantControlPlane components provide:
+
+- Administrative interface for tenant management
+- Tenant creation and provisioning workflows
+- Tenant resource monitoring and allocation
+- Tenant configuration and customization
+- Audit logs for tenant operations
+- Performance monitoring dashboards for tenants
 
 ## Database Schema
 
@@ -224,6 +261,36 @@ CREATE TABLE tenant_plugins (
   config JSONB NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY(tenant_id, plugin_id)
 );
+
+CREATE TABLE tenant_provisioning (
+  id UUID PRIMARY KEY,
+  tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+  status VARCHAR(50) NOT NULL,
+  resources JSONB NOT NULL DEFAULT '{}'::jsonb,
+  config JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE tenant_resource_limits (
+  tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+  resource_type VARCHAR(50) NOT NULL,
+  max_limit INTEGER NOT NULL,
+  alert_threshold INTEGER NOT NULL,
+  current_usage INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY(tenant_id, resource_type)
+);
+
+CREATE TABLE tenant_operation_logs (
+  id UUID PRIMARY KEY,
+  tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+  operation_type VARCHAR(50) NOT NULL,
+  performed_by UUID REFERENCES users(id),
+  details JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 ```
 
 ### Entity-Relationship Model
@@ -237,6 +304,12 @@ permissions --< role_permissions >+
 tenants -+-> users
          |
          +-> roles
+         |
+         +-> tenant_provisioning
+         |
+         +-> tenant_resource_limits
+         |
+         +-> tenant_operation_logs
 ```
 
 ### Core Entities
@@ -288,3 +361,24 @@ tenants -+-> users
 - Links plugins with tenants
 - Enables tenant-specific plugin configuration
 - Controls plugin activation per tenant
+
+#### Tenant Provisioning
+
+- Manages tenant provisioning lifecycle
+- Tracks provisioning status for new tenants
+- Stores resource allocation information
+- Contains tenant-specific configuration settings
+
+#### Tenant Resource Limits
+
+- Defines resource limits per tenant
+- Sets alert thresholds for resource monitoring
+- Tracks current resource usage
+- Supports performance isolation between tenants
+
+#### Tenant Operation Logs
+
+- Records audit trail for tenant operations
+- Tracks administrative actions on tenants
+- Maintains security logging for tenant management
+- Supports compliance requirements

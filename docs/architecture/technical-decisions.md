@@ -131,6 +131,116 @@ The application implements a discriminator-based multi-tenancy approach:
 - **Tenant Context**: ThreadLocal-like approach for tenant identification
 - **API Layer Filter**: Automatic filtering of all database accesses by tenant ID
 
+### Tenant Control Plane
+
+```typescript
+// tenant-control-plane.module.ts
+@Module({
+  imports: [
+    TenantModule,
+    AuthModule,
+    ConfigModule,
+    MikroOrmModule.forFeature([
+      TenantProvisioning,
+      TenantResourceLimits,
+      TenantOperationLog,
+    ]),
+  ],
+  controllers: [TenantControlPlaneController],
+  providers: [
+    TenantManagementService,
+    TenantProvisioningService,
+    TenantConfigurationService,
+    TenantMonitoringService,
+    {
+      provide: APP_GUARD,
+      useClass: ControlPlaneAccessGuard,
+    },
+  ],
+  exports: [
+    TenantManagementService,
+    TenantProvisioningService,
+  ],
+})
+export class TenantControlPlaneModule {}
+```
+
+The Control Plane provides centralized tenant management:
+
+- **Tenant Onboarding**: Automated provisioning of new tenants
+- **Tenant Lifecycle**: Management of tenant creation, suspension, and deletion
+- **Resource Allocation**: Assignment of infrastructure resources per tenant
+- **Configuration Management**: Centralized management of tenant configurations
+- **Tenant Monitoring**: Health and performance monitoring of tenant resources
+- **Admin Interface**: Administrative dashboard for tenant management
+- **Audit Logging**: Comprehensive audit trails for all tenant operations
+- **Security Controls**: Strong access controls for tenant management functions
+
+### Performance Isolation
+
+```typescript
+// tenant-resource-limiter.service.ts
+@Injectable()
+export class TenantResourceLimiterService {
+  constructor(
+    @InjectRepository(TenantResourceLimits)
+    private resourceLimitsRepository: Repository<TenantResourceLimits>,
+    private monitoringService: MonitoringService,
+  ) {}
+  
+  async enforceResourceLimits(
+    tenantId: string,
+    resourceType: ResourceType,
+    requestedAmount: number,
+  ): Promise<boolean> {
+    const limits = await this.resourceLimitsRepository.findOne({
+      where: { tenantId, resourceType },
+    });
+    
+    if (!limits) {
+      return true; // No specific limits defined
+    }
+    
+    const currentUsage = await this.monitoringService.getCurrentUsage(
+      tenantId,
+      resourceType,
+    );
+    
+    if (currentUsage + requestedAmount > limits.maxLimit) {
+      // Log and alert on resource limit reached
+      await this.monitoringService.recordLimitExceeded(
+        tenantId,
+        resourceType,
+        currentUsage,
+        requestedAmount,
+        limits.maxLimit,
+      );
+      
+      return false; // Limit exceeded
+    }
+    
+    // Update current usage metrics
+    await this.resourceLimitsRepository.update(
+      { tenantId, resourceType },
+      { currentUsage: currentUsage + requestedAmount },
+    );
+    
+    return true;
+  }
+}
+```
+
+Performance isolation is implemented through:
+
+- **Resource Quotas**: Enforced limits on resource consumption per tenant
+- **Rate Limiting**: Tenant-specific API request limits
+- **Connection Pool Management**: Dedicated or fairly shared database connections
+- **Query Limits**: Maximum complexity and execution time for database queries
+- **Background Job Throttling**: Fair allocation of background processing tasks
+- **Resource Monitoring**: Real-time tracking of tenant resource consumption
+- **Adaptive Throttling**: Dynamic adjustment of limits based on system load
+- **Fair Resource Scheduling**: Balanced allocation during resource contention
+
 ### Advantages of the Chosen Strategy
 
 - **Cost Efficiency**: No separate database instances needed per tenant
@@ -138,6 +248,9 @@ The application implements a discriminator-based multi-tenancy approach:
 - **Efficient Resource Usage**: Better hardware utilization
 - **Easier Updates**: Central upgrades for all tenants
 - **Flexibility**: Possibility for dedicated resources for premium tenants
+- **Scalability**: Ability to handle growing number of tenants
+- **Isolation**: Strong data isolation without infrastructure separation
+- **Performance Protection**: Prevention of "noisy neighbor" problems
 
 ## Security Measures (OWASP/SOC2)
 

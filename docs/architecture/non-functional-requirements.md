@@ -24,6 +24,7 @@ The application is continuously monitored to ensure compliance with performance 
 - **Frontend Monitoring**: Web Vitals API for client-side performance metrics
 - **User Behavior**: Anonymized usage data for critical paths
 - **Automated Tests**: Regular load tests and performance tests in the CI/CD pipeline
+- **Tenant-Specific Monitoring**: Per-tenant performance metrics and resource usage tracking
 
 ## Scaling Concept
 
@@ -86,6 +87,73 @@ services:
 - **Auto-Scaling**: Monitoring-driven scaling during increased load
 - **Queuing Mechanisms**: Asynchronous processing for compute-intensive operations
 - **Graceful Degradation**: Prioritization of critical functions during overload
+
+## Tenant Performance Isolation
+
+The application implements strict performance isolation between tenants to prevent "noisy neighbor" problems:
+
+### Resource Limits and Rate Throttling
+
+```typescript
+// src/core/multi-tenancy/middleware/tenant-rate-limiter.middleware.ts
+@Injectable()
+export class TenantRateLimiterMiddleware implements NestMiddleware {
+  constructor(
+    private tenantConfigService: TenantConfigService,
+    private rateLimiterService: RateLimiterService,
+  ) {}
+
+  async use(req: Request, res: Response, next: NextFunction) {
+    const tenantId = req.headers['x-tenant-id'] as string;
+    
+    // Get tenant-specific limits
+    const tenantLimits = await this.tenantConfigService.getTenantLimits(tenantId);
+    
+    // Apply rate limiting
+    const rateLimitResult = await this.rateLimiterService.checkLimit({
+      key: tenantId,
+      pointsToConsume: 1,
+      maxPoints: tenantLimits.requestsPerMinute,
+      duration: 60,
+    });
+    
+    if (rateLimitResult.rejected) {
+      res.status(429).json({ message: 'Rate limit exceeded' });
+      return;
+    }
+    
+    next();
+  }
+}
+```
+
+### Isolation Mechanisms
+
+- **Tenant-Specific Rate Limiting**: Configurable API request quotas per tenant
+- **Resource Quotas**: Enforced limits on CPU, memory, and database connections
+- **Database Connection Pooling**: Dedicated connection pools per tenant
+- **Tenant-Aware Caching**: Isolated cache spaces to prevent cache pollution
+- **Background Job Scheduling**: Fair scheduling with tenant quotas
+- **Adaptive Rate Control**: Dynamic adjustment based on system load
+- **Database Query Limits**: Maximum query complexity and execution time limits
+
+### Tenant Resource Monitoring
+
+- **Resource Usage Dashboards**: Real-time visibility into tenant resource consumption
+- **Anomaly Detection**: Identification of abnormal usage patterns
+- **Alert Thresholds**: Configurable thresholds for resource usage warnings
+- **Usage Analytics**: Historical analysis of tenant resource consumption
+- **Capacity Planning**: Predictive modeling for tenant resource needs
+- **Tenant Performance SLAs**: Defined service levels per subscription tier
+
+### Subscription Tier Considerations
+
+| Tier | API Rate Limit | Max Concurrent Users | Database Connections | Background Jobs | Storage Quota |
+|------|---------------|---------------------|---------------------|----------------|--------------|
+| Basic | 100 req/min | 50 | 5 | 5/hour | 5 GB |
+| Standard | 500 req/min | 200 | 20 | 20/hour | 20 GB |
+| Premium | 2000 req/min | 1000 | 50 | Unlimited | 100 GB |
+| Enterprise | Custom | Custom | Custom | Custom | Custom |
 
 ## Error Handling Strategy
 
@@ -193,6 +261,7 @@ export class LoggingModule {}
 - **Rotation**: Automatic log rotation for storage management
 - **Data Protection**: Masking of sensitive data in logs
 - **Performance Metrics**: Integration of performance data in logs
+- **Tenant Context**: Inclusion of tenant information in all logs for multi-tenant analysis
 
 ### Monitoring System
 
@@ -203,6 +272,7 @@ export class LoggingModule {}
 - **Trend Analysis**: Long-term analysis of performance trends
 - **Audit Logging**: Separate recording of security-relevant events
 - **User Activity Monitoring**: Analysis of usage patterns
+- **Tenant-Specific Dashboards**: Dedicated monitoring views per tenant
 
 ## Security Goals
 
@@ -213,6 +283,7 @@ export class LoggingModule {}
 - **Data Protection**: Minimization of personal data, encryption of sensitive data
 - **Penetration Tests**: Regular security tests
 - **Vulnerability Management**: Continuous monitoring and remediation of vulnerabilities
+- **Tenant Isolation**: Complete data isolation between tenants
 
 ## Maintainability
 
