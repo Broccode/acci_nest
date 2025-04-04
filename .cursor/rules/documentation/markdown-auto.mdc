@@ -1,7 +1,7 @@
 ---
 description: ALWAYS use when writing or updating Markdown files to ensure consistent formatting and readability
 globs: **/*.md
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Markdown Documentation Standards
