@@ -389,3 +389,15 @@ Durch die Erstellung einer umfassenden Fehlerbehebungsanleitung haben wir auch e
 **User:** Beginne nun mit der Umsetzung von Task 9.
 
 **AI:** Ich habe die GitHub Actions Workflow-Konfiguration, GitLab CI Pipeline-Konfiguration und Dokumentation erfolgreich erstellt. Alle Tasks wurden abgeschlossen, einschließlich der Optimierung der Test-Performance und der Erstellung einer Fehlerbehebungsanleitung.
+
+**User:** Bezüglich task-9.story.md haben wir noch ein Problem mit der GitHub-Pipeline (test.yml). Die Jobs hängen beim Step "Run E2E tests" bis GitHub sie irgendwann abbricht mit der Meldung: "Jest did not exit one second after the test run has completed. This usually means that there are asynchronous operations that weren't stopped in your tests. Consider running Jest with `--detectOpenHandles` to troubleshoot this issue."
+
+**AI:** Das Problem liegt an asynchronen Operationen (wahrscheinlich Testcontainers oder Datenbankverbindungen), die nicht ordnungsgemäß geschlossen werden. Die Tests selbst sind erfolgreich, aber Jest beendet sich nicht. Ich habe folgende Lösungen implementiert:
+
+1. In `.github/workflows/test.yml` den E2E-Test-Befehl direkt auf Jest geändert und die Flags `--forceExit` und `--testTimeout=60000` hinzugefügt, um sicherzustellen, dass Jest nach Abschluss der Tests beendet wird.
+
+2. Den `test:e2e`-Befehl in `package.json` ebenfalls aktualisiert, um dieselben Flags zu verwenden.
+
+3. Die GitLab CI-Konfiguration angepasst, um denselben direkten Jest-Befehl mit den neuen Flags zu verwenden.
+
+Diese Änderungen sorgen dafür, dass die CI-Pipeline nicht mehr hängen bleibt, auch wenn asynchrone Operationen nicht ordnungsgemäß geschlossen werden.

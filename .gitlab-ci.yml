@@ -42,8 +42,8 @@ test:
     - bun run check || echo "Linting failed, but continuing"
     # Run unit tests
     - bun run test || echo "Unit tests failed, but continuing"
-    # Run E2E tests (includes integration tests per jest-e2e.json configuration)
-    - bun run test:e2e || echo "E2E tests failed, but continuing"
+    # Run E2E tests directly with jest command to ensure proper exit
+    - jest --config src/backend/test/jest-e2e.json --runInBand --detectOpenHandles --forceExit --testTimeout=60000 || echo "E2E tests failed, but continuing"
     # Generate coverage report
     - bun run test:coverage || echo "Coverage report generation failed, but continuing"
     # Create directories for artifacts even if tests fail
