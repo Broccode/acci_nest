@@ -238,6 +238,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added dedicated Jest configuration for the project and backend
   - Enhanced testing setup for better NestJS compatibility
   - Improved foundation for future integration of Testcontainers
+- **Documentation Rules Update** (2025-04-04)
+  - Updated communication style guidelines for enhanced collaboration
+  - Improved documentation formatting standards
+  - Added specialized context-specific communication patterns
+  - Enhanced development workflow with consistent communication protocols
 
 ### Fixed
 
