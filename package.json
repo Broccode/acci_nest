@@ -14,7 +14,7 @@
     "build": "bun run --cwd src/backend build",
     "build:full": "bun run --cwd src/backend build && bun run --cwd src/frontend build",
     "test": "jest --projects src/backend && bun run --cwd src/frontend test",
-    "test:e2e": "jest --config src/backend/test/jest-e2e.json --runInBand --forceExit --testTimeout=60000",
+    "test:e2e": "jest --config src/backend/test/jest-e2e.json --runInBand --detectOpenHandles --forceExit --testTimeout=60000",
     "test:cov": "jest --projects src/backend --coverage && bun run --cwd src/frontend test:cov",
     "test:coverage": "bun run test:cov",
     "migration:generate": "bun run --cwd src/backend migration:generate",

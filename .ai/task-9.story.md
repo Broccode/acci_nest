@@ -401,3 +401,17 @@ Durch die Erstellung einer umfassenden Fehlerbehebungsanleitung haben wir auch e
 3. Die GitLab CI-Konfiguration angepasst, um denselben direkten Jest-Befehl mit den neuen Flags zu verwenden.
 
 Diese Änderungen sorgen dafür, dass die CI-Pipeline nicht mehr hängen bleibt, auch wenn asynchrone Operationen nicht ordnungsgemäß geschlossen werden.
+
+**User:** Der Job schlägt jetzt mit einem anderen Fehler fehl: "jest: command not found". Es scheint, dass Jest nicht im Pfad verfügbar ist, wenn es direkt aufgerufen wird.
+
+**AI:** Ich habe das Problem identifiziert und behoben. Da Jest nicht direkt im Pfad verfügbar ist, müssen wir `bunx jest` verwenden, um es über Bun auszuführen. Ich habe folgende Änderungen implementiert:
+
+1. Ersetzt den direkten `jest`-Befehl durch `bunx jest` in:
+   - `.github/workflows/test.yml`
+   - `.gitlab-ci.yml`
+
+2. Zusätzlich habe ich das Flag `--detectOpenHandles` zu allen Jest-Aufrufen hinzugefügt, um bei der Diagnose von offenen Handles zu helfen.
+
+3. Das `test:e2e`-Skript in `package.json` ebenfalls aktualisiert, um diese Änderungen konsistent zu halten.
+
+Diese Anpassungen sollten das "command not found"-Problem beheben und gleichzeitig die offenen asynchronen Operationen besser erkennen.

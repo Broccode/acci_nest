@@ -71,9 +71,8 @@ jobs:
       
       # E2E tests with Testcontainers
       - name: Run E2E tests
-        # Added --forceExit to ensure Jest terminates after tests complete
-        # Added --testTimeout=60000 to give tests more time to complete
-        run: jest --config src/backend/test/jest-e2e.json --runInBand --detectOpenHandles --forceExit --testTimeout=60000
+        # Using bunx to ensure jest is available in the PATH
+        run: bunx jest --config src/backend/test/jest-e2e.json --runInBand --detectOpenHandles --forceExit --testTimeout=60000
         env:
           # Important for TestContainers
           TESTCONTAINERS_HOST_OVERRIDE: localhost
