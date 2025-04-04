@@ -2,8 +2,10 @@ import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import * as compressionLib from 'compression';
 import { NextFunction, Request, Response } from 'express';
 
-// Definiere einen Typ für die Compression-Middleware
-type CompressionMiddlewareFunction = (req: Request, res: Response, next: NextFunction) => void;
+/**
+ * Type definition for middleware function to avoid type conflicts
+ */
+type MiddlewareHandler = (req: Request, res: Response, next: NextFunction) => void;
 
 /**
  * Middleware for compressing HTTP responses
@@ -12,7 +14,8 @@ type CompressionMiddlewareFunction = (req: Request, res: Response, next: NextFun
 @Injectable()
 export class CompressionMiddleware implements NestMiddleware {
   private readonly logger = new Logger(CompressionMiddleware.name);
-  private readonly compressionMiddleware: CompressionMiddlewareFunction;
+  // Using explicit function type instead of 'Function'
+  private readonly compressionMiddleware: MiddlewareHandler;
 
   constructor() {
     try {
@@ -22,14 +25,15 @@ export class CompressionMiddleware implements NestMiddleware {
           ? compressionLib
           : (compressionLib as unknown as { default: typeof compressionLib }).default;
 
-      this.compressionMiddleware = compression();
+      // Double-casting to overcome type conflicts
+      this.compressionMiddleware = compression() as unknown as MiddlewareHandler;
     } catch (error) {
       this.logger.error(
         'Failed to initialize compression middleware',
         error instanceof Error ? error.stack : String(error)
       );
       // Fallback to no compression
-      this.compressionMiddleware = (req: Request, res: Response, next: NextFunction) => next();
+      this.compressionMiddleware = (_req: unknown, _res: unknown, next: NextFunction) => next();
     }
   }
 
@@ -40,6 +44,7 @@ export class CompressionMiddleware implements NestMiddleware {
    * @param next - Next middleware function
    */
   use(req: Request, res: Response, next: NextFunction): void {
+    // Direct call is now type-safe
     this.compressionMiddleware(req, res, next);
   }
 }
