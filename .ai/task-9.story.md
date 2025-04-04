@@ -1,10 +1,10 @@
 # Epic-5 - Task-9
 
-CI/CD-Pipeline für Testcontainers-basierte Tests
+CI/CD Pipeline for Testcontainers-based Tests
 
-**Als** Entwickler
-**möchte ich** automatisierte CI/CD-Pipelines für unsere Testcontainers-basierten Tests konfigurieren
-**damit** wir die korrekte Ausführung aller Tests in der CI-Umgebung sicherstellen können und frühzeitig Fehler erkennen.
+**As a** developer
+**I want to** configure automated CI/CD pipelines for our Testcontainers-based tests
+**so that** we can ensure the correct execution of all tests in the CI environment and detect errors early.
 
 ## Status
 
@@ -12,33 +12,33 @@ Completed
 
 ## Context
 
-- Wir haben in Story-7 erfolgreich Testcontainers für Integrationstests implementiert.
-- Bevor wir mit weiteren Features fortfahren, müssen wir sicherstellen, dass alle Tests (inklusive der Testcontainers-basierten Tests) in unseren CI/CD-Pipelines laufen.
-- Wir benötigen Konfigurationen sowohl für GitHub Actions als auch für GitLab CI, um maximale Flexibilität zu gewährleisten.
-- Die Implementierung basiert auf den in der Architektur-Dokumentation definierten Test- und Deployment-Strategien.
+- We successfully implemented Testcontainers for integration tests in Story-7.
+- Before we continue with further features, we need to ensure that all tests (including Testcontainers-based tests) run in our CI/CD pipelines.
+- We need configurations for both GitHub Actions and GitLab CI to ensure maximum flexibility.
+- The implementation is based on the test and deployment strategies defined in the architecture documentation.
 
 ## Acceptance Criteria
 
 1. **GitHub Actions Workflow**
-   - Workflow-Datei in `.github/workflows/` erstellen
-   - Konfiguration von Docker-in-Docker für Testcontainers
-   - Ausführung von Unit-, Integrations- und E2E-Tests
-   - Generierung und Speicherung von Testberichten
+   - Create workflow file in `.github/workflows/`
+   - Configuration of Docker-in-Docker for Testcontainers
+   - Execution of unit, integration, and E2E tests
+   - Generation and storage of test reports
 
 2. **GitLab CI Pipeline**
-   - `.gitlab-ci.yml` Datei im Root-Verzeichnis erstellen
-   - Konfiguration von Docker-in-Docker für Testcontainers
-   - Ausführung von Unit-, Integrations- und E2E-Tests
-   - Generierung und Speicherung von Testberichten
+   - Create `.gitlab-ci.yml` file in the root directory
+   - Configuration of Docker-in-Docker for Testcontainers
+   - Execution of unit, integration, and E2E tests
+   - Generation and storage of test reports
 
-3. **Optimierung der Test-Performance**
-   - Implementierung von Caching-Strategien für Abhängigkeiten
-   - Konfiguration von Container-Wiederverwendung für Testcontainers
-   - Parallelisierung von Tests wo möglich
+3. **Test Performance Optimization**
+   - Implementation of caching strategies for dependencies
+   - Configuration of container reuse for Testcontainers
+   - Parallelization of tests where possible
 
-4. **Dokumentation**
-   - Aktualisierung der Entwicklungsdokumentation mit CI/CD-Informationen
-   - Fehlerbehebungsanleitung für häufige CI/CD-Probleme
+4. **Documentation**
+   - Update development documentation with CI/CD information
+   - Troubleshooting guide for common CI/CD problems
 
 ## Estimation
 
@@ -46,33 +46,33 @@ Story Points: 3
 
 ## Tasks
 
-1. - [x] GitHub Actions Workflow-Konfiguration
-   1. - [x] `.github/workflows/test.yml` erstellen
-   2. - [x] Docker-in-Docker-Service konfigurieren
-   3. - [x] Test-Jobs und Stages definieren
-   4. - [x] Caching für Bun-Abhängigkeiten einrichten
-   5. - [x] Artefakt-Handling für Testberichte konfigurieren
+1. - [x] GitHub Actions Workflow Configuration
+   1. - [x] Create `.github/workflows/test.yml`
+   2. - [x] Configure Docker-in-Docker service
+   3. - [x] Define test jobs and stages
+   4. - [x] Set up caching for Bun dependencies
+   5. - [x] Configure artifact handling for test reports
 
-2. - [x] GitLab CI Pipeline-Konfiguration
-   1. - [x] `.gitlab-ci.yml` im Root-Verzeichnis erstellen
-   2. - [x] Docker-in-Docker-Service konfigurieren
-   3. - [x] Test-Jobs und Stages definieren
-   4. - [x] Caching für Bun-Abhängigkeiten einrichten
-   5. - [x] Artefakt-Handling für Testberichte konfigurieren
+2. - [x] GitLab CI Pipeline Configuration
+   1. - [x] Create `.gitlab-ci.yml` in the root directory
+   2. - [x] Configure Docker-in-Docker service
+   3. - [x] Define test jobs and stages
+   4. - [x] Set up caching for Bun dependencies
+   5. - [x] Configure artifact handling for test reports
 
-3. - [x] Test-Performance-Optimierung
-   1. - [x] Testcontainers Reuse-Konfiguration implementieren
-   2. - [x] Vorab-Download relevanter Docker-Images
-   3. - [x] Test-Parallelisierung konfigurieren
+3. - [x] Test Performance Optimization
+   1. - [x] Implement Testcontainers reuse configuration
+   2. - [x] Pre-download relevant Docker images
+   3. - [x] Configure test parallelization
 
-4. - [x] Dokumentation
-   1. - [x] Readme-Abschnitt zu CI/CD aktualisieren
-   2. - [x] Fehlerbehebungsanleitung erstellen
-   3. - [x] Badge für Build-Status hinzufügen
+4. - [x] Documentation
+   1. - [x] Update Readme section on CI/CD
+   2. - [x] Create troubleshooting guide
+   3. - [x] Add badge for build status
 
 ## Implementation Details
 
-### GitHub Actions Workflow-Konfiguration
+### GitHub Actions Workflow Configuration
 
 ```yaml
 name: CI/CD Tests
@@ -89,7 +89,7 @@ jobs:
     name: Tests
     runs-on: ubuntu-latest
     
-    # Konfiguration für Docker-in-Docker, erforderlich für Testcontainers
+    # Configuration for Docker-in-Docker, required for Testcontainers
     services:
       docker:
         image: docker:dind
@@ -107,13 +107,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       
-      # Bun Setup (schneller als Node.js)
+      # Bun Setup (faster than Node.js)
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
       
-      # Cache für Bun Abhängigkeiten
+      # Cache for Bun dependencies
       - name: Cache Bun dependencies
         uses: actions/cache@v3
         with:
@@ -124,39 +124,39 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bun-
       
-      # Installation von Abhängigkeiten
+      # Installation of dependencies
       - name: Install dependencies
         run: bun install --frozen-lockfile
       
-      # Vorbereitung für Testcontainers
+      # Preparation for Testcontainers
       - name: Prepare for Testcontainers
         run: |
-          # Stellen Sie sicher, dass TestContainers den Docker-Host findet
+          # Make sure TestContainers can find the Docker host
           echo "TESTCONTAINERS_HOST_OVERRIDE=localhost" >> $GITHUB_ENV
           echo "DOCKER_HOST=unix:///var/run/docker.sock" >> $GITHUB_ENV
-          # Optional: Docker Images vorab ziehen, um Tests zu beschleunigen
+          # Optional: Pull Docker images in advance to speed up tests
           docker pull postgres:latest
           docker pull redis:latest
       
-      # Linting und Codequalität
+      # Linting and code quality
       - name: Run linting
         run: bun run check
       
-      # Unit Tests (schneller, ohne Testcontainers)
+      # Unit Tests (faster, without Testcontainers)
       - name: Run unit tests
         run: bun test --test-file-pattern "**/*.spec.ts" --coverage
       
-      # Integrationstests mit Testcontainers
+      # Integration tests with Testcontainers
       - name: Run integration tests
         run: bun test --test-file-pattern "**/*.integration.spec.ts" --coverage
         env:
-          # Wichtig für TestContainers
+          # Important for TestContainers
           TESTCONTAINERS_HOST_OVERRIDE: localhost
           DOCKER_HOST: unix:///var/run/docker.sock
-          # Testcontainer Reuse Strategie für schnellere Tests
+          # Testcontainer Reuse Strategy for faster tests
           TESTCONTAINERS_REUSE_ENABLE: true
       
-      # E2E-Tests (falls vorhanden)
+      # E2E Tests (if available)
       - name: Run E2E tests
         run: bun test --test-file-pattern "**/*.e2e-spec.ts" --coverage
         env:
@@ -164,25 +164,25 @@ jobs:
           DOCKER_HOST: unix:///var/run/docker.sock
           TESTCONTAINERS_REUSE_ENABLE: true
       
-      # Coverage-Bericht erstellen
+      # Create coverage report
       - name: Generate coverage report
         run: bun run test:coverage
       
-      # Coverage-Bericht als Artefakt speichern
+      # Save coverage report as artifact
       - name: Upload coverage report
         uses: actions/upload-artifact@v3
         with:
           name: coverage-report
           path: coverage/
       
-      # Testberichte als Artefakt speichern
+      # Save test reports as artifact
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
           name: test-results
           path: test-results/
 
-  # Optional: Build-Job für die Anwendung
+  # Optional: Build job for the application
   build:
     name: Build
     needs: test
@@ -211,7 +211,7 @@ jobs:
           path: dist/
 ```
 
-### GitLab CI Pipeline-Konfiguration
+### GitLab CI Pipeline Configuration
 
 ```yaml
 stages:
@@ -224,7 +224,7 @@ variables:
   TESTCONTAINERS_HOST_OVERRIDE: "docker"
   TESTCONTAINERS_REUSE_ENABLE: "true"
 
-# Gemeinsames Template für die Bun-Konfiguration
+# Common template for Bun configuration
 .bun-setup:
   image: oven/bun:${BUN_VERSION}
   cache:
@@ -233,7 +233,7 @@ variables:
       - node_modules/
       - .bun-install/cache
 
-# Testjob mit Testcontainers
+# Test job with Testcontainers
 test:
   extends: .bun-setup
   stage: test
@@ -244,19 +244,19 @@ test:
   before_script:
     - apt-get update && apt-get install -y docker.io
     - bun install --frozen-lockfile
-    # Docker Images vorab ziehen, um Tests zu beschleunigen
+    # Pull Docker images in advance to speed up tests
     - docker pull postgres:latest
     - docker pull redis:latest
   script:
-    # Linting ausführen
+    # Run linting
     - bun run check
-    # Unit Tests ausführen
+    # Run unit tests
     - bun test --test-file-pattern "**/*.spec.ts" --coverage
-    # Integrationstests mit Testcontainers ausführen
+    # Run integration tests with Testcontainers
     - bun test --test-file-pattern "**/*.integration.spec.ts" --coverage
-    # E2E-Tests ausführen
+    # Run E2E tests
     - bun test --test-file-pattern "**/*.e2e-spec.ts" --coverage
-    # Coverage-Bericht generieren
+    # Generate coverage report
     - bun run test:coverage
   artifacts:
     paths:
@@ -268,7 +268,7 @@ test:
         coverage_format: cobertura
         path: coverage/cobertura-coverage.xml
 
-# Build-Job
+# Build job
 build:
   extends: .bun-setup
   stage: build
@@ -342,76 +342,76 @@ To make the CI/CD configuration compatible with our existing scripts, we should 
 
 ## Constraints
 
-- Die CI/CD-Pipelines müssen sowohl für GitHub Actions als auch für GitLab CI konfiguriert werden.
-- Tests dürfen in der CI-Umgebung nicht manuell bestätigt werden müssen.
-- Alle Tests müssen automatisch ausgeführt werden, ohne weitere Benutzerinteraktion.
-- Die Testumgebung muss sauber zwischen den Test-Läufen zurückgesetzt werden.
-- Die Konfiguration sollte möglichst wartungsarm sein und zukünftigen Änderungen standhalten.
+- The CI/CD pipelines must be configured for both GitHub Actions and GitLab CI.
+- Tests should not require manual confirmation in the CI environment.
+- All tests must run automatically without further user interaction.
+- The test environment must be cleaned up between test runs.
+- The configuration should be as low-maintenance as possible and withstand future changes.
 
 ## References
 
-- Story-7: Testcontainers Integration für realistische Integrationstests
-- `.ai/arch.md`: Abschnitt zur Testing und Deployment-Strategie
+- Story-7: Testcontainers Integration for Realistic Integration Tests
+- `.ai/arch.md`: Section on Testing and Deployment Strategy
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [GitLab CI Documentation](https://docs.gitlab.com/ee/ci/)
 - [Testcontainers Documentation](https://node.testcontainers.org/)
 
-## Fazit
+## Conclusion
 
-Die Implementierung der CI/CD-Pipelines für Testcontainers-basierte Tests wurde erfolgreich abgeschlossen. Wir haben:
+The implementation of CI/CD pipelines for Testcontainers-based tests has been successfully completed. We have:
 
-1. **GitHub Actions Workflow** konfiguriert, der automatisch bei Push-Events und Pull Requests ausgeführt wird und Docker-in-Docker für Testcontainers nutzt.
+1. **Configured GitHub Actions Workflow** that automatically runs on push events and pull requests, using Docker-in-Docker for Testcontainers.
 
-2. **GitLab CI Pipeline** implementiert, um maximale Flexibilität bei der CI/CD-Infrastruktur zu gewährleisten.
+2. **Implemented GitLab CI Pipeline** to ensure maximum flexibility in CI/CD infrastructure.
 
-3. **Performance-Optimierungen** eingeführt, einschließlich Caching-Strategien, Container-Wiederverwendung und Vorab-Download relevanter Docker-Images.
+3. **Introduced performance optimizations** including caching strategies, container reuse, and pre-downloading relevant Docker images.
 
-4. **Dokumentation** erstellt, die Entwicklern hilft, mit den CI/CD-Pipelines zu arbeiten und potenzielle Probleme zu beheben.
+4. **Created documentation** to help developers work with the CI/CD pipelines and troubleshoot potential issues.
 
-Die hinzugefügten Konfigurationen folgen Best Practices für CI/CD mit Testcontainers und ermöglichen die zuverlässige automatische Ausführung von Unit-, Integrations- und E2E-Tests in der Pipeline. Mithilfe dieser Konfigurationen können Entwickler sicher sein, dass ihre Änderungen in verschiedenen Umgebungen ordnungsgemäß funktionieren.
+The added configurations follow best practices for CI/CD with Testcontainers and enable reliable automatic execution of unit, integration, and E2E tests in the pipeline. With these configurations, developers can be confident that their changes work properly in different environments.
 
-Durch die Erstellung einer umfassenden Fehlerbehebungsanleitung haben wir auch einen Weg geschaffen, häufige Probleme schnell zu identifizieren und zu lösen, was die Entwicklungseffizienz weiter verbessert.
+By creating a comprehensive troubleshooting guide, we have also created a way to quickly identify and solve common problems, further improving development efficiency.
 
 ## Chat Log
 
-**User:** Bevor wir mit den Stories weitermachen, sollten wir einen Task erstellen, um die Tests in unseren CI/CD-Pipelines (GitHub/GitLab) laufen lassen zu können.
+**User:** Before we continue with the stories, we should create a task to make the tests run in our CI/CD pipelines (GitHub/GitLab).
 
-**AI:** Ich erstelle einen Task für die CI/CD-Pipeline-Integration mit konkreten Konfigurationsvorschlägen.
+**AI:** I'll create a task for CI/CD pipeline integration with concrete configuration suggestions.
 
-**User:** Ja, bitte erstelle einen Entwurf.
+**User:** Yes, please create a draft.
 
-**AI:** Ich habe einen detaillierten Entwurf für GitHub Actions und GitLab CI erstellt, der Docker-in-Docker für Testcontainers unterstützt.
+**AI:** I've created a detailed draft for GitHub Actions and GitLab CI that supports Docker-in-Docker for Testcontainers.
 
-**User:** Bitte erstelle nun die Task-Datei. Wir werden sowohl für GitHub als auch für GitLab Pipelines benötigen.
+**User:** Please create the task file now. We'll need pipelines for both GitHub and GitLab.
 
-**AI:** Hiermit erstelle ich die Task-Datei mit den vollständigen Konfigurationen für beide CI/CD-Systeme.
+**AI:** I'm creating the task file with the complete configurations for both CI/CD systems.
 
-**User:** Beginne nun mit der Umsetzung von Task 9.
+**User:** Now start implementing Task 9.
 
-**AI:** Ich habe die GitHub Actions Workflow-Konfiguration, GitLab CI Pipeline-Konfiguration und Dokumentation erfolgreich erstellt. Alle Tasks wurden abgeschlossen, einschließlich der Optimierung der Test-Performance und der Erstellung einer Fehlerbehebungsanleitung.
+**AI:** I've successfully created the GitHub Actions workflow configuration, GitLab CI pipeline configuration, and documentation. All tasks have been completed, including the optimization of test performance and the creation of a troubleshooting guide.
 
-**User:** Bezüglich task-9.story.md haben wir noch ein Problem mit der GitHub-Pipeline (test.yml). Die Jobs hängen beim Step "Run E2E tests" bis GitHub sie irgendwann abbricht mit der Meldung: "Jest did not exit one second after the test run has completed. This usually means that there are asynchronous operations that weren't stopped in your tests. Consider running Jest with `--detectOpenHandles` to troubleshoot this issue."
+**User:** Regarding task-9.story.md, we still have an issue with the GitHub pipeline (test.yml). The jobs hang at the "Run E2E tests" step until GitHub eventually terminates them with the message: "Jest did not exit one second after the test run has completed. This usually means that there are asynchronous operations that weren't stopped in your tests. Consider running Jest with `--detectOpenHandles` to troubleshoot this issue."
 
-**AI:** Das Problem liegt an asynchronen Operationen (wahrscheinlich Testcontainers oder Datenbankverbindungen), die nicht ordnungsgemäß geschlossen werden. Die Tests selbst sind erfolgreich, aber Jest beendet sich nicht. Ich habe folgende Lösungen implementiert:
+**AI:** The problem is with asynchronous operations (likely Testcontainers or database connections) that aren't properly closed. The tests themselves succeed, but Jest doesn't exit. I've implemented the following solutions:
 
-1. In `.github/workflows/test.yml` den E2E-Test-Befehl direkt auf Jest geändert und die Flags `--forceExit` und `--testTimeout=60000` hinzugefügt, um sicherzustellen, dass Jest nach Abschluss der Tests beendet wird.
+1. In `.github/workflows/test.yml`, changed the E2E test command directly to Jest and added the flags `--forceExit` and `--testTimeout=60000` to ensure Jest exits after tests complete.
 
-2. Den `test:e2e`-Befehl in `package.json` ebenfalls aktualisiert, um dieselben Flags zu verwenden.
+2. Updated the `test:e2e` command in `package.json` to also use these flags.
 
-3. Die GitLab CI-Konfiguration angepasst, um denselben direkten Jest-Befehl mit den neuen Flags zu verwenden.
+3. Adjusted the GitLab CI configuration to use the same direct Jest command with the new flags.
 
-Diese Änderungen sorgen dafür, dass die CI-Pipeline nicht mehr hängen bleibt, auch wenn asynchrone Operationen nicht ordnungsgemäß geschlossen werden.
+These changes ensure the CI pipeline doesn't hang, even if asynchronous operations aren't properly closed.
 
-**User:** Der Job schlägt jetzt mit einem anderen Fehler fehl: "jest: command not found". Es scheint, dass Jest nicht im Pfad verfügbar ist, wenn es direkt aufgerufen wird.
+**User:** The job now fails with a different error: "jest: command not found". It seems that Jest isn't available in the path when called directly.
 
-**AI:** Ich habe das Problem identifiziert und behoben. Da Jest nicht direkt im Pfad verfügbar ist, müssen wir `bunx jest` verwenden, um es über Bun auszuführen. Ich habe folgende Änderungen implementiert:
+**AI:** I've identified and fixed the issue. Since Jest isn't directly available in the path, we need to use `bunx jest` to run it through Bun. I've made the following changes:
 
-1. Ersetzt den direkten `jest`-Befehl durch `bunx jest` in:
+1. Replaced the direct `jest` command with `bunx jest` in:
    - `.github/workflows/test.yml`
    - `.gitlab-ci.yml`
 
-2. Zusätzlich habe ich das Flag `--detectOpenHandles` zu allen Jest-Aufrufen hinzugefügt, um bei der Diagnose von offenen Handles zu helfen.
+2. Additionally, I've added the `--detectOpenHandles` flag to all Jest calls to help diagnose open handles.
 
-3. Das `test:e2e`-Skript in `package.json` ebenfalls aktualisiert, um diese Änderungen konsistent zu halten.
+3. Also updated the `test:e2e` script in `package.json` to maintain consistency with these changes.
 
-Diese Anpassungen sollten das "command not found"-Problem beheben und gleichzeitig die offenen asynchronen Operationen besser erkennen.
+These adjustments should fix the "command not found" problem while better detecting open asynchronous operations.
