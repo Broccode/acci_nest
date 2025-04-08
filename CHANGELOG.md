@@ -341,6 +341,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added specialized context-specific communication patterns
   - Enhanced development workflow with consistent communication protocols
 
+- **Documentation and Cursor Rules Update** (2025-04-05)
+  - Enhanced English documentation rules with clearer language requirements
+  - Updated i18n implementation guidelines with improved examples
+  - Added comprehensive Node.js testing best practices documentation
+  - Improved security testing standards with better compliance examples
+  - Enhanced simplified test dependencies rule with clearer guidelines
+  - Updated story documentation with authentication implementation details
+
 ### Fixed
 
 - Type-casting issues in repository classes

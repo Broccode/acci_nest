@@ -116,6 +116,13 @@ Story Points: 8
    2. - [x] Write authentication flow documentation
    3. - [x] Update user manual for authentication
 
+9. - [x] Integration Tests
+   1. - [x] Create test containers for integration testing
+   2. - [x] Implement LDAP authentication integration tests with Samba
+   3. - [x] Implement OAuth2 authentication integration tests
+   4. - [x] Implement refresh token mechanism integration tests
+   5. - [x] Implement MFA integration tests
+
 ## Implementation Details
 
 ### Authentication Module
@@ -546,6 +553,102 @@ export default () => ({
 });
 ```
 
+### Integration Tests
+
+To ensure the authentication system works correctly under real-world conditions, we have implemented comprehensive integration tests using Testcontainers:
+
+```typescript
+// src/backend/test/utils/testcontainers/samba-ldap.container.ts
+import { GenericContainer, StartedTestContainer, Wait } from 'testcontainers';
+
+export class SambaLdapContainer extends GenericContainer {
+  private static readonly DEFAULT_SAMBA_IMAGE = 'nowsci/samba-domain:4.15.9';
+  private static readonly DEFAULT_SAMBA_PORT = 389;
+  private static readonly DEFAULT_ADMIN_PASSWORD = 'Passw0rd';
+  private static readonly DEFAULT_DOMAIN = 'EXAMPLE.COM';
+  private static readonly DEFAULT_ADMIN_USER = 'Administrator';
+
+  constructor(
+    image: string = SambaLdapContainer.DEFAULT_SAMBA_IMAGE,
+    adminPassword: string = SambaLdapContainer.DEFAULT_ADMIN_PASSWORD,
+    domain: string = SambaLdapContainer.DEFAULT_DOMAIN,
+  ) {
+    super(image);
+
+    this.withExposedPorts(
+      SambaLdapContainer.DEFAULT_SAMBA_PORT, // LDAP
+      636,  // LDAPS
+      445,  // SMB
+      135,  // RPC
+      138,  // NetBIOS
+      139,  // NetBIOS
+    )
+    .withEnvironment({
+      'DOMAIN': domain,
+      'ADMIN_PASSWORD': adminPassword,
+      'INSECURE': 'true',
+    })
+    .withWaitStrategy(
+      Wait.forLogMessage('[+] Samba Domain Controller started successfully')
+    );
+  }
+
+  // Helper methods for LDAP connection parameters
+  public getLdapUrl(started: StartedTestContainer): string {
+    const host = started.getHost();
+    const port = started.getMappedPort(SambaLdapContainer.DEFAULT_SAMBA_PORT);
+    return `ldap://${host}:${port}`;
+  }
+
+  public getLdapBindDn(started: StartedTestContainer, domain: string = SambaLdapContainer.DEFAULT_DOMAIN): string {
+    const dcComponents = domain.toLowerCase().split('.').map(part => `dc=${part}`).join(',');
+    return `cn=${SambaLdapContainer.DEFAULT_ADMIN_USER},cn=Users,${dcComponents}`;
+  }
+
+  public getLdapSearchBase(started: StartedTestContainer, domain: string = SambaLdapContainer.DEFAULT_DOMAIN): string {
+    return domain.toLowerCase().split('.').map(part => `dc=${part}`).join(',');
+  }
+
+  public getLdapSearchFilter(): string {
+    return '(&(objectClass=user)(sAMAccountName={{username}}))';
+  }
+}
+
+export type StartedSambaLdapContainerWithDetails = StartedTestContainer & {
+  getLdapUrl: () => string;
+  getLdapBindDn: (domain?: string) => string; 
+  getLdapSearchBase: (domain?: string) => string;
+  getLdapSearchFilter: () => string;
+};
+
+export async function startSambaLdapContainer(
+  image?: string,
+  adminPassword?: string,
+  domain?: string,
+): Promise<StartedSambaLdapContainerWithDetails> {
+  const container = new SambaLdapContainer(image, adminPassword, domain);
+  const startedContainer = await container.start();
+  
+  const sambaContainer: StartedSambaLdapContainerWithDetails = Object.assign(startedContainer, {
+    getLdapUrl: () => container.getLdapUrl(startedContainer),
+    getLdapBindDn: (domain?: string) => container.getLdapBindDn(startedContainer, domain),
+    getLdapSearchBase: (domain?: string) => container.getLdapSearchBase(startedContainer, domain),
+    getLdapSearchFilter: () => container.getLdapSearchFilter(),
+  });
+  
+  return sambaContainer;
+}
+```
+
+These integration tests cover all the authentication mechanisms implemented in the system:
+
+1. **LDAP Authentication Tests**: Test authentication against a real LDAP server using Samba in a Docker container
+2. **OAuth2 Authentication Tests**: Test OAuth2 login flow with Google and GitHub
+3. **Refresh Token Tests**: Test token refresh, rotation, and invalidation
+4. **MFA Tests**: Test TOTP-based multi-factor authentication flow
+
+The integration tests ensure that the authentication systems work correctly with real-world services and validate edge cases like invalid credentials, token expiration, and MFA validation.
+
 ## Constraints
 
 - The implementation must comply with OWASP Top 10 security standards
@@ -567,9 +670,13 @@ export default () => ({
 - [JWT Documentation](https://jwt.io/introduction)
 - [OWASP Authentication Best Practices](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
 - [LDAP Authentication Best Practices](https://ldap.com/ldap-security-best-practices/)
+- [Testcontainers Documentation](https://www.testcontainers.org/)
+- [Samba AD Documentation](https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller)
 
 ## Conclusion
 
 The successful implementation of the authentication system is a fundamental building block for the ACCI Nest Enterprise Application Framework. It forms the basis for secure user authentication and authorization and enables seamless integration with various identity providers. The implementation of JWT, OAuth2, LDAP/AD, refresh tokens, and MFA ensures that the system meets modern security standards and provides users with a flexible and secure authentication experience.
+
+The extensive integration test suite with Testcontainers ensures that the authentication mechanisms work correctly in real-world scenarios and provides confidence in the system's security and reliability.
 
 ## Chat Log

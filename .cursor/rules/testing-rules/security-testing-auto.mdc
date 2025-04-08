@@ -1,7 +1,7 @@
 ---
 description: ALWAYS apply when implementing security-related tests to ensure comprehensive validation of security controls and generate evidence for OWASP and SOC2 compliance
 globs: tests/**/*.spec.ts, tests/**/*.test.ts, src/**/*.spec.ts, src/**/*.test.ts
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Security Testing Standard

@@ -1,0 +1,104 @@
+---
+description: ALWAYS apply when writing or reviewing tests to ensure high-quality, maintainable test code following industry best practices
+globs: test/**/*.ts, test/**/*.js, src/**/*.test.ts, src/**/*.test.js, src/**/*.spec.ts, src/**/*.spec.js
+alwaysApply: true
+---
+
+# Node.js Testing Best Practices
+
+## Context
+
+- Apply when creating or modifying test files
+- Reference when designing test architecture
+- Use when reviewing and refactoring existing tests
+- Follow when setting up testing infrastructure
+- Consider when troubleshooting flaky tests
+- Check when evaluating test coverage
+
+## Critical Rules
+
+- ORGANIZE test structure using AAA pattern (Arrange, Act, Assert)
+- INCLUDE only the minimal amount of test doubles (mocks, stubs, spies)
+- USE realistic and meaningful test data
+- MAINTAIN separate tests for separate concerns (unit, integration, e2e)
+- AVOID test interdependence - each test should setup and teardown its own data
+- KEEP test files alongside implementation code
+- TEST all error flows and edge cases
+- WRITE deterministic tests that don't rely on timing or random values
+- USE a realistic testing database, not in-memory alternatives when testing data access
+- TAG tests appropriately for categorization (e.g., @slow, @integration)
+- DESIGN test names as requirements specifications
+- AVOID global test fixtures and seeds, add data per-test
+- AVOID mocking internal implementation details
+- MOCK external services and use contract testing where appropriate
+- MEASURE and TRACK test coverage but don't obsess about 100%
+- CHECK your negative testing - intentionally make tests fail
+- RUN tests in parallel when possible for faster feedback
+- ISOLATE the test environment using environment variables
+- USE snapshot testing cautiously and only for stable parts of the code
+- LIMIT the use of beforeEach/afterEach to essential shared setup
+- AVOID logic in tests including loops and conditions
+- IMPLEMENT a component testing strategy focused on testing in isolation
+
+## Examples
+
+<example>
+// Good example - Following AAA pattern
+describe('Product service', () => {
+  describe('Add new product', () => {
+    test('When valid product details are provided, should save to database', async () => {
+      // Arrange
+      const productData = { name: 'Test Product', price: 20.99 };
+      const dbContext = new DatabaseContext();
+      const productService = new ProductService(dbContext);
+      
+      // Act
+      const savedProduct = await productService.add(productData);
+      
+      // Assert
+      expect(savedProduct).toHaveProperty('id');
+      expect(savedProduct.name).toBe(productData.name);
+      expect(savedProduct.price).toBe(productData.price);
+    });
+  });
+  
+  test('When duplicate product name exists, should throw ConflictError', async () => {
+    // Arrange
+    const existingProduct = { name: 'Existing Product', price: 10.99 };
+    const dbContext = new DatabaseContext();
+    await dbContext.products.create(existingProduct);
+    const productService = new ProductService(dbContext);
+    
+    // Act & Assert
+    await expect(productService.add(existingProduct))
+      .rejects
+      .toThrow(ConflictError);
+  });
+});
+</example>
+
+<example type="invalid">
+// Bad example - Multiple test concerns, magic strings, no clear structure
+test('product stuff', async () => {
+  // No clear separation of concerns
+  const db = getDb();
+  const response = await request(app)
+    .post('/api/products')
+    .send({ name: 'p1', price: '5' }); // String instead of number
+  
+  // Multiple assertions without clear purpose
+  expect(response.status).toBe(200);
+  expect(response.body.success).toBe(true);
+  
+  // Checking implementation details
+  expect(db.products.save).toHaveBeenCalled();
+  
+  // Magic values without context
+  expect(response.body.data.id).toBe(15);
+  expect(response.body.data).toHaveProperty('createdAt');
+  
+  // Additional action within same test
+  const getResponse = await request(app).get('/api/products/15');
+  expect(getResponse.status).toBe(200);
+});
+</example> 

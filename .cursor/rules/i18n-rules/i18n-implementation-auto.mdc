@@ -1,7 +1,7 @@
 ---
 description: ALWAYS apply when implementing user-facing text to ensure proper internationalization support throughout the application with consistent translation key usage
 globs: src/**/*.ts, src/**/*.tsx
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Internationalization Implementation Standard

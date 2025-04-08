@@ -1,7 +1,7 @@
 ---
 description: ALWAYS prefer simplified test dependencies when testing components with complex external dependencies to improve test maintainability and focus
 globs: tests/**/*.spec.ts, tests/**/*.test.ts, src/**/*.spec.ts, src/**/*.test.ts
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Simplified Test Dependencies
