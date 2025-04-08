@@ -8,15 +8,19 @@
     "src/frontend"
   ],
   "scripts": {
-    "start:dev": "bun run concurrently \"bun run start:backend:dev\" \"bun run start:frontend:dev\"",
+    "start:dev": "bun run concurrently \\\"bun run start:backend:dev\\\" \\\"bun run start:frontend:dev\\\"",
     "start:backend:dev": "bun run --cwd src/backend start:dev",
     "start:frontend:dev": "bun run --cwd src/frontend start",
     "build": "bun run --cwd src/backend build",
     "build:full": "bun run --cwd src/backend build && bun run --cwd src/frontend build",
-    "test": "jest --projects src/backend && bun run --cwd src/frontend test",
-    "test:e2e": "jest --config src/backend/test/jest-e2e.json --runInBand --detectOpenHandles --forceExit --testTimeout=60000",
-    "test:cov": "jest --projects src/backend --coverage && bun run --cwd src/frontend test:cov",
-    "test:coverage": "bun run test:cov",
+    "test": "bun run test:backend:unit && bun run --cwd src/frontend test",
+    "test:backend:unit": "jest --projects src/backend",
+    "test:backend:integration": "TESTCONTAINERS_REUSE_ENABLE=true jest --config src/backend/jest.integration.config.js --runInBand --detectOpenHandles --forceExit",
+    "test:backend:e2e": "jest --config src/backend/test/jest-e2e.json --runInBand --detectOpenHandles --forceExit --testTimeout=60000",
+    "test:backend:cov": "bun run test:backend:unit -- --coverage",
+    "test:coverage": "bun run test:backend:cov && bun run --cwd src/frontend test:cov",
+    "test:infra:unit": "jest --config src/infrastructure/jest.config.js",
+    "test:infra:integration": "jest --config src/infrastructure/jest.config.js --runInBand --testRegex \\.integration\\.spec\\.ts$",
     "migration:generate": "bun run --cwd src/backend migration:generate",
     "migration:run": "bun run --cwd src/backend migration:run",
     "migration:revert": "bun run --cwd src/backend migration:revert",
@@ -37,6 +41,7 @@
     "@biomejs/biome": "1.4.1",
     "@types/node": "22.14.0",
     "concurrently": "9.1.2",
+    "nock": "^14.0.2",
     "rimraf": "6.0.1",
     "typescript": "^5.8.2"
   },
@@ -44,6 +49,7 @@
     "bun": ">=1.0.0"
   },
   "dependencies": {
+    "@mikro-orm/sqlite": "6.4.11",
     "compression": "^1.8.0",
     "nestjs-pino": "^4.4.0",
     "pino": "^9.6.0",

@@ -1,14 +1,15 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
       "@infrastructure/*": ["src/infrastructure/*"],
       "@backend/*": ["src/backend/*"],
       "@frontend/*": ["src/frontend/*"],
       "@examples/*": ["src/examples/*"],
-      "@shared/*": ["src/shared/*"]
+      "@shared/*": ["src/shared/*"],
+      "@app/*": ["src/*"]
     }
   },
   "exclude": ["node_modules", "dist", "build", "coverage"]

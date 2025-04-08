@@ -199,16 +199,26 @@ export class RedisTestContainer {
   async stop(): Promise<void> {
     if (this.redisClient) {
       try {
-        // First disconnect call, then quit
-        await this.redisClient.disconnect();
-
-        // Short pause to allow the connection to close
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
-        // Then try to quit
-        await this.redisClient.quit();
-
-        // Explicitly remove all remaining listeners
+        // Only attempt to disconnect/quit if the client is likely connected
+        if (this.redisClient.status === 'ready' || 
+            this.redisClient.status === 'connecting' || 
+            this.redisClient.status === 'connect' || 
+            this.redisClient.status === 'reconnecting') {
+          
+          await this.redisClient.disconnect();
+          
+          // Attempt to quit, catching errors if already closed by disconnect
+          try {
+            await this.redisClient.quit();
+          } catch (quitError) {
+            // Ignore "Connection is closed" errors as they are expected after disconnect
+            if (!quitError.message.includes('Connection is closed')) {
+              console.error('Error during Redis quit:', quitError);
+            }
+          }
+        }
+        
+        // Explicitly remove all remaining listeners regardless of state
         this.redisClient.removeAllListeners();
       } catch (error) {
         console.error('Error closing Redis client:', error);
