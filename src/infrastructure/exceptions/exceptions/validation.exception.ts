@@ -16,5 +16,13 @@ export class ValidationException extends DomainException {
       ...context,
       validationErrors: errors,
     });
+
+    // Override the response to include 'errors' directly in response
+    Object.defineProperty(this, 'response', {
+      value: {
+        ...(this.getResponse() as Record<string, unknown>),
+        errors: errors,
+      },
+    });
   }
 }

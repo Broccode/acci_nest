@@ -95,9 +95,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       // Standard NestJS HTTP exception
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
+
       errorResponse = {
         ...errorResponse,
         statusCode: status,
+        errorCode: 'HTTP_EXCEPTION',
         message:
           typeof exceptionResponse === 'string'
             ? exceptionResponse
@@ -109,7 +111,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       if (status >= 500) {
         this.loggingService.error(
           `HTTP exception: ${errorResponse.message}`,
-          exception,
+          exception as Error,
           logContext
         );
       } else {
