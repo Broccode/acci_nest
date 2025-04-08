@@ -12,7 +12,10 @@ export default () => ({
     jwtSecret: process.env.JWT_SECRET || 'dev-jwt-secret',
     jwtExpiresIn: parseInt(process.env.JWT_EXPIRES_IN || '900', 10), // 15 minutes
     refreshTokenExpiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN || '604800', 10), // 7 days
-    passwordResetTokenExpiresIn: parseInt(process.env.PASSWORD_RESET_TOKEN_EXPIRES_IN || '3600', 10), // 1 hour
+    passwordResetTokenExpiresIn: parseInt(
+      process.env.PASSWORD_RESET_TOKEN_EXPIRES_IN || '3600',
+      10
+    ), // 1 hour
     mfaTokenLength: 6,
     passwordMinLength: 8,
     maxLoginAttempts: 5,

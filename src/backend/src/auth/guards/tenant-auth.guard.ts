@@ -3,14 +3,14 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 
 /**
  * Tenant Authentication Guard
- * 
+ *
  * @description Guard that validates both JWT and tenant access
  */
 @Injectable()
 export class TenantAuthGuard extends JwtAuthGuard {
   /**
    * Determine if the request is authorized for the tenant
-   * 
+   *
    * @param context Execution context
    * @returns Boolean indicating if the request is allowed
    */
@@ -23,10 +23,8 @@ export class TenantAuthGuard extends JwtAuthGuard {
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    const requestTenantId = 
-      request.params.tenantId || 
-      request.query.tenantId || 
-      request.body.tenantId;
+    const requestTenantId =
+      request.params.tenantId || request.query.tenantId || request.body.tenantId;
 
     // If no tenant ID is specified in the request, allow access
     // The tenant will be determined from the user's token
@@ -41,4 +39,4 @@ export class TenantAuthGuard extends JwtAuthGuard {
 
     return true;
   }
-} 
+}

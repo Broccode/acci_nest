@@ -8,7 +8,7 @@ import { RefreshTokenService } from './refresh-token.service';
 
 /**
  * Authentication Service
- * 
+ *
  * @description Handles user authentication and token management
  */
 @Injectable()
@@ -17,7 +17,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly refreshTokenService?: RefreshTokenService,
-    private readonly mfaService?: MfaService,
+    private readonly mfaService?: MfaService
   ) {}
 
   /**
@@ -28,9 +28,13 @@ export class AuthService {
    * @param tenantId Tenant ID
    * @returns Validated user or null
    */
-  async validateUser(email: string, password: string, tenantId: string): Promise<Partial<User> | null> {
+  async validateUser(
+    email: string,
+    password: string,
+    tenantId: string
+  ): Promise<Partial<User> | null> {
     const user = await this.userService.findByEmail(email, tenantId);
-    if (user && await this.userService.validatePassword(password, user.password)) {
+    if (user && (await this.userService.validatePassword(password, user.password))) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;
       return result;
@@ -45,7 +49,13 @@ export class AuthService {
    * @param mfaCode MFA code if MFA is enabled
    * @returns Auth tokens
    */
-  async login(user: Partial<User> & { id: string, roles?: string[] | { getItems: () => Array<{ name: string }> } }, mfaCode?: string): Promise<AuthResponse> {
+  async login(
+    user: Partial<User> & {
+      id: string;
+      roles?: string[] | { getItems: () => Array<{ name: string }> };
+    },
+    mfaCode?: string
+  ): Promise<AuthResponse> {
     // Check if MFA is required
     if (user.mfaEnabled && this.mfaService) {
       // If MFA is enabled but no code provided, return requiresMfa flag
@@ -59,15 +69,15 @@ export class AuthService {
         throw new UnauthorizedException('Invalid MFA code');
       }
     }
-    
+
     // Generate JWT payload
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email || '',
       tenantId: user.tenantId || '',
-      roles: user.roles?.getItems?.() 
-        ? user.roles.getItems().map(role => role.name) 
-        : user.roles as string[] || [],
+      roles: user.roles?.getItems?.()
+        ? user.roles.getItems().map((role) => role.name)
+        : (user.roles as string[]) || [],
     };
 
     // Generate access token
@@ -93,11 +103,11 @@ export class AuthService {
 
   /**
    * Generate a JWT access token
-   * 
+   *
    * @param payload Token payload
    * @returns Signed JWT token
    */
   generateToken(payload: JwtPayload): string {
     return this.jwtService.sign(payload);
   }
-} 
+}

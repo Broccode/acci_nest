@@ -9,13 +9,13 @@ export class LoginDto {
    * @example "user@example.com"
    */
   email!: string;
-  
+
   /**
    * User password
    * @example "securePassword123"
    */
   password!: string;
-  
+
   /**
    * Tenant identifier
    * @example "tenant-123"
@@ -37,27 +37,27 @@ export interface JwtPayload {
    * User identifier
    */
   sub: string;
-  
+
   /**
    * User email
    */
   email: string;
-  
+
   /**
    * Tenant identifier
    */
   tenantId: string;
-  
+
   /**
    * User roles
    */
   roles: string[];
-  
+
   /**
    * Token issued at timestamp
    */
   iat?: number;
-  
+
   /**
    * Token expiration timestamp
    */
@@ -105,17 +105,17 @@ export interface AuthResponse {
    * JWT access token
    */
   accessToken?: string;
-  
+
   /**
    * JWT refresh token
    */
   refreshToken?: string;
-  
+
   /**
    * User information
    */
   user?: Partial<User>;
-  
+
   /**
    * Indicates if MFA is required to complete authentication
    */
@@ -130,7 +130,7 @@ export interface MfaSetupResponse {
    * Secret key for TOTP
    */
   secret: string;
-  
+
   /**
    * QR code data URL
    */
@@ -145,22 +145,22 @@ export interface RefreshTokenData {
    * User identifier
    */
   userId: string;
-  
+
   /**
    * User email
    */
   email: string;
-  
+
   /**
    * Tenant identifier
    */
   tenantId: string;
-  
+
   /**
    * User roles
    */
   roles: string[];
-  
+
   /**
    * Token expiration timestamp
    */
@@ -176,16 +176,16 @@ export class LdapLoginDto {
    * @example "john.doe@example.com"
    */
   email!: string;
-  
+
   /**
    * User password for LDAP authentication
    * @example "SecurePassword123"
    */
   password!: string;
-  
+
   /**
    * Multi-factor authentication code (optional)
    * @example "123456"
    */
   mfaCode?: string;
-} 
+}

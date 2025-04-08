@@ -8,7 +8,7 @@ import { LoginDto } from '../types/auth.types';
 
 /**
  * Local authentication strategy for passport
- * 
+ *
  * @description Validates username/password credentials
  */
 @Injectable()
@@ -23,7 +23,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
   /**
    * Validate user credentials
-   * 
+   *
    * @param request Express request object containing tenant ID
    * @param email User email
    * @param password User password
@@ -33,17 +33,17 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(request: Request, email: string, password: string): Promise<Partial<User>> {
     // Extract tenant ID from request body
     const tenantId = request.body.tenantId;
-    
+
     if (!tenantId) {
       throw new UnauthorizedException('Tenant ID is required');
     }
-    
+
     const user = await this.authService.validateUser(email, password, tenantId);
-    
+
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    
+
     return user;
   }
-} 
+}

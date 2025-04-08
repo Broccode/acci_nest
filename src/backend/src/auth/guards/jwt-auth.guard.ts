@@ -5,7 +5,7 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 /**
  * JWT Authentication Guard
- * 
+ *
  * @description Protects routes with JWT authentication, unless marked as public
  */
 @Injectable()
@@ -16,7 +16,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
   /**
    * Determines if the current route can be activated
-   * 
+   *
    * @param context Execution context
    * @returns Boolean indicating if the route can be activated
    */
@@ -34,10 +34,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     // Otherwise, use standard JWT authentication
     try {
-      return await super.canActivate(context) as boolean;
+      return (await super.canActivate(context)) as boolean;
     } catch (error) {
       // Throw a standardized UnauthorizedException
       throw new UnauthorizedException('Authentication failed');
     }
   }
-} 
+}

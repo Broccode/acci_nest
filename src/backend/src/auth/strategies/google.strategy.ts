@@ -8,15 +8,12 @@ import { User, UserStatus } from '../../users/entities/user.entity';
 
 /**
  * Google OAuth2 strategy
- * 
+ *
  * @description Passport strategy for Google authentication
  */
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly em: EntityManager,
-  ) {
+  constructor(private readonly configService: ConfigService, private readonly em: EntityManager) {
     super({
       clientID: configService.get('oauth.google.clientId'),
       clientSecret: configService.get('oauth.google.clientSecret'),
@@ -27,7 +24,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 
   /**
    * Validate Google profile and find or create user
-   * 
+   *
    * @param accessToken Google access token
    * @param refreshToken Google refresh token
    * @param profile Google profile
@@ -37,25 +34,25 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     accessToken: string,
     refreshToken: string,
     profile: Profile,
-    done: (error: Error | null, user?: User | false) => void,
+    done: (error: Error | null, user?: User | false) => void
   ): Promise<void> {
     try {
       // Extract profile information
       const { emails, name } = profile;
-      
+
       if (!emails || emails.length === 0) {
         return done(new UnauthorizedException('Email not provided by Google'), null);
       }
-      
+
       const email = emails[0].value;
       const firstName = name?.givenName || '';
       const lastName = name?.familyName || '';
-      
+
       // For social logins, we'll use a default tenant for now
       // In a real application, you would determine the tenant based on your business logic
       const defaultTenantName = 'default';
       const defaultTenantDomain = 'default.domain';
-      
+
       // Find or create the default tenant
       let tenant = await this.em.findOne(Tenant, { name: defaultTenantName });
       if (!tenant) {
@@ -66,10 +63,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         });
         await this.em.persistAndFlush(tenant);
       }
-      
+
       // Find existing user
       let user = await this.em.findOne(User, { email, tenantId: tenant.id });
-      
+
       // Create user if not exists
       if (!user) {
         user = this.em.create(User, {
@@ -84,20 +81,20 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
           tenant,
           status: UserStatus.ACTIVE,
         });
-        
+
         await this.em.persistAndFlush(user);
       }
-      
+
       // Update user profile if needed
       if (user.profile.firstName !== firstName || user.profile.lastName !== lastName) {
         user.profile.firstName = firstName;
         user.profile.lastName = lastName;
         await this.em.flush();
       }
-      
+
       return done(null, user);
     } catch (error) {
       return done(error instanceof Error ? error : new Error(String(error)), null);
     }
   }
-} 
+}

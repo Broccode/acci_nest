@@ -1,27 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
-import { EntityManager } from '@mikro-orm/core';
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtStrategy } from '../../strategies/jwt.strategy';
 import { User } from '../../../users/entities/user.entity';
-import { Tenant, TenantStatus } from '../../../tenants/entities/tenant.entity';
+import { UserService } from '../../../users/services/user.service';
 
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;
   let configService: ConfigService;
-  let entityManager: EntityManager;
+  let userService: UserService;
 
-  // Mock user and tenant data
+  // Mock user data
   const mockUser = {
     id: '123',
     email: 'test@example.com',
     tenantId: 'tenant-123',
   } as unknown as User;
-
-  const mockTenant = {
-    id: 'tenant-123',
-    status: TenantStatus.ACTIVE,
-  } as unknown as Tenant;
 
   beforeEach(async () => {
     // Create test module with mocked dependencies
@@ -40,9 +34,9 @@ describe('JwtStrategy', () => {
           },
         },
         {
-          provide: EntityManager,
+          provide: UserService,
           useValue: {
-            findOne: jest.fn(),
+            findById: jest.fn(),
           },
         },
       ],
@@ -51,7 +45,7 @@ describe('JwtStrategy', () => {
     // Get service instances
     strategy = module.get<JwtStrategy>(JwtStrategy);
     configService = module.get<ConfigService>(ConfigService);
-    entityManager = module.get<EntityManager>(EntityManager);
+    userService = module.get<UserService>(UserService);
   });
 
   describe('validate', () => {
@@ -63,22 +57,20 @@ describe('JwtStrategy', () => {
         tenantId: 'tenant-123',
         roles: ['user'],
       };
-      jest.spyOn(entityManager, 'findOne').mockImplementation((entity, filter) => {
-        if (entity === User) {
-          return Promise.resolve(mockUser);
-        } else if (entity === Tenant) {
-          return Promise.resolve(mockTenant);
-        }
-        return Promise.resolve(null);
-      });
+      
+      jest.spyOn(userService, 'findById').mockResolvedValue(mockUser);
 
       // Act
       const result = await strategy.validate(payload);
 
       // Assert
-      expect(entityManager.findOne).toHaveBeenCalledWith(User, { id: '123', tenantId: 'tenant-123' });
-      expect(entityManager.findOne).toHaveBeenCalledWith(Tenant, { id: 'tenant-123' });
-      expect(result).toEqual(mockUser);
+      expect(userService.findById).toHaveBeenCalledWith('123', 'tenant-123');
+      expect(result).toEqual({
+        id: '123',
+        email: 'test@example.com',
+        tenantId: 'tenant-123',
+        roles: ['user'],
+      });
     });
 
     it('should throw UnauthorizedException when user is not found', async () => {
@@ -89,68 +81,12 @@ describe('JwtStrategy', () => {
         tenantId: 'tenant-123',
         roles: ['user'],
       };
-      jest.spyOn(entityManager, 'findOne').mockImplementation((entity, filter) => {
-        if (entity === User) {
-          return Promise.resolve(null); // User not found
-        } else if (entity === Tenant) {
-          return Promise.resolve(mockTenant);
-        }
-        return Promise.resolve(null);
-      });
+      
+      jest.spyOn(userService, 'findById').mockResolvedValue(null);
 
       // Act & Assert
       await expect(strategy.validate(payload)).rejects.toThrow(UnauthorizedException);
-      expect(entityManager.findOne).toHaveBeenCalledWith(User, { id: '123', tenantId: 'tenant-123' });
-    });
-
-    it('should throw UnauthorizedException when tenant is not found', async () => {
-      // Arrange
-      const payload = {
-        sub: '123',
-        email: 'test@example.com',
-        tenantId: 'tenant-123',
-        roles: ['user'],
-      };
-      jest.spyOn(entityManager, 'findOne').mockImplementation((entity, filter) => {
-        if (entity === User) {
-          return Promise.resolve(mockUser);
-        } else if (entity === Tenant) {
-          return Promise.resolve(null); // Tenant not found
-        }
-        return Promise.resolve(null);
-      });
-
-      // Act & Assert
-      await expect(strategy.validate(payload)).rejects.toThrow(UnauthorizedException);
-      expect(entityManager.findOne).toHaveBeenCalledWith(User, { id: '123', tenantId: 'tenant-123' });
-      expect(entityManager.findOne).toHaveBeenCalledWith(Tenant, { id: 'tenant-123' });
-    });
-
-    it('should throw UnauthorizedException when tenant is inactive', async () => {
-      // Arrange
-      const payload = {
-        sub: '123',
-        email: 'test@example.com',
-        tenantId: 'tenant-123',
-        roles: ['user'],
-      };
-      const inactiveTenant = {
-        ...mockTenant,
-        status: TenantStatus.SUSPENDED,
-      };
-      jest.spyOn(entityManager, 'findOne').mockImplementation((entity, filter) => {
-        if (entity === User) {
-          return Promise.resolve(mockUser);
-        } else if (entity === Tenant) {
-          return Promise.resolve(inactiveTenant);
-        }
-        return Promise.resolve(null);
-      });
-
-      // Act & Assert
-      await expect(strategy.validate(payload)).rejects.toThrow(UnauthorizedException);
-      expect(entityManager.findOne).toHaveBeenCalledWith(User, { id: '123', tenantId: 'tenant-123' });
-      expect(entityManager.findOne).toHaveBeenCalledWith(Tenant, { id: 'tenant-123' });
+      expect(userService.findById).toHaveBeenCalledWith('123', 'tenant-123');
     });
   });
 }); 

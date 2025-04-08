@@ -15,14 +15,14 @@ import { LocalStrategy } from './strategies/local.strategy';
 
 /**
  * Authentication Module
- * 
+ *
  * @description Provides authentication services and strategies
  */
 @Module({
   imports: [
     // Configure Passport default strategy to JWT
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    
+
     // Configure JWT module with settings from config
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -34,7 +34,7 @@ import { LocalStrategy } from './strategies/local.strategy';
         },
       }),
     }),
-    
+
     // Import the UsersModule to access user services
     UsersModule,
   ],
@@ -51,4 +51,4 @@ import { LocalStrategy } from './strategies/local.strategy';
   ],
   exports: [AuthService, JwtModule, RefreshTokenService, MfaService],
 })
-export class AuthModule {} 
+export class AuthModule {}

@@ -2,7 +2,7 @@ import { ExecutionContext, createParamDecorator } from '@nestjs/common';
 
 /**
  * Current User Decorator
- * 
+ *
  * @description Extracts the authenticated user from the request
  * @example
  * ```typescript
@@ -13,9 +13,7 @@ import { ExecutionContext, createParamDecorator } from '@nestjs/common';
  * }
  * ```
  */
-export const CurrentUser = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.user;
-  },
-); 
+export const CurrentUser = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
+  const request = ctx.switchToHttp().getRequest();
+  return request.user;
+});

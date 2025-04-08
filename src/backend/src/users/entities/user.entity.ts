@@ -84,13 +84,13 @@ export class User extends BaseEntity {
 
   @Enum(() => UserStatus)
   status: UserStatus = UserStatus.PENDING;
-  
+
   /**
    * Indicates if multi-factor authentication is enabled for this user
    */
   @Property({ default: false })
   mfaEnabled = false;
-  
+
   /**
    * MFA secret key (encrypted)
    */
