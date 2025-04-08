@@ -1,7 +1,5 @@
 {
-  "namespaces": [
-    "public"
-  ],
+  "namespaces": ["public"],
   "name": "public",
   "tables": [
     {
@@ -70,10 +68,7 @@
       "indexes": [
         {
           "keyName": "permission_resource_action_index",
-          "columnNames": [
-            "resource",
-            "action"
-          ],
+          "columnNames": ["resource", "action"],
           "composite": true,
           "constraint": false,
           "primary": false,
@@ -84,9 +79,7 @@
         },
         {
           "keyName": "permission_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -156,12 +149,7 @@
           "primary": false,
           "nullable": false,
           "default": "'trial'",
-          "enumItems": [
-            "active",
-            "suspended",
-            "trial",
-            "archived"
-          ],
+          "enumItems": ["active", "suspended", "trial", "archived"],
           "mappedType": "enum"
         },
         "plan": {
@@ -197,9 +185,7 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "name"
-          ],
+          "columnNames": ["name"],
           "composite": false,
           "keyName": "tenants_name_unique",
           "constraint": true,
@@ -207,9 +193,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "domain"
-          ],
+          "columnNames": ["domain"],
           "composite": false,
           "keyName": "tenants_domain_unique",
           "constraint": true,
@@ -218,9 +202,7 @@
         },
         {
           "keyName": "tenants_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -317,10 +299,7 @@
       "indexes": [
         {
           "keyName": "role_name_tenant_id_index",
-          "columnNames": [
-            "name",
-            "tenant_id"
-          ],
+          "columnNames": ["name", "tenant_id"],
           "composite": true,
           "constraint": false,
           "primary": false,
@@ -331,9 +310,7 @@
         },
         {
           "keyName": "role_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -344,13 +321,9 @@
       "foreignKeys": {
         "role_tenant_reference_id_foreign": {
           "constraintName": "role_tenant_reference_id_foreign",
-          "columnNames": [
-            "tenant_reference_id"
-          ],
+          "columnNames": ["tenant_reference_id"],
           "localTableName": "public.role",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.tenants",
           "updateRule": "cascade"
         }
@@ -383,10 +356,7 @@
       "indexes": [
         {
           "keyName": "role_permissions_pkey",
-          "columnNames": [
-            "role_id",
-            "permission_id"
-          ],
+          "columnNames": ["role_id", "permission_id"],
           "composite": true,
           "constraint": true,
           "primary": true,
@@ -397,26 +367,18 @@
       "foreignKeys": {
         "role_permissions_role_id_foreign": {
           "constraintName": "role_permissions_role_id_foreign",
-          "columnNames": [
-            "role_id"
-          ],
+          "columnNames": ["role_id"],
           "localTableName": "public.role_permissions",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.role",
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
         "role_permissions_permission_id_foreign": {
           "constraintName": "role_permissions_permission_id_foreign",
-          "columnNames": [
-            "permission_id"
-          ],
+          "columnNames": ["permission_id"],
           "localTableName": "public.role_permissions",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.permission",
           "deleteRule": "cascade",
           "updateRule": "cascade"
@@ -543,12 +505,7 @@
           "primary": false,
           "nullable": false,
           "default": "'pending'",
-          "enumItems": [
-            "active",
-            "inactive",
-            "locked",
-            "pending"
-          ],
+          "enumItems": ["active", "inactive", "locked", "pending"],
           "mappedType": "enum"
         },
         "mfa_enabled": {
@@ -576,9 +533,7 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "email"
-          ],
+          "columnNames": ["email"],
           "composite": false,
           "keyName": "user_email_index",
           "constraint": false,
@@ -587,10 +542,7 @@
         },
         {
           "keyName": "user_email_tenant_id_index",
-          "columnNames": [
-            "email",
-            "tenant_id"
-          ],
+          "columnNames": ["email", "tenant_id"],
           "composite": true,
           "constraint": false,
           "primary": false,
@@ -601,9 +553,7 @@
         },
         {
           "keyName": "user_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -614,13 +564,9 @@
       "foreignKeys": {
         "user_tenant_reference_id_foreign": {
           "constraintName": "user_tenant_reference_id_foreign",
-          "columnNames": [
-            "tenant_reference_id"
-          ],
+          "columnNames": ["tenant_reference_id"],
           "localTableName": "public.user",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.tenants",
           "updateRule": "cascade"
         }
@@ -653,10 +599,7 @@
       "indexes": [
         {
           "keyName": "user_roles_pkey",
-          "columnNames": [
-            "user_id",
-            "role_id"
-          ],
+          "columnNames": ["user_id", "role_id"],
           "composite": true,
           "constraint": true,
           "primary": true,
@@ -667,26 +610,18 @@
       "foreignKeys": {
         "user_roles_user_id_foreign": {
           "constraintName": "user_roles_user_id_foreign",
-          "columnNames": [
-            "user_id"
-          ],
+          "columnNames": ["user_id"],
           "localTableName": "public.user_roles",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.user",
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
         "user_roles_role_id_foreign": {
           "constraintName": "user_roles_role_id_foreign",
-          "columnNames": [
-            "role_id"
-          ],
+          "columnNames": ["role_id"],
           "localTableName": "public.user_roles",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.role",
           "deleteRule": "cascade",
           "updateRule": "cascade"
