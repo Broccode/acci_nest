@@ -1,26 +1,53 @@
-import { SetMetadata, UseInterceptors, applyDecorators } from '@nestjs/common';
-import { CACHE_TAGS_METADATA, CACHE_TTL_METADATA, DEFAULT_CACHE_TTL } from './cache.constants';
+import { UseInterceptors } from '@nestjs/common';
+import { SetMetadata } from '@nestjs/common';
 import { CacheableInterceptor } from './cacheable.interceptor';
 
-/**
- * Options for the Cacheable decorator
- */
 export interface CacheableOptions {
-  /** Time-to-live in seconds */
   ttl?: number;
-  /** Tags for grouping cache entries */
   tags?: string[];
 }
 
-/**
- * Decorator for method-level caching
- * Marks a method for caching its results based on parameters
- * @param options - Caching options
- */
-export function Cacheable(options: CacheableOptions = {}) {
-  return applyDecorators(
-    SetMetadata(CACHE_TTL_METADATA, options.ttl || DEFAULT_CACHE_TTL),
-    SetMetadata(CACHE_TAGS_METADATA, options.tags || []),
-    UseInterceptors(CacheableInterceptor)
-  );
+// Typen für Klassen-Konstruktoren und Methoden
+type Constructor = abstract new (...args: unknown[]) => unknown;
+type DecoratorFunction = <T extends Constructor>(target: T) => T;
+type MethodDecoratorFunction = <T extends (...args: unknown[]) => unknown>(
+  target: object,
+  propertyKey: string | symbol,
+  descriptor: TypedPropertyDescriptor<T>
+) => TypedPropertyDescriptor<T>;
+
+export function Cacheable(options: CacheableOptions = {}): DecoratorFunction & MethodDecoratorFunction {
+  const ttl = options.ttl || 3600;
+  const tags = options.tags || [];
+
+  return ((
+    target: Constructor | object,
+    propertyKey?: string | symbol,
+    descriptor?: TypedPropertyDescriptor<(...args: unknown[]) => unknown>
+  ): Constructor | TypedPropertyDescriptor<(...args: unknown[]) => unknown> => {
+    if (propertyKey && descriptor) {
+      // Method decorator
+      SetMetadata('cache:ttl', ttl)(target, propertyKey, descriptor);
+      SetMetadata('cache:tags', tags)(target, propertyKey, descriptor);
+      const result = UseInterceptors(CacheableInterceptor)(target, propertyKey, descriptor);
+      return result as TypedPropertyDescriptor<(...args: unknown[]) => unknown>;
+    }
+
+    // Class decorator
+    const classConstructor = target as Constructor;
+    const proto = classConstructor.prototype;
+    const methods = Object.getOwnPropertyNames(proto)
+      .filter(prop => typeof proto[prop] === 'function' && prop !== 'constructor');
+
+    for (const method of methods) {
+      const methodDescriptor = Object.getOwnPropertyDescriptor(proto, method);
+      if (methodDescriptor) {
+        SetMetadata('cache:ttl', ttl)(proto, method, methodDescriptor);
+        SetMetadata('cache:tags', tags)(proto, method, methodDescriptor);
+        UseInterceptors(CacheableInterceptor)(proto, method, methodDescriptor);
+      }
+    }
+
+    return classConstructor;
+  }) as DecoratorFunction & MethodDecoratorFunction;
 }

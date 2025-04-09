@@ -64,12 +64,26 @@ export class CacheableInterceptor implements NestInterceptor {
     const className = context.getClass().name;
 
     // Get cache metadata from method
-    const ttl = this.reflector.get<number>(CACHE_TTL_METADATA, context.getHandler());
-    const tags = this.reflector.get<string[]>(CACHE_TAGS_METADATA, context.getHandler());
+    const ttl = this.reflector.getAllAndOverride<number>(CACHE_TTL_METADATA, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    const tags = this.reflector.getAllAndOverride<string[]>(CACHE_TAGS_METADATA, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     // If no TTL is set, the method is not cacheable
     if (ttl === undefined) {
       return next.handle();
+    }
+
+    // Only cache GET requests
+    if (context.getType() === 'http') {
+      const request = context.switchToHttp().getRequest();
+      if (request.method !== 'GET') {
+        return next.handle();
+      }
     }
 
     // Get current tenant
@@ -92,7 +106,11 @@ export class CacheableInterceptor implements NestInterceptor {
 
     // Generate a cache key
     const args = context.getArgByIndex(0);
-    const cacheKey = this.generateCacheKey(className, methodName, Object.values(args || {}));
+    const cacheKey = this.generateCacheKey(
+      className,
+      methodName,
+      args ? [args] : []
+    );
 
     return of(true).pipe(
       // Try to get from cache first
