@@ -163,8 +163,8 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBearerAuth()
   @Post('logout')
-  async // @UseGuards(JwtAuthGuard) // Removed guard temporarily - needs review for security implications
-  logout(@CurrentUser() user: AuthenticatedUser, @Body() refreshTokenDto: RefreshTokenDto) {
+  // @UseGuards(JwtAuthGuard) // Removed guard temporarily - needs review for security implications
+  async logout(@CurrentUser() user: AuthenticatedUser, @Body() refreshTokenDto: RefreshTokenDto) {
     if (refreshTokenDto.refreshToken) {
       // Optional: Validate refresh token belongs to the user trying to log out if user context is available
       await this.refreshTokenService.revokeRefreshToken(refreshTokenDto.refreshToken);
