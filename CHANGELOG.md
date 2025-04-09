@@ -375,6 +375,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed incorrect year (2024 to 2025) in migration filename and class name to align with project timeline
 - German comments and error messages in test files translated to English for consistent code documentation
 - Positioned `async` keyword correctly in AuthController's logout method to fix integration test failures (2025-04-09)
+- Fixed GitHub strategy test by correcting mock implementation and assertions for user creation (2025-04-09)
 
 ## [0.1.0] - 2025-04-02
 
