@@ -1,5 +1,5 @@
 import { EntityManager } from '@mikro-orm/core';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Tenant } from '../../tenants/entities/tenant.entity';
 import { Role } from '../entities/role.entity';
@@ -190,5 +190,23 @@ export class UserService {
    */
   async validatePassword(plaintext: string, hashed: string): Promise<boolean> {
     return bcrypt.compare(plaintext, hashed);
+  }
+
+  /**
+   * Updates the MFA secret for a user
+   * @param userId - The ID of the user
+   * @param secret - The new MFA secret
+   * @param tenantId - The ID of the tenant
+   * @returns The updated user
+   */
+  async updateMfaSecret(userId: string, secret: string, tenantId: string): Promise<User> {
+    const user = await this.findById(userId, tenantId);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    user.mfaSecret = secret;
+    await this.em.persistAndFlush(user);
+    return user;
   }
 }

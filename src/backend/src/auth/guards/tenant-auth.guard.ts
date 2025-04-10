@@ -24,7 +24,7 @@ export class TenantAuthGuard extends JwtAuthGuard {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     const requestTenantId =
-      request.params.tenantId || request.query.tenantId || request.body.tenantId;
+      request.params?.tenantId || request.query?.tenantId || request.body?.tenantId;
 
     // If no tenant ID is specified in the request, allow access
     // The tenant will be determined from the user's token

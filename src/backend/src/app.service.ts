@@ -58,7 +58,7 @@ export class AppService {
       let version = 'PostgreSQL';
       let migrationStatus = { pending: 0, applied: 0 };
       let stats = { tables: 0, sequences: 0, schemas: 0 };
-      
+
       try {
         // Fetch PostgreSQL version
         const versionResult = await this.em.getConnection().execute('SELECT version()');
@@ -83,7 +83,7 @@ export class AppService {
             `Could not fetch migration data: ${e instanceof Error ? e.message : String(e)}`
           );
         }
-        
+
         migrationStatus = { pending, applied };
 
         // Get connection pool stats - Use a simplified approach with defaults

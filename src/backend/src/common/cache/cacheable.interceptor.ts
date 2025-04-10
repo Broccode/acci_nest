@@ -106,11 +106,7 @@ export class CacheableInterceptor implements NestInterceptor {
 
     // Generate a cache key
     const args = context.getArgByIndex(0);
-    const cacheKey = this.generateCacheKey(
-      className,
-      methodName,
-      args ? [args] : []
-    );
+    const cacheKey = this.generateCacheKey(className, methodName, args ? [args] : []);
 
     return of(true).pipe(
       // Try to get from cache first

@@ -16,7 +16,9 @@ type MethodDecoratorFunction = <T extends (...args: unknown[]) => unknown>(
   descriptor: TypedPropertyDescriptor<T>
 ) => TypedPropertyDescriptor<T>;
 
-export function Cacheable(options: CacheableOptions = {}): DecoratorFunction & MethodDecoratorFunction {
+export function Cacheable(
+  options: CacheableOptions = {}
+): DecoratorFunction & MethodDecoratorFunction {
   const ttl = options.ttl || 3600;
   const tags = options.tags || [];
 
@@ -36,8 +38,9 @@ export function Cacheable(options: CacheableOptions = {}): DecoratorFunction & M
     // Class decorator
     const classConstructor = target as Constructor;
     const proto = classConstructor.prototype;
-    const methods = Object.getOwnPropertyNames(proto)
-      .filter(prop => typeof proto[prop] === 'function' && prop !== 'constructor');
+    const methods = Object.getOwnPropertyNames(proto).filter(
+      (prop) => typeof proto[prop] === 'function' && prop !== 'constructor'
+    );
 
     for (const method of methods) {
       const methodDescriptor = Object.getOwnPropertyDescriptor(proto, method);

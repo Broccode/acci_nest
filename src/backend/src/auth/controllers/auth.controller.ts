@@ -296,7 +296,7 @@ export class AuthController {
   }
 
   /**
-   * Verify MFA token and enable MFA
+   * Verify MFA token
    *
    * @param user Current authenticated user
    * @param mfaDto MFA token
@@ -314,6 +314,8 @@ export class AuthController {
       throw new UnauthorizedException('Invalid MFA code');
     }
 
+    // MFA wird automatisch durch verifyToken aktiviert, wenn der Token gültig ist
+    // userService.updateMfaSecret wird nicht mehr benötigt
     return { success: true, message: 'MFA setup completed successfully' };
   }
 
@@ -344,7 +346,6 @@ export class AuthController {
    * LDAP/AD User login endpoint
    *
    * @param req Request object
-   * @param ldapLoginDto LDAP Login data
    * @returns Authentication response with tokens
    */
   @ApiOperation({ summary: 'LDAP/AD login' })
@@ -371,10 +372,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'LDAP Authentication failed' })
   @Post('ldap/login')
   @UseGuards(AuthGuard('ldap'))
-  async ldapLogin(
-    @Request() req: ExpressRequest & { user: AuthenticatedUser },
-    @Body() ldapLoginDto: LdapLoginDto
-  ) {
-    return this.authService.login(req.user, ldapLoginDto.mfaCode);
+  async ldapLogin(@Request() req: ExpressRequest & { user: AuthenticatedUser }) {
+    return this.authService.login(req.user);
   }
 }
