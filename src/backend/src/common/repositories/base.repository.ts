@@ -81,7 +81,10 @@ export abstract class BaseRepository<T extends BaseEntity> extends EntityReposit
   async updateAndSave(entity: T, data: Partial<T>): Promise<T> {
     // Bypass TypeScript checking for MikroORM internal types
     // @ts-expect-error - MikroORM expects specific entity data structure
-    this.assign(entity, data);
+    this.assign(entity, {
+      ...data,
+      updatedAt: new Date()
+    });
     await this.getEntityManager().persistAndFlush(entity);
     return entity;
   }

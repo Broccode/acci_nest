@@ -54,10 +54,15 @@ export class AppService {
         return defaultResponse;
       }
 
+      // Default-Werte für den Fall, dass Abfragen fehlschlagen
+      let version = 'PostgreSQL';
+      let migrationStatus = { pending: 0, applied: 0 };
+      let stats = { tables: 0, sequences: 0, schemas: 0 };
+      
       try {
         // Fetch PostgreSQL version
         const versionResult = await this.em.getConnection().execute('SELECT version()');
-        const version = versionResult[0]?.version || 'Unknown';
+        version = (versionResult[0]?.version || 'PostgreSQL').split(' ')[0];
 
         // Get migration status
         const migrationsTable = 'mikro_orm_migrations';
@@ -78,6 +83,8 @@ export class AppService {
             `Could not fetch migration data: ${e instanceof Error ? e.message : String(e)}`
           );
         }
+        
+        migrationStatus = { pending, applied };
 
         // Get connection pool stats - Use a simplified approach with defaults
         // as the internal pool structure can vary between drivers
@@ -95,19 +102,27 @@ export class AppService {
             (SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name NOT IN ('pg_catalog', 'information_schema')) as schemas
         `;
 
-        const statsResult = await this.em.getConnection().execute(statsQuery);
-        const stats = statsResult[0] || { tables: 0, sequences: 0, schemas: 0 };
+        try {
+          const statsResult = await this.em.getConnection().execute(statsQuery);
+          stats = {
+            tables: parseInt(statsResult[0]?.tables || '0', 10),
+            sequences: parseInt(statsResult[0]?.sequences || '0', 10),
+            schemas: parseInt(statsResult[0]?.schemas || '0', 10),
+          };
+        } catch (error) {
+          this.logger.error('Error retrieving database stats', {
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+          });
+          // Benutze die Default-Werte für stats
+        }
 
         return {
           connected,
-          version: version.split(' ')[0] || version,
-          migrationStatus: { pending, applied },
+          version,
+          migrationStatus,
           connectionPool,
-          stats: {
-            tables: parseInt(stats.tables, 10),
-            sequences: parseInt(stats.sequences, 10),
-            schemas: parseInt(stats.schemas, 10),
-          },
+          stats,
         };
       } catch (error) {
         this.logger.error('Error retrieving database details during health check', {
@@ -115,8 +130,11 @@ export class AppService {
           stack: error instanceof Error ? error.stack : undefined,
         });
         return {
-          ...defaultResponse,
-          connected, // We know the connection succeeded even if the details failed
+          connected: true, // We know the connection succeeded even if the details failed
+          version,
+          migrationStatus,
+          connectionPool: { used: 0, size: 10, waiting: 0 },
+          stats,
         };
       }
     } catch (error) {
