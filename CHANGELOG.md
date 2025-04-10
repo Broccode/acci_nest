@@ -429,6 +429,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed Local strategy test implementation with proper mock handling and validation assertions (2025-04-09)
 - Fixed Google OAuth strategy test with correct profile data handling and tenant validation (2025-04-09)
 - Implemented comprehensive LDAP strategy unit tests with proper mock handling and edge cases (2025-04-09)
+- **Authentication System Improvements** (2025-04-10)
+  - Added null/undefined checks in TenantAuthGuard to prevent runtime errors
+  - Updated AuthController's LDAP login method to remove unnecessary parameters
+  - Fixed MFA verification flow in AuthController
+  - Added proper error handling for edge cases in BaseRepository
+  - Extended test coverage for repository methods with edge case handling
+  - Added updateMfaSecret method to UserService for better MFA support
+  - Improved code formatting and indentation in auth-related components
 
 ## [0.1.0] - 2025-04-02
 
