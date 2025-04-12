@@ -1,4 +1,4 @@
-# Epic-2 - Story-6
+# Epic-2 - Story-2
 
 User and Role Management - Core Entities
 
