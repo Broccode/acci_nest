@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Created comprehensive test suite for user management components
   - Added test utilities for MikroORM entity testing
   - Added Testcontainers integration documentation for realistic infrastructure testing
+  - Added test utilities for common testing patterns
+  - Added Task-5 story detailing the Proof of Concept for Suites testing framework integration (2025-04-12)
 
 - **Testing Framework Enhancement** (2025-04-10)
   - **Jest Configuration Improvements**
@@ -444,6 +446,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Extended test coverage for repository methods with edge case handling
   - Added updateMfaSecret method to UserService for better MFA support
   - Improved code formatting and indentation in auth-related components
+- Fixed TypeScript errors in RedisMock tests by ensuring correct type casting and string conversion (2025-04-12)
 
 ## [0.1.0] - 2025-04-02
 

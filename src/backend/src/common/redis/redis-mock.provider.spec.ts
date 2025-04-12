@@ -134,13 +134,13 @@ describe('RedisMock', () => {
       
       // Act - First request under limit
       const result = await redisMock.eval(
-        'rate_limit_script', 1, key, points, duration, now
+        'rate_limit_script', 1, key, String(points), String(duration), String(now)
       );
       
       // Assert
       // Test stellt sicher, dass das Skript ausgeführt wird und ein Array zurückgibt
       expect(Array.isArray(result)).toBe(true);
-      expect(result.length).toBe(2);
+      expect((result as string[]).length).toBe(2);
       
       // Die genauen Werte hängen von der Implementierung ab - wir überprüfen, dass sie String-Zahlen sind
       expect(result[0]).toMatch(/^\d+$/);
