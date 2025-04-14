@@ -93,7 +93,7 @@
     "@biomejs/biome": "1.4.1",
     "@golevelup/ts-jest": "^0.6.2",
     "@nestjs/cli": "11.0.6",
-    "@nestjs/schematics": "11.0.3",
+    "@nestjs/schematics": "11.0.5",
     "@nestjs/testing": "11.0.13",
     "@suites/di.nestjs": "^3.0.1",
     "@suites/doubles.jest": "^3.0.1",
