@@ -8,7 +8,7 @@ PoC: Integrate Suites Testing Framework for Auth Module
 
 ## Status
 
-In Progress
+Completed
 
 ## Context
 
